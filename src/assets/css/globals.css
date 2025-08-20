@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* MatterSQ */
+@font-face {
+  font-family: 'MatterSQ-Bold';
+  src: url('../font/MatterSQ/MatterSQ-Bold.ttf');
+}
+
+@font-face {
+  font-family: 'MatterSQ-Light';
+  src: url('../font/MatterSQ/MatterSQ-Light.ttf');
+}
+@font-face {
+  font-family: 'MatterSQ-Medium';
+  src: url('../font/MatterSQ/MatterSQ-Medium.ttf');
+}
+
+@font-face {
+  font-family: 'MatterSQ-Regular';
+  src: url('../font/MatterSQ/MatterSQ-Regular.ttf');
+}
+
+@font-face {
+  font-family: 'MatterSQ-SemiBold';
+  src: url('../font/MatterSQ/MatterSQ-SemiBold.ttf');
+}
+
+@font-face {
+  font-family: 'Faculty-Glyphic';
+  src: url('../font/facultyglyphic/facultyglyphic-regular.otf');
+}
+
+
+@font-face {
+  font-family: 'Fusion-Pixel';
+  src: url('../font/fusion-pixel/fusion-pixel.ttf');
+}
+
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --fontfamily: 'MatterSQ-Regular'
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+/* 全局字体设置 */
+* {
+  font-family: 'MatterSQ-Regular', sans-serif;
+}
+
+html,body {
+  /* background: var(--background); */
+  color: var(--foreground);
+  background-color: var(--background);
+  font-family: 'MatterSQ-Regular', sans-serif;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scroll-behavior: smooth;
+}
+
+/* Webkit */
+body::-webkit-scrollbar {
+  display: none;
+}
+
+
