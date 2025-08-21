@@ -4,16 +4,18 @@ import { Provider } from "@/providers";
 import "@/assets/css/globals.css";
 import "@radix-ui/themes/styles.css";
 
+import "@solvprotocol/ui-v2/dist/assets/style.css";
+
 export const metadata: Metadata = {
   title: "Solv App",
   description: "Solv App - The Future of Bitcoin Finance",
   icons: {
-    icon: "/favicon.ico"
-  }
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
-  children
+  children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {

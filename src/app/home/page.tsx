@@ -5,8 +5,8 @@ import Demo from "./components/demo";
 const Home = () => {
   return (
     <div className="text-xl">
-      <Demo />
       Home
+      <Demo />
     </div>
   );
 };
