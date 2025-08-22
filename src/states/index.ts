@@ -1,4 +1,5 @@
 import { create } from "zustand";
+export * from './wallet-store';
 
 import useSolvBtcStore from "./solvbtc";
 
@@ -13,3 +14,12 @@ const useStore = create<Store>((set) => ({
 }));
 
 export { useSolvBtcStore, useStore };
+
+// Re-export commonly used hooks and utilities
+export {
+  useWalletStore,
+  startAutoRefresh,
+  stopAutoRefresh,
+  type WalletState,
+  type WalletActions,
+} from './wallet-store';

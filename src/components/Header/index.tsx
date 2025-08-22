@@ -6,6 +6,7 @@ import { useTheme } from "next-themes";
 import Image from "next/image";
 
 import { useSolvBtcStore } from "@/states";
+import { WalletConnector } from "@/components/WalletConnector";
 import solvLogoDark from "@/assets/images/solv-logo-dark.svg";
 import solvLogoLight from "@/assets/images/solv-logo-light.svg";
 
@@ -42,7 +43,7 @@ const Header = ({ className }: { className?: string }) => {
             )}
           </div>
         </div>
-
+        <WalletConnector />
         <div className="flex items-center gap-2">
           <div
             className="cursor-pointer border border-solid border-gray-500 rounded-full p-1"

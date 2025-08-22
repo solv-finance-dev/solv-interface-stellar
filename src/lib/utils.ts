@@ -12,6 +12,33 @@ interface BeautyAmountProps {
   needBillion?: boolean;
 }
 
+
+// 复制到剪贴板
+export async function copyToClipboard(text: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } else {
+      // 降级方案
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      const result = document.execCommand('copy');
+      textArea.remove();
+      return result;
+    }
+  } catch (error) {
+    console.error('Failed to copy to clipboard:', error);
+    return false;
+  }
+}
+
 export function isEmpty(value: string | number | boolean) {
   return (value ?? "") === "";
 }
@@ -345,14 +372,14 @@ export function comparisonDate(
     isGreaterThan(endTime, getCurrentTimestamp());
   const closed =
     maturityDate &&
-    isGreaterThanOrEqualTo(getCurrentTimestamp(), endTime) &&
-    isGreaterThan(getCurrentTimestamp(), maturityDate)
+      isGreaterThanOrEqualTo(getCurrentTimestamp(), endTime) &&
+      isGreaterThan(getCurrentTimestamp(), maturityDate)
       ? true
       : false;
   const fundraising =
     maturityDate &&
-    isGreaterThanOrEqualTo(getCurrentTimestamp(), endTime) &&
-    isGreaterThan(maturityDate, getCurrentTimestamp())
+      isGreaterThanOrEqualTo(getCurrentTimestamp(), endTime) &&
+      isGreaterThan(maturityDate, getCurrentTimestamp())
       ? true
       : false;
 
@@ -586,7 +613,7 @@ export const fixedDecimals = (
   options?: { fixed?: number; isFixed?: boolean; mantissa?: boolean }
 ) => {
   const fixed =
-      (options?.fixed ?? 0) != 0 ? options?.fixed || 4 : options?.fixed || 4,
+    (options?.fixed ?? 0) != 0 ? options?.fixed || 4 : options?.fixed || 4,
     isFixed = options?.isFixed != undefined ? options.isFixed : true,
     mantissa = options?.mantissa || false;
 
@@ -690,8 +717,8 @@ export function beautyAmount(
         resLastLen < 2
           ? new BigNumber(res).toFixed(2, 1)
           : resLastLen == 3 || resLastLen == 5
-          ? new BigNumber(res).toFixed(resLastLen + 1, 1)
-          : res;
+            ? new BigNumber(res).toFixed(resLastLen + 1, 1)
+            : res;
     }
   } else {
     res = !res.includes(".") ? new BigNumber(res).toFixed(2, 1) : res;
