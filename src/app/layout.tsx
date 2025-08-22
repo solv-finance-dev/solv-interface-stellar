@@ -5,6 +5,7 @@ import "@/assets/css/globals.css";
 import "@radix-ui/themes/styles.css";
 
 import "@solvprotocol/ui-v2/dist/assets/style.css";
+import Header from "@/components/Header";
 
 export const metadata: Metadata = {
   title: "Solv App",
@@ -22,7 +23,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Provider>{children}</Provider>
+        <Provider>
+          <Header></Header>
+          {children}
+        </Provider>
       </body>
     </html>
   );
