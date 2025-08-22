@@ -7,7 +7,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogDescription,
-} from '../Dialog';
+} from '@/components/Dialog';
 import cn from 'classnames'
 
 interface WalletModalProps {
