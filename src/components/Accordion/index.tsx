@@ -3,7 +3,12 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 import { SolvInfo } from "@/types/API";
-import * as Accordion from "@radix-ui/react-accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from "@solvprotocol/ui-v2";
 
 interface DynamicAccordionProps {
   data: SolvInfo[];
@@ -21,27 +26,16 @@ const DynamicAccordion: React.FC<DynamicAccordionProps> = ({
   }, [defaultValue]);
 
   return (
-    <Accordion.Root
+    <Accordion
       type="multiple"
       className="w-full overflow-hidden"
       value={value}
       onValueChange={setValue}
     >
       {data.map((item) => (
-        <Accordion.Item key={item.title} value={item.title} className="">
-          <Accordion.Header>
-            <Accordion.Trigger
-              className="w-full px-4 py-3 text-left text-base font-medium text-[14px] 
-                flex justify-between items-center
-                data-[state=open]:after:content-['−'] data-[state=closed]:after:content-['+']"
-            >
-              {item.title}
-            </Accordion.Trigger>
-          </Accordion.Header>
-          <Accordion.Content
-            className="px-4 overflow-hidden text-[12px]
-              data-[state=open]:animate-slideDown data-[state=closed]:animate-slideUp"
-          >
+        <AccordionItem key={item.title} value={item.title} className="">
+          <AccordionTrigger className="text-xl">{item.title}</AccordionTrigger>
+          <AccordionContent>
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
@@ -52,10 +46,10 @@ const DynamicAccordion: React.FC<DynamicAccordionProps> = ({
             >
               {item.content}
             </ReactMarkdown>
-          </Accordion.Content>
-        </Accordion.Item>
+          </AccordionContent>
+        </AccordionItem>
       ))}
-    </Accordion.Root>
+    </Accordion>
   );
 };
 

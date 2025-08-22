@@ -4,8 +4,6 @@ import { persist } from "zustand/middleware";
 import { persistConfig } from "./config";
 
 interface useSolvBtcStore {
-  mode: string;
-  setMode: (mode: string) => void;
   navOpen: boolean;
   setNavOpen: (navOpen: boolean) => void;
 }
@@ -13,8 +11,6 @@ interface useSolvBtcStore {
 const useSolvBtcStore = create<useSolvBtcStore>()(
   persist(
     (set) => ({
-      mode: "dark",
-      setMode: (mode: string) => set({ mode }),
       navOpen: false,
       setNavOpen: (navOpen: boolean) => set({ navOpen })
     }),

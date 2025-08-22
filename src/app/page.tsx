@@ -1,7 +1,7 @@
 "use client";
 
-import { redirect } from "next/navigation";
+import { Card } from "@solvprotocol/ui-v2";
 
 export default function Home() {
-  redirect("/solvbtc");
+  return <Card>321321321</Card>;
 }

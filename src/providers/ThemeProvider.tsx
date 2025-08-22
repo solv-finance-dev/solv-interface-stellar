@@ -1,18 +1,13 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ThemeProviderProps } from "next-themes";
+import dynamic from "next/dynamic";
 
-import { useSolvBtcStore } from "@/states";
-import { Theme } from "@radix-ui/themes";
+const NextThemesProvider = dynamic(
+  () => import("next-themes").then((mod) => mod.ThemeProvider),
+  { ssr: false }
+);
 
-function ThemeProvider({ children }: { children: ReactNode }) {
-  const { mode } = useSolvBtcStore();
-
-  return (
-    <Theme appearance={mode as "light" | "dark" | "inherit" | undefined}>
-      {children}
-    </Theme>
-  );
+export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
+  return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
 }
-
-export default ThemeProvider;

@@ -5,9 +5,8 @@ import FAQ from "@/components/FAQ";
 
 const SolvBtcPage = () => {
   return (
-    <div className="pb-10">
+    <div>
       <Banner />
-
       <FAQ />
     </div>
   );
