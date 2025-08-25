@@ -40,7 +40,7 @@ const Header = ({ className }: { className?: string }) => {
     >
       <header className="flex items-center justify-between w-full lg:h-[4.5rem] ">
         <div
-          className="lg:flex items-center  w-[16.25rem] h-[2.75rem] rounded-full box-border px-[.75rem] hidden"
+          className="lg:flex items-center h-[2.75rem] rounded-full box-border px-[.75rem] hidden"
           onClick={() => {
             window.open("https://solv.finance", "_blank");
           }}
