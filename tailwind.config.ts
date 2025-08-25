@@ -13,7 +13,7 @@ const config = {
         grayColor: "#a5a5a5",
         primaryColor: "#BDC4FB",
         secondaryColor: "#bdc4fd",
-        
+        surfaces: "var(--surfaces)",
         border: "hsl(var(--solv-border))",
         textColor: "hsl(var(--solv-text))",
         textActiveColor: "hsl(var(--solv-active-text))",

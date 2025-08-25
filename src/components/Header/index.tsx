@@ -35,7 +35,7 @@ const Header = ({ className }: { className?: string }) => {
     <div
       className={classNames(
         className,
-        "fixed top-0 left-0 right-0 w-full z-50 h-[3.125rem] flex items-center px-4 lg:h-[6.5rem] overflow-hidden"
+        "fixed top-0 left-0 right-0 w-full z-50 h-[4.75rem] flex items-center px-4 lg:h-[6.5rem] overflow-hidden lg:bg-transparent backdrop-blur-md "
       )}
     >
       <header className="flex items-center justify-between w-full lg:h-[4.5rem] ">

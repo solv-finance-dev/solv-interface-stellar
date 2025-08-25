@@ -6,7 +6,12 @@ import FAQ from "@/components/FAQ";
 const SolvBtcPage = () => {
   return (
     <div>
-      <Banner />
+      <Banner
+        title="SolvBTC"
+        subTitle="on Solana"
+        description="A Bitcoin Reserve for Everyone"
+        showBg={true}
+      />
       <FAQ />
     </div>
   );
