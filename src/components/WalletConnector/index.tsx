@@ -14,6 +14,15 @@ interface WalletConnectorProps {
   showChainIcon?: boolean;
 }
 
+const UserAvatar = () => {
+  return (
+    <Avatar className="w-8 h-8 md:w-[44px] md:h-[44px]">
+      <AvatarImage src="https://github.com/shadcn.png" alt="chainIcon" />
+      <AvatarFallback>CN</AvatarFallback>
+    </Avatar>
+  );
+};
+
 export function WalletConnector({
   className,
   showChainIcon = true,
@@ -66,7 +75,6 @@ export function WalletConnector({
         >
           {isConnecting || isLoadingAccount ? "Connecting..." : "Connect Wallet"}
         </Button>
-
         <WalletModal open={isModalOpen} onOpenChange={setIsModalOpen} />
       </>
     );
@@ -77,21 +85,9 @@ export function WalletConnector({
     <div className={cn("relative", className)}>
       <Popover>
         <PopoverTrigger asChild>
-          <div className="flex items-center space-x-3 px-4 py-2 rounded-full transition-colors border ">
+          <div className="flex items-center space-x-3 px-4 py-2 rounded-full transition-colors border cursor-pointer">
             {/* chainIcon */}
-            {showChainIcon && (
-              <div
-                className={classNames(
-                  "h-8 w-8 md:h-[44px] md:w-[44px]",
-                  "rounded-full border-[1px] border-solid flex items-center justify-center"
-                )}
-              >
-                <Avatar>
-                  <AvatarImage src="https://github.com/shadcn.png" alt="chainIcon" />
-                  <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
-              </div>
-            )}
+            {showChainIcon && <UserAvatar />}
 
             {/* 地址 */}
             <span className="text-sm font-medium">
@@ -112,19 +108,7 @@ export function WalletConnector({
           <div className="p-4">
             <div className="flex items-center space-x-3">
               {/* chainIcon */}
-              {showChainIcon && (
-                <div
-                  className={classNames(
-                    "h-8 w-8 md:h-[44px] md:w-[44px]",
-                    "rounded-full border-[1px] border-solid flex items-center justify-center"
-                  )}
-                >
-                  <Avatar>
-                    <AvatarImage src="https://github.com/shadcn.png" alt="chainIcon" />
-                    <AvatarFallback>CN</AvatarFallback>
-                  </Avatar>
-                </div>
-              )}
+              {showChainIcon && <UserAvatar />}
 
               <div className="flex-1 min-w-0">
                 <h3 className="font-medium">
