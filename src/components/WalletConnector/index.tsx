@@ -1,5 +1,5 @@
 import cn from "classnames";
-import { Copy, User, LogOut, Briefcase, ChevronDown } from "lucide-react";
+import { Copy, LogOut, Briefcase, ChevronDown, Check } from "lucide-react";
 import React, { useState } from "react";
 
 import { useWalletStore } from "@/states";
@@ -7,49 +7,74 @@ import { WalletModal } from "@/components/WalletModal";
 import { copyToClipboard, otherAddressFormat } from "@/lib/utils";
 import classNames from "classnames";
 import { Avatar, AvatarFallback, AvatarImage } from "@solvprotocol/ui-v2";
+import { Button, Popover, PopoverContent, PopoverTrigger } from "@solvprotocol/ui-v2";
 
 interface WalletConnectorProps {
   className?: string;
   showChainIcon?: boolean;
 }
 
+const UserAvatar = () => {
+  return (
+    <Avatar className="w-8 h-8 md:w-[44px] md:h-[44px]">
+      <AvatarImage src="https://github.com/shadcn.png" alt="chainIcon" />
+      <AvatarFallback>CN</AvatarFallback>
+    </Avatar>
+  );
+};
+
 export function WalletConnector({
   className,
   showChainIcon = true,
 }: WalletConnectorProps) {
-  const { isConnected, isConnecting, connectedWallet, disconnectWallet } =
+  const { isConnected, isConnecting, isLoadingAccount, connectedWallet, disconnectWallet } =
     useWalletStore();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [copySuccess, setCopySuccess] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
+
+  // 复制钱包地址
+  const handleCopyAddress = async () => {
+    if (!connectedWallet) return;
+
+    try {
+      await copyToClipboard(connectedWallet.publicKey);
+      setIsCopied(true);
+      // 2秒后重置复制状态
+      setTimeout(() => {
+        setIsCopied(false);
+      }, 2000);
+    } catch (error) {
+      console.error("Failed to copy address:", error);
+    }
+  };
 
   // 断开钱包连接
   const handleDisconnect = async () => {
     try {
       await disconnectWallet();
-      setIsDropdownOpen(false);
     } catch (error) {
       console.error("Failed to disconnect wallet:", error);
     }
   };
 
   // 如果没有连接钱包，显示连接按钮
-  if (!isConnected || !connectedWallet) {
+  if (!isConnected || !connectedWallet || isLoadingAccount || isConnecting) {
     return (
       <>
-        <button
+        <Button
           onClick={() => setIsModalOpen(true)}
-          disabled={isConnecting}
+          variant="outline"
+          size="lg"
+          disabled={isConnecting || isLoadingAccount}
           className={cn(
             "px-4 py-2 bg-gray-400/10 text-textColor hover:opacity-90 transition-all font-medium text-sm rounded-full border-border border border-solid",
             "disabled:opacity-50 disabled:cursor-not-allowed",
             className
           )}
         >
-          {isConnecting ? "Connecting..." : "Connect Wallet"}
-        </button>
-
+          {isConnecting || isLoadingAccount ? "Connecting..." : "Connect Wallet"}
+        </Button>
         <WalletModal open={isModalOpen} onOpenChange={setIsModalOpen} />
       </>
     );
@@ -58,121 +83,82 @@ export function WalletConnector({
   // 已连接钱包，显示钱包信息下拉菜单
   return (
     <div className={cn("relative", className)}>
-      {/* chainIcon */}
-      {showChainIcon && (
-        <div
-          className={classNames(
-            "h-8 w-8 md:h-[44px] md:w-[44px]",
-            "rounded-full border-[1px] border-solid flex items-center justify-center"
-          )}
+      <Popover>
+        <PopoverTrigger asChild>
+          <div className="flex items-center space-x-3 px-4 py-2 rounded-full transition-colors border cursor-pointer">
+            {/* chainIcon */}
+            {showChainIcon && <UserAvatar />}
+
+            {/* 地址 */}
+            <span className="text-sm font-medium">
+              {otherAddressFormat(connectedWallet.publicKey)}
+            </span>
+
+            {/* 下拉箭头 */}
+            <ChevronDown className="w-4 h-4 transition-transform" />
+          </div>
+        </PopoverTrigger>
+
+        <PopoverContent
+          className="p-0 border rounded-xl shadow-xl overflow-hidden"
+          align="end"
+          sideOffset={8}
         >
-          <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" alt="chainIcon" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-        </div>
-      )}
-      {/* 钱包信息按钮 */}
-      <button
-        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-        className="flex items-center space-x-2 px-3 py-2 bg-secondary/80 hover:bg-secondary rounded-lg transition-colors border border-border/50"
-      >
-        {/* 头像 */}
-        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-          <User className="w-4 h-4 text-white" />
-        </div>
-
-        {/* 地址 */}
-        <span className="text-sm font-medium text-foreground">
-          {otherAddressFormat(connectedWallet.publicKey)}
-        </span>
-
-        {/* 下拉箭头 */}
-        <ChevronDown
-          className={cn(
-            "w-4 h-4 text-muted-foreground transition-transform",
-            isDropdownOpen && "rotate-180"
-          )}
-        />
-      </button>
-
-      {/* 下拉菜单 */}
-      {isDropdownOpen && (
-        <div className="absolute top-full right-0 mt-2 w-64 bg-background border border-border rounded-lg shadow-lg overflow-hidden z-50">
           {/* 钱包信息头部 */}
-          <div className="p-4 border-b border-border">
+          <div className="p-4">
             <div className="flex items-center space-x-3">
-              {/* 大头像 */}
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                <User className="w-6 h-6 text-white" />
-              </div>
+              {/* chainIcon */}
+              {showChainIcon && <UserAvatar />}
 
               <div className="flex-1 min-w-0">
-                <h3 className="font-medium text-foreground">
+                <h3 className="font-medium">
                   {otherAddressFormat(connectedWallet.publicKey)}
                 </h3>
                 <div className="flex items-center space-x-2 mt-1">
-                  <p className="text-xs text-muted-foreground font-mono truncate">
+                  <p className="text-xs font-mono truncate">
                     {otherAddressFormat(connectedWallet.publicKey)}
                   </p>
-                  <button
-                    onClick={() => copyToClipboard(connectedWallet.publicKey)}
-                    className={cn(
-                      "p-1 rounded hover:bg-muted transition-colors",
-                      copySuccess && "text-green-500"
-                    )}
-                    title="Copy address"
+                  <div
+                    onClick={handleCopyAddress}
+                    className="p-1 rounded cursor-pointer"
+                    title={isCopied ? "Copied!" : "Copy address"}
                   >
-                    <Copy className="w-3 h-3" />
-                  </button>
+                    {isCopied ? (
+                      <Check className="w-3 h-3 text-green-500" />
+                    ) : (
+                      <Copy className="w-3 h-3" />
+                    )}
+                  </div>
                 </div>
-                {copySuccess && (
-                  <p className="text-xs text-green-500 mt-1">Copied!</p>
-                )}
               </div>
             </div>
 
             {/* 网络标识 */}
             <div className="mt-3 flex items-center space-x-2">
-              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-              <span className="text-xs text-muted-foreground">Stellar</span>
+              <div className="w-2 h-2 rounded-full bg-green-500"></div>
+              <span className="text-xs">Stellar</span>
+            </div>
+
+            <div className="py-2 space-y-1">
+              <div
+                className="w-full flex cursor-pointer items-center space-x-3 py-3  transition-colors text-left"
+              >
+                <Briefcase className="w-4 h-4" />
+                <span className="text-sm">My Portfolio</span>
+              </div>
+
+              {/* Disconnect */}
+              <div
+                onClick={handleDisconnect}
+                className="w-full flex cursor-pointer items-center space-x-3 py-3 transition-colors text-left"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="text-sm">Disconnect</span>
+              </div>
             </div>
           </div>
-
-          {/* 菜单选项 */}
-          <div className="py-2">
-            {/* My Portfolio */}
-            <button
-              onClick={() => {
-                setIsDropdownOpen(false);
-                // 这里可以添加导航到 portfolio 页面的逻辑
-                console.log("Navigate to portfolio");
-              }}
-              className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-muted transition-colors text-left"
-            >
-              <Briefcase className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm text-foreground">My Portfolio</span>
-            </button>
-
-            {/* Disconnect */}
-            <button
-              onClick={handleDisconnect}
-              className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-muted transition-colors text-left"
-            >
-              <LogOut className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm text-foreground">Disconnect</span>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* 点击外部关闭下拉菜单 */}
-      {isDropdownOpen && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={() => setIsDropdownOpen(false)}
-        />
-      )}
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }
