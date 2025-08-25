@@ -2,6 +2,7 @@
 
 import Banner from "@/components/Banner";
 import FAQ from "@/components/FAQ";
+import SolvBtc from "./components";
 
 const SolvBtcPage = () => {
   return (
@@ -12,6 +13,9 @@ const SolvBtcPage = () => {
         description="A Bitcoin Reserve for Everyone"
         showBg={true}
       />
+
+      <SolvBtc />
+
       <FAQ />
     </div>
   );

@@ -78,18 +78,18 @@ const Header = ({ className }: { className?: string }) => {
 
         <MeunPc menuList={menuList} />
 
-        <div className="flex items-center gap-[1rem]">
+        <div className="flex items-center md:gap-4 gap-2">
           <WalletConnector />
 
           <div className="flex items-center justify-center">
             <div
-              className="cursor-pointer border border-solid rounded-full p-[.375rem] border-border bg-gray-400/10"
+              className="cursor-pointer border border-solid rounded-full md:p-[.375rem] border-border bg-gray-400/10 w-8 h-8 flex justify-center items-center lg:w-[2.75rem] lg:h-[2.75rem]"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             >
               {theme == "dark" ? (
-                <SunIcon width={24} height={24} color="#fff" />
+                <SunIcon className="lg:w-[1.5rem] w-[1.125rem] h-[1.125rem] lg:h-[1.5rem] text-textColor" />
               ) : (
-                <MoonIcon width={24} height={24} color="black" />
+                <MoonIcon className="lg:w-[1.5rem] w-[1.125rem] h-[1.125rem] lg:h-[1.5rem] text-textColor" />
               )}
             </div>
           </div>
