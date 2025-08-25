@@ -5,12 +5,18 @@ import React, { useState } from "react";
 import { useWalletStore } from "@/states";
 import { WalletModal } from "@/components/WalletModal";
 import { copyToClipboard, otherAddressFormat } from "@/lib/utils";
+import classNames from "classnames";
+import { Avatar, AvatarFallback, AvatarImage } from "@solvprotocol/ui-v2";
 
 interface WalletConnectorProps {
   className?: string;
+  showChainIcon?: boolean;
 }
 
-export function WalletConnector({ className }: WalletConnectorProps) {
+export function WalletConnector({
+  className,
+  showChainIcon = true,
+}: WalletConnectorProps) {
   const { isConnected, isConnecting, connectedWallet, disconnectWallet } =
     useWalletStore();
 
@@ -36,7 +42,7 @@ export function WalletConnector({ className }: WalletConnectorProps) {
           onClick={() => setIsModalOpen(true)}
           disabled={isConnecting}
           className={cn(
-            "px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm",
+            "px-4 py-2 bg-gray-400/10 text-textColor hover:opacity-90 transition-all font-medium text-sm rounded-full border-border border border-solid",
             "disabled:opacity-50 disabled:cursor-not-allowed",
             className
           )}
@@ -52,6 +58,20 @@ export function WalletConnector({ className }: WalletConnectorProps) {
   // 已连接钱包，显示钱包信息下拉菜单
   return (
     <div className={cn("relative", className)}>
+      {/* chainIcon */}
+      {showChainIcon && (
+        <div
+          className={classNames(
+            "h-8 w-8 md:h-[44px] md:w-[44px]",
+            "rounded-full border-[1px] border-solid flex items-center justify-center"
+          )}
+        >
+          <Avatar>
+            <AvatarImage src="https://github.com/shadcn.png" alt="chainIcon" />
+            <AvatarFallback>CN</AvatarFallback>
+          </Avatar>
+        </div>
+      )}
       {/* 钱包信息按钮 */}
       <button
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
