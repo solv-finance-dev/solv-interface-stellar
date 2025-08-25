@@ -5,7 +5,6 @@ import React, { useState } from "react";
 import { useWalletStore } from "@/states";
 import { WalletModal } from "@/components/WalletModal";
 import { copyToClipboard, otherAddressFormat } from "@/lib/utils";
-import classNames from "classnames";
 import { Avatar, AvatarFallback, AvatarImage } from "@solvprotocol/ui-v2";
 import { Button, Popover, PopoverContent, PopoverTrigger } from "@solvprotocol/ui-v2";
 
@@ -14,12 +13,25 @@ interface WalletConnectorProps {
   showChainIcon?: boolean;
 }
 
-const UserAvatar = () => {
+const ImageAvatar = ({ src, alt, className }: { src: string; alt: string; className?: string }) => {
   return (
-    <Avatar className="w-8 h-8 md:w-[44px] md:h-[44px]">
-      <AvatarImage src="https://github.com/shadcn.png" alt="chainIcon" />
+    <Avatar className={cn(className)}>
+      <AvatarImage src={src} alt={alt} />
       <AvatarFallback>CN</AvatarFallback>
     </Avatar>
+  );
+};
+
+const ChainIcon = () => {
+  return (
+    <div
+      className={cn(
+        "h-8 w-8 md:h-[44px] md:w-[44px]",
+        "rounded-full border-[1px] border-solid flex items-center justify-center"
+      )}
+    >
+      <ImageAvatar src="https://s2.coinmarketcap.com/static/img/coins/200x200/512.png" alt="Stellar" />
+    </div>
   );
 };
 
@@ -62,6 +74,7 @@ export function WalletConnector({
   if (!isConnected || !connectedWallet || isLoadingAccount || isConnecting) {
     return (
       <>
+        {showChainIcon && <ChainIcon />}
         <Button
           onClick={() => setIsModalOpen(true)}
           variant="outline"
@@ -82,19 +95,15 @@ export function WalletConnector({
 
   // 已连接钱包，显示钱包信息下拉菜单
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn("relative flex items-center space-x-3", className)}>
+      {showChainIcon && <ChainIcon />}
       <Popover>
         <PopoverTrigger asChild>
           <div className="flex items-center space-x-3 px-4 py-2 rounded-full transition-colors border cursor-pointer">
-            {/* chainIcon */}
-            {showChainIcon && <UserAvatar />}
-
-            {/* 地址 */}
+            <ImageAvatar src="https://avatar.sft-api.com/avatar/28.png" alt="User Avatar" />
             <span className="text-sm font-medium">
               {otherAddressFormat(connectedWallet.publicKey)}
             </span>
-
-            {/* 下拉箭头 */}
             <ChevronDown className="w-4 h-4 transition-transform" />
           </div>
         </PopoverTrigger>
@@ -107,9 +116,7 @@ export function WalletConnector({
           {/* 钱包信息头部 */}
           <div className="p-4">
             <div className="flex items-center space-x-3">
-              {/* chainIcon */}
-              {showChainIcon && <UserAvatar />}
-
+              <ImageAvatar src="https://avatar.sft-api.com/avatar/28.png " alt="User Avatar" />
               <div className="flex-1 min-w-0">
                 <h3 className="font-medium">
                   {otherAddressFormat(connectedWallet.publicKey)}
