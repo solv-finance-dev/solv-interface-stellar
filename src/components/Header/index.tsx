@@ -78,12 +78,12 @@ const Header = ({ className }: { className?: string }) => {
 
         <MeunPc menuList={menuList} />
 
-        <div className="flex items-center md:gap-4 gap-2">
+        <div className="flex items-center lg:gap-4 gap-2">
           <WalletConnector />
 
           <div className="flex items-center justify-center">
             <div
-              className="cursor-pointer border border-solid rounded-full md:p-[.375rem] border-border bg-gray-400/10 w-8 h-8 flex justify-center items-center lg:w-[2.75rem] lg:h-[2.75rem]"
+              className="cursor-pointer border border-solid rounded-full lg:p-[.375rem] border-border bg-gray-400/10 w-8 h-8 flex justify-center items-center lg:w-[2.75rem] lg:h-[2.75rem]"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             >
               {theme == "dark" ? (
