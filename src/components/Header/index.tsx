@@ -23,7 +23,11 @@ export interface MenuItem {
 
 export const menuList: MenuItem[] = [
   { label: "SolvBTC", href: "/solvbtc", activeHref: ["/", "/solvbtc"] },
-  { label: "SolvBTC_JUP", href: "/solvbtc-jup", activeHref: ["/solvbtc-jup"] },
+  {
+    label: "SolvBTC_JUP",
+    href: "/solvbtc-jupiter",
+    activeHref: ["/solvbtc-jupiter"],
+  },
   { label: "My portfolio", href: "/portfolio", activeHref: ["/portfolio"] },
 ];
 
