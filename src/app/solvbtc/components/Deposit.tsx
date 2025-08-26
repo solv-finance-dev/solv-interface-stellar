@@ -70,16 +70,19 @@ export default function Deposit() {
         onSubmit={form.handleSubmit(onSubmit)}
         className="w-full space-y-6 flex flex-col"
       >
-        <div className="flex justify-between">
+        <div className="flex justify-between flex-col md:flex-row">
           <FormField
             control={form.control}
             name="deposit"
             render={({ field }) => (
-              <FormItem className="w-[45.4%] gap-[10px]">
+              <FormItem className="md:w-[45.4%] gap-[10px] w-full">
                 <FormLabel className="text-[.75rem] leading-[1rem] flex items-end justify-between">
                   <span>Deposit</span>
                   <div className="flex items-end text-[.875rem]">
-                    <span className="text-grayColor">Balance:</span>
+                    {/*  Sample code error : !text-errorColor */}
+                    <span className="text-grayColor mr-2 !text-errorColor">
+                      Balance:
+                    </span>
                     <div className="text-textColor"> 128.34 mBTC</div>
                   </div>
                 </FormLabel>
@@ -94,6 +97,7 @@ export default function Deposit() {
 
                     <InputComplex
                       className="h-[2.75rem]"
+                      error={true} // Sample code error
                       inputValue={field.value}
                       onInputChange={field.onChange}
                       inputProps={{
@@ -102,7 +106,7 @@ export default function Deposit() {
                           "h-[2.75rem] outline-none !border-none !ring-transparent",
                       }}
                       iSuffix={
-                        <div className="flex items-center h-full w-[9.3rem]">
+                        <div className="flex items-center h-full justify-end">
                           <div className="w-[2.875rem] h-[1.5rem] rounded-[4px] cursor-pointer text-brand-500 bg-brand-50 text-[.75rem] px-2 flex items-center justify-center ">
                             MAX
                           </div>
@@ -153,15 +157,15 @@ export default function Deposit() {
             )}
           />
 
-          <div className="pt-[2.125rem] px-[2.5rem] box-border">
-            <ArrowRight />
+          <div className="flex items-center justify-center px-[2.5rem] h-[2.75rem] md:mt-[1.625rem] box-border">
+            <ArrowRight className="w-4 h-4 rotate-90 md:w-6 md:h-6 md:rotate-0" />
           </div>
 
           <FormField
             control={form.control}
             name="receive"
             render={({ field }) => (
-              <FormItem className="w-[45.4%] gap-[10px]">
+              <FormItem className="md:w-[45.4%] gap-[10px] w-full">
                 <FormLabel className="text-[.75rem] leading-[1rem] flex items-center !gap-1">
                   You Will Receive
                   <TooltipComplex content={"tips"}></TooltipComplex>
@@ -182,7 +186,7 @@ export default function Deposit() {
                         "h-[2.75rem] outline-none !border-none !ring-transparent",
                     }}
                     iSuffix={
-                      <div className="flex items-center h-full">
+                      <div className="flex items-center h-full justify-end">
                         {" "}
                         <div className="flex items-center justify-between text-[1rem]">
                           <Avatar className="w-6 h-6 mr-[2px]">

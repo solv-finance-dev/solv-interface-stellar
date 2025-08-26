@@ -1,4 +1,5 @@
 import typography from "@tailwindcss/typography";
+import { error } from "console";
 
 const config = {
   content: [
@@ -17,6 +18,7 @@ const config = {
         border: "hsl(var(--solv-border))",
         textColor: "hsl(var(--solv-text))",
         textActiveColor: "hsl(var(--solv-active-text))",
+        errorColor: "hsl(var(--solv-alert-500))",
         brand: {
           DEFAULT: "#7667EB", // main
           50: "#D8E0FD",
