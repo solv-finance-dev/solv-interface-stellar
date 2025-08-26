@@ -6,7 +6,7 @@ import {
   TabsContent,
 } from "@solvprotocol/ui-v2";
 import Deposit from "./Deposit";
-import Withdraw from "./withdraw";
+import Withdraw from "./Withdraw";
 import Details from "./Details";
 
 interface TabItem {
