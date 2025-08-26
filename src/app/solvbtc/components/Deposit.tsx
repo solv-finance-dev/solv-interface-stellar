@@ -25,6 +25,7 @@ import {
 } from "@solvprotocol/ui-v2";
 import { ArrowRight } from "lucide-react";
 import { InputComplex } from "@/components/InputComplex";
+import { TooltipComplex } from "@/components/TooltipComplex";
 
 const FormSchema = z.object({
   deposit: z.string().min(2, {
@@ -75,8 +76,12 @@ export default function Deposit() {
             name="deposit"
             render={({ field }) => (
               <FormItem className="w-[45.4%] gap-[10px]">
-                <FormLabel className="text-[.75rem] leading-[1rem] ">
-                  Deposit
+                <FormLabel className="text-[.75rem] leading-[1rem] flex items-end justify-between">
+                  <span>Deposit</span>
+                  <div className="flex items-end text-[.875rem]">
+                    <span className="text-grayColor">Balance:</span>
+                    <div className="text-textColor"> 128.34 mBTC</div>
+                  </div>
                 </FormLabel>
 
                 <div className="flex items-center">
@@ -157,8 +162,9 @@ export default function Deposit() {
             name="receive"
             render={({ field }) => (
               <FormItem className="w-[45.4%] gap-[10px]">
-                <FormLabel className="text-[.75rem] leading-[1rem] ">
+                <FormLabel className="text-[.75rem] leading-[1rem] flex items-center !gap-1">
                   You Will Receive
+                  <TooltipComplex content={"tips"}></TooltipComplex>
                 </FormLabel>
                 <FormControl>
                   {/* <Input
