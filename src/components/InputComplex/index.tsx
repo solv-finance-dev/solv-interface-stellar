@@ -22,7 +22,6 @@ export interface InputSelectButtonProps
   disabled?: boolean;
 }
 
-/* ----------------- 组件实现 ----------------- */
 export const InputComplex = React.forwardRef<
   HTMLDivElement,
   InputSelectButtonProps
@@ -42,8 +41,8 @@ export const InputComplex = React.forwardRef<
     <div
       ref={ref}
       className={cn(
-        "flex w-full items-stretch rounded-md border border-input bg-transparent",
-        "transition-colors duration-150  pr-3",
+        "flex w-full items-stretch border border-input bg-transparent rounded-lg overflow-hidden",
+        "transition-colors duration-150 pr-3",
         "hover:border-brand-500",
         "active:border-brand-500",
         disabled && "cursor-not-allowed opacity-50",
@@ -60,7 +59,7 @@ export const InputComplex = React.forwardRef<
         className="min-w-0 flex-1 rounded-none rounded-l-md border-0 shadow-none focus-visible:ring-0 !bg-transparent !px-0  dark:!bg-transparent"
         {...inputProps}
       />
-      {iSuffix && <div className="flex-y-center h-full">{iSuffix}</div>}
+      {iSuffix && <div className="flex-y-center h-full ">{iSuffix}</div>}
     </div>
   );
 });

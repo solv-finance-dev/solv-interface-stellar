@@ -97,13 +97,13 @@ export default function Deposit() {
                           "h-[2.75rem] outline-none !border-none !ring-transparent",
                       }}
                       iSuffix={
-                        <div className="flex items-center h-full w-[10rem]">
+                        <div className="flex items-center h-full w-[9.3rem]">
                           <div className="w-[2.875rem] h-[1.5rem] rounded-[4px] cursor-pointer text-brand-500 bg-brand-50 text-[.75rem] px-2 flex items-center justify-center ">
                             MAX
                           </div>
 
                           <Select value={selected} onValueChange={setSelected}>
-                            <SelectTrigger className="w-[96px] outline-none focus-visible:ring-0 border-0 !pr-0 !pl-2">
+                            <SelectTrigger className="outline-none focus-visible:ring-0 border-0 !pr-0 !pl-2 !bg-transparent">
                               <div className="flex items-center justify-between text-[1rem]">
                                 <Avatar className="w-6 h-6 mr-[2px]">
                                   <AvatarImage
@@ -202,7 +202,7 @@ export default function Deposit() {
         <div className="flex justify-center items-end">
           <Button
             type="submit"
-            className="md:w-[25.625rem] w-full rounded-full bg-brand-500 hover:bg-brand-500/90"
+            className="md:w-[25.625rem] w-full rounded-full bg-brand-500 hover:bg-brand-500/90 text-white"
           >
             Select token
           </Button>
