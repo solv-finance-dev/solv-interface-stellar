@@ -15,17 +15,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
   toast,
 } from "@solvprotocol/ui-v2";
 import { ArrowRight } from "lucide-react";
 import { InputComplex } from "@/components/InputComplex";
-import { TooltipComplex } from "@/components/TooltipComplex";
 
 const FormSchema = z.object({
   deposit: z.string().min(2, {
@@ -45,11 +38,6 @@ export default function Withdraw() {
     },
   });
 
-  const [selected, setSelected] = useState("cbBTC");
-  const options = [
-    { label: "cbBTC", value: "cbBTC" },
-    { label: "FBTC", value: "FBTC" },
-  ];
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     toast(

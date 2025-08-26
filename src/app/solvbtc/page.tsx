@@ -9,7 +9,7 @@ const SolvBtcPage = () => {
     <div>
       <Banner
         title="SolvBTC"
-        subTitle="on Solana"
+        subTitle=" "
         description="A Bitcoin Reserve for Everyone"
         showBg={true}
       />

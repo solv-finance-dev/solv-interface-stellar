@@ -7,7 +7,7 @@ import {
   Accordion,
   AccordionContent,
   AccordionItem,
-  AccordionTrigger
+  AccordionTrigger,
 } from "@solvprotocol/ui-v2";
 
 interface DynamicAccordionProps {
@@ -17,7 +17,7 @@ interface DynamicAccordionProps {
 
 const DynamicAccordion: React.FC<DynamicAccordionProps> = ({
   data,
-  defaultValue
+  defaultValue,
 }) => {
   const [value, setValue] = useState<string[]>([]);
 
@@ -41,7 +41,9 @@ const DynamicAccordion: React.FC<DynamicAccordionProps> = ({
               components={{
                 a: ({ ...attrs }) => <a {...attrs} target="_blank"></a>,
                 ul: ({ ...attrs }) => <ul {...attrs} className="ml-4"></ul>,
-                li: ({ ...attrs }) => <li {...attrs} className="list-disc"></li>
+                li: ({ ...attrs }) => (
+                  <li {...attrs} className="list-disc"></li>
+                ),
               }}
             >
               {item.content}
