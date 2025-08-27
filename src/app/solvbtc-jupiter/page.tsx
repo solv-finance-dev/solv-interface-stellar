@@ -3,6 +3,7 @@
 import Banner from "@/components/Banner";
 import FAQ from "@/components/FAQ";
 import SolvBTCJupiter from "./components";
+import { solvJupFAQ } from "@/constants";
 
 const SolvBTCJupiterPage = () => {
   return (
@@ -16,7 +17,7 @@ const SolvBTCJupiterPage = () => {
 
       <SolvBTCJupiter />
 
-      <FAQ />
+      <FAQ faqData={solvJupFAQ} />
     </div>
   );
 };

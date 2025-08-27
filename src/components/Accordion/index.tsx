@@ -2,13 +2,17 @@ import React, { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-import { SolvInfo } from "@/types/API";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@solvprotocol/ui-v2";
+
+export interface SolvInfo {
+  title: string;
+  content: string;
+}
 
 interface DynamicAccordionProps {
   data: SolvInfo[];

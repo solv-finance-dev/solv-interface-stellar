@@ -16,11 +16,10 @@ export default function c({
       <span>
         <a
           href={url}
-          className="underline hover:text-primary"
+          className="underline hover:text-brand"
           target="_blank"
           rel="noreferrer"
         >
-          {/* {`0x9537...d185`} */}
           {value}
         </a>
       </span>

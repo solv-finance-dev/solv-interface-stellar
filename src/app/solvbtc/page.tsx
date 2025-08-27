@@ -3,6 +3,7 @@
 import Banner from "@/components/Banner";
 import FAQ from "@/components/FAQ";
 import SolvBtc from "./components";
+import { solvFAQ } from "@/constants";
 
 const SolvBtcPage = () => {
   return (
@@ -16,7 +17,7 @@ const SolvBtcPage = () => {
 
       <SolvBtc />
 
-      <FAQ />
+      <FAQ faqData={solvFAQ} />
     </div>
   );
 };
