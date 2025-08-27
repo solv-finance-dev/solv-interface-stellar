@@ -7,7 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@solvprotocol/ui-v2";
-import { Info } from "lucide-react";
+import { InfoIcon } from "@/assets/svg/svg";
 
 export interface TooltipComplexProps {
   content: React.ReactNode;
@@ -30,7 +30,7 @@ export function TooltipComplex({
         <TooltipTrigger asChild>
           <div className="flex justify-start items-center">
             {showIcon && (
-              <Info className="text-grayColor w-[.875rem] h-[.875rem]" />
+              <InfoIcon className="text-grayColor w-[.875rem] h-[.875rem]" />
             )}
             {children && <div>{children}</div>}
           </div>
