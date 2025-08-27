@@ -78,12 +78,6 @@ export const STELLAR_ASSETS = {
     // 可以添加更多资产
 };
 
-// 常用合约地址（如果有智能合约的话）
-export const STELLAR_CONTRACTS = {
-    // 示例合约地址
-    // EXAMPLE_CONTRACT: 'CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC',
-};
-
 // 网络配置
 export const NETWORK_CONFIG = {
     testnet: {

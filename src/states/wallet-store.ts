@@ -12,6 +12,7 @@ import { getStellarAPI } from '@/stellar';
 import { getCurrentStellarNetwork, getCurrentNetworkType } from '@/config/stellar';
 import { Horizon } from '@stellar/stellar-sdk';
 
+
 export interface WalletState {
     // 连接状态
     isConnected: boolean;
@@ -152,13 +153,6 @@ export const useWalletStore = create<WalletStore>()(
                     const stellarAPI = getStellarAPI();
                     const accountInfo = await stellarAPI.getAccount(connectedWallet.publicKey);
 
-                    const networkType = getCurrentNetworkType();
-                    console.log(`📊 Account loaded for ${networkType}:`, {
-                        publicKey: connectedWallet.publicKey,
-                        network: stellarAPI.isTestnet() ? 'Testnet' : 'Mainnet',
-                        horizonUrl: stellarAPI.getConfig().horizonUrl
-                    });
-
                     set({
                         accountInfo,
                         isLoadingAccount: false,
@@ -223,14 +217,12 @@ export const useWalletStore = create<WalletStore>()(
 
             initializeWallets: async () => {
                 const network = getCurrentStellarNetwork();
-                console.log(network)
                 const adapter = createWalletAdapter(network);
                 const availableWallets = await getAvailableWallets(adapter.getKit());
-                console.log(availableWallets)
                 set({ availableWallets, walletAdapter: adapter });
+
+
             },
-
-
 
             openWalletModal: async (onWalletSelected?: (walletType: WalletType) => void) => {
                 const { walletAdapter, connectWallet, setError } = get();

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 export * from './wallet-store';
+export * from './contract-store';
 
 import useSolvBtcStore from "./solvbtc";
 
@@ -23,3 +24,21 @@ export {
   type WalletState,
   type WalletActions,
 } from './wallet-store';
+
+// Re-export contract store hooks and utilities
+export {
+  useContractStore,
+  useContractClient,
+  useSolvBTCVaultClient,
+  useVaultClient,
+  ensureContractInitialized,
+  ensureClientInitialized,
+  getContractClients,
+  getContractClient,
+  setContractClient,
+  registerContractClientType,
+  type ContractState,
+  type ContractActions,
+  type ContractClientConfig,
+  type ContractClientConstructor,
+} from './contract-store';
