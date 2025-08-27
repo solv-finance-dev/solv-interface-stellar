@@ -1,17 +1,20 @@
 import cn from "classnames";
-import { Copy, LogOut, Briefcase, ChevronDown, Check } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import React, { useState } from "react";
 
 import { useWalletStore } from "@/states";
 import { WalletModal } from "@/components/WalletModal";
 import { copyToClipboard, otherAddressFormat } from "@/lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "@solvprotocol/ui-v2";
+
 import {
   Button,
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@solvprotocol/ui-v2";
+import { TokenIcon } from "../TokenIcon";
+import { CopyHelper } from "../CopyHelper";
+import { DisconnectIcon, MyPortfolioIcon } from "@/assets/svg/svg";
 
 interface WalletConnectorProps {
   className?: string;
@@ -28,19 +31,22 @@ const ImageAvatar = ({
   className?: string;
 }) => {
   return (
-    <Avatar className={cn("lg:h-6 lg:w-6 h-5 w-5", className)}>
-      <AvatarImage src={src} alt={alt} />
-      <AvatarFallback>CN</AvatarFallback>
-    </Avatar>
+    <TokenIcon
+      src={src}
+      alt={alt}
+      className={cn("lg:h-6 lg:w-6 h-5 w-5", className)}
+      fallback=" "
+    />
   );
 };
 
-const ChainIcon = () => {
+const ChainIcon = ({ className }: { className?: string }) => {
   return (
     <div
       className={cn(
         "h-8 w-8 lg:h-[2.75rem] lg:w-[2.75rem]",
-        "rounded-full border-[1px] border-solid flex items-center justify-center bg-gray-400/10 backdrop-blur-[5px] border-border"
+        "rounded-full border-[1px] border-solid flex items-center justify-center bg-gray-400/10 backdrop-blur-[5px] border-border",
+        className
       )}
     >
       <ImageAvatar
@@ -64,23 +70,6 @@ export function WalletConnector({
   } = useWalletStore();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isCopied, setIsCopied] = useState(false);
-
-  // 复制钱包地址
-  const handleCopyAddress = async () => {
-    if (!connectedWallet) return;
-
-    try {
-      await copyToClipboard(connectedWallet.publicKey);
-      setIsCopied(true);
-      // 2秒后重置复制状态
-      setTimeout(() => {
-        setIsCopied(false);
-      }, 2000);
-    } catch (error) {
-      console.error("Failed to copy address:", error);
-    }
-  };
 
   // 断开钱包连接
   const handleDisconnect = async () => {
@@ -140,59 +129,52 @@ export function WalletConnector({
         </PopoverTrigger>
 
         <PopoverContent
-          className="p-0 border rounded-xl shadow-xl overflow-hidden outline-none"
+          className="p-0 border-0 rounded-xl shadow-xl overflow-hidden outline-none"
           align="end"
           sideOffset={8}
         >
-          {/* 钱包信息头部 */}
-          <div className="p-4">
-            <div className="flex items-center space-x-3">
+          {/* user info */}
+          <div className="p-6">
+            <div className="flex items-center space-x-3 bg-">
               <ImageAvatar
                 src="https://avatar.sft-api.com/avatar/28.png "
                 alt="User Avatar"
+                className="!w-12 !h-12"
               />
-              <div className="flex-1 min-w-0">
-                <h3 className="font-medium">
-                  {otherAddressFormat(connectedWallet.publicKey)}
-                </h3>
-                <div className="flex items-center space-x-2 mt-1">
-                  <p className="text-xs font-mono truncate">
-                    {otherAddressFormat(connectedWallet.publicKey)}
-                  </p>
-                  <div
-                    onClick={handleCopyAddress}
-                    className="p-1 rounded cursor-pointer"
-                    title={isCopied ? "Copied!" : "Copy address"}
-                  >
-                    {isCopied ? (
-                      <Check className="w-3 h-3 text-green-500" />
-                    ) : (
-                      <Copy className="w-3 h-3" />
-                    )}
-                  </div>
+              <div className="flex-1 min-w-0 ">
+                <h3 className="font-medium text-xl">{connectedWallet.name}</h3>
+
+                <div className="flex items-center space-x-2 ">
+                  <CopyHelper size="14" data={connectedWallet.publicKey}>
+                    <p className="truncate text-[.875rem] leading-5 text-textColor">
+                      {otherAddressFormat(connectedWallet.publicKey)}
+                    </p>
+                  </CopyHelper>
                 </div>
               </div>
             </div>
 
-            {/* 网络标识 */}
-            <div className="mt-3 flex items-center space-x-2">
-              <div className="w-2 h-2 rounded-full bg-green-500"></div>
-              <span className="text-xs">Stellar</span>
+            {/* network */}
+            <div className="py-4 mt-4">
+              <div className="flex items-center space-x-2 py-[.625rem] px-3  bg-gray-300/20 rounded-lg">
+                <ChainIcon className="!w-6 !h-6 !p-0 !border-0 !bg-none" />
+                <span className="text-[.875rem] leading-4">Stellar</span>
+              </div>
             </div>
 
-            <div className="py-2 space-y-1">
-              <div className="w-full flex cursor-pointer items-center space-x-3 py-3  transition-colors text-left">
-                <Briefcase className="w-4 h-4" />
-                <span className="text-sm">My Portfolio</span>
+            <div className="space-y-1">
+              <div className="w-full flex cursor-pointer items-center space-x-2 py-3 transition-colors text-left border-b-[1px] border-border border-solid text-[.875rem] leader-5">
+                <MyPortfolioIcon className="w-4 h-4" />
+                <span>My Portfolio</span>
               </div>
 
               {/* Disconnect */}
               <div
                 onClick={handleDisconnect}
-                className="w-full flex cursor-pointer items-center space-x-3 py-3 transition-colors text-left"
+                className="w-full flex cursor-pointer items-center space-x-2 py-3 transition-colors text-left text-[.875rem] leader-5"
               >
-                <LogOut className="w-4 h-4" />
-                <span className="text-sm">Disconnect</span>
+                <DisconnectIcon className="w-4 h-4" />
+                <span>Disconnect</span>
               </div>
             </div>
           </div>
