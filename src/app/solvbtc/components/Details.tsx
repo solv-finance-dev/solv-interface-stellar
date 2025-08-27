@@ -7,7 +7,7 @@ export default function Details() {
     <div>
       <div className="text-xl font-MatterSQ-Medium mb-4">Contract Info</div>
 
-      <div className="flex md:space-x-[3.875rem] mb-6">
+      <div className="flex md:space-x-[3.875rem] mb-6 space-x-[2rem]">
         <InfoItem label="Vault Address" value={`0x9537...d185`} url={""} />
 
         <InfoItem label="Token Address" value={`0x9537...d185`} url={""} />
