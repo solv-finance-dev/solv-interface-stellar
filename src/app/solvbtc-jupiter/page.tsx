@@ -1,11 +1,12 @@
 "use client";
 
+import React from "react";
 import Banner from "@/components/Banner";
 import FAQ from "@/components/FAQ";
 import SolvBTCJupiter from "./components";
 import { solvJupFAQ } from "@/constants";
 
-const SolvBTCJupiterPage = () => {
+export default function SolvBTCJupiterPage() {
   return (
     <div>
       <Banner
@@ -21,6 +22,4 @@ const SolvBTCJupiterPage = () => {
       <FAQ faqData={solvJupFAQ} />
     </div>
   );
-};
-
-export default SolvBTCJupiterPage;
+}

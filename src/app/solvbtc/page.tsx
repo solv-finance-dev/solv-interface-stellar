@@ -1,11 +1,12 @@
 "use client";
 
+import React from "react";
 import Banner from "@/components/Banner";
 import FAQ from "@/components/FAQ";
 import SolvBtc from "./components";
 import { solvFAQ } from "@/constants";
 
-const SolvBtcPage = () => {
+export default function SolvBtcPage() {
   return (
     <div>
       <Banner
@@ -20,6 +21,4 @@ const SolvBtcPage = () => {
       <FAQ faqData={solvFAQ} />
     </div>
   );
-};
-
-export default SolvBtcPage;
+}

@@ -1,10 +1,7 @@
 import DetailsDescription from "@/components/DetailsDescription";
 import InfoItem from "@/components/InfoItem";
-import { Skeleton } from "@solvprotocol/ui-v2";
-import classNames from "classnames";
-import React, { useEffect, useRef, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+
+import React from "react";
 
 export default function Details() {
   return (

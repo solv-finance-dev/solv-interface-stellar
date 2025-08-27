@@ -5,9 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
   Button,
   Form,
   FormControl,
@@ -19,6 +16,7 @@ import {
 } from "@solvprotocol/ui-v2";
 import { ArrowRight } from "lucide-react";
 import { InputComplex } from "@/components/InputComplex";
+import { TokenIcon } from "@/components/TokenIcon";
 
 const FormSchema = z.object({
   deposit: z.string().min(2, {
@@ -37,7 +35,6 @@ export default function Withdraw() {
       receive: "",
     },
   });
-
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     toast(
@@ -100,13 +97,11 @@ export default function Withdraw() {
                           </div>
 
                           <div className="flex items-center justify-between text-[1rem] ml-2">
-                            <Avatar className="w-6 h-6 mr-[2px]">
-                              <AvatarImage
-                                src="https://res1.sft-api.com/token/SolvBTC.png"
-                                alt="token"
-                              />
-                              <AvatarFallback>CN</AvatarFallback>
-                            </Avatar>
+                            <TokenIcon
+                              src="https://res1.sft-api.com/token/SolvBTC.png"
+                              alt="SolvBTC"
+                              fallback="SolvBTC"
+                            />
                             {`SolvBTC`}
                           </div>
                         </div>
@@ -150,14 +145,11 @@ export default function Withdraw() {
                     iSuffix={
                       <div className="flex items-center h-full justify-end">
                         <div className="flex items-center justify-between text-[1rem]">
-                          <Avatar className="w-6 h-6 mr-[2px]">
-                            <AvatarImage
-                              src="https://res1.sft-api.com/token/WBTC.png"
-                              alt="token"
-                            />
-                            <AvatarFallback>CN</AvatarFallback>
-                          </Avatar>
-                          {`WBTC`}
+                          <TokenIcon
+                            src="https://res1.sft-api.com/token/WBTC.png"
+                            alt="WBTC"
+                            fallback="WBTC"
+                          />
                         </div>
                       </div>
                     }

@@ -5,9 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
   Button,
   Form,
   FormControl,
@@ -26,6 +23,7 @@ import {
 import { ArrowRight } from "lucide-react";
 import { InputComplex } from "@/components/InputComplex";
 import { TooltipComplex } from "@/components/TooltipComplex";
+import { TokenIcon } from "@/components/TokenIcon";
 
 const FormSchema = z.object({
   deposit: z.string().min(2, {
@@ -114,13 +112,11 @@ export default function Deposit() {
                           <Select value={selected} onValueChange={setSelected}>
                             <SelectTrigger className="outline-none focus-visible:ring-0 border-0 !pr-0 !pl-2 !bg-transparent">
                               <div className="flex items-center justify-between text-[1rem]">
-                                <Avatar className="w-6 h-6 mr-[2px]">
-                                  <AvatarImage
-                                    src="https://res1.sft-api.com/token/cbBTC.png"
-                                    alt="token"
-                                  />
-                                  <AvatarFallback>CN</AvatarFallback>
-                                </Avatar>
+                                <TokenIcon
+                                  src="https://res1.sft-api.com/token/cbBTC.png"
+                                  alt="CBTC"
+                                  fallback="CBTC"
+                                />
                                 {selected}
                               </div>
                             </SelectTrigger>
@@ -132,13 +128,11 @@ export default function Deposit() {
                                 {options.map((opt) => (
                                   <SelectItem key={opt.value} value={opt.value}>
                                     <div className="flex items-center justify-between text-[1rem]">
-                                      <Avatar className="w-6 h-6 mr-[2px]">
-                                        <AvatarImage
-                                          src="https://res1.sft-api.com/token/SolvBTC.png"
-                                          alt="token"
-                                        />
-                                        <AvatarFallback>CN</AvatarFallback>
-                                      </Avatar>
+                                      <TokenIcon
+                                        src="https://res1.sft-api.com/token/SolvBTC.png"
+                                        alt="SolvBTC"
+                                        fallback="SolvBTC"
+                                      />
                                       {opt.label}
                                     </div>
                                   </SelectItem>
@@ -189,13 +183,12 @@ export default function Deposit() {
                       <div className="flex items-center h-full justify-end">
                         {" "}
                         <div className="flex items-center justify-between text-[1rem]">
-                          <Avatar className="w-6 h-6 mr-[2px]">
-                            <AvatarImage
-                              src="https://res1.sft-api.com/token/SolvBTC.png"
-                              alt="token"
-                            />
-                            <AvatarFallback>CN</AvatarFallback>
-                          </Avatar>
+                          <TokenIcon
+                            src="https://res1.sft-api.com/token/SolvBTC.png"
+                            alt="SolvBTC"
+                            fallback="SolvBTC"
+                          />
+
                           {`SolvBTC`}
                         </div>
                       </div>
