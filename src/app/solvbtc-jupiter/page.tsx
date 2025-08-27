@@ -12,6 +12,7 @@ const SolvBTCJupiterPage = () => {
         title="SolvBTC Jupiter"
         subTitle=" "
         description="Subtitle, please write a brief introduction of what does user do on this page"
+        slot="4.18% APY"
         showBg={false}
       />
 
