@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Client as ContractClient } from '@stellar/stellar-sdk/contract';
 import { SolvBTCVaultClient } from '@/contracts/solvBTCVaultContract/src';
+import { SolvBTCTokenClient } from '@/contracts/solvBTCTokenContract/src';
 import { getCurrentStellarNetwork } from '@/config/stellar';
 
 // Contract client configuration type definition
@@ -261,6 +262,8 @@ const getDefaultContractId = (clientName: string): string => {
   switch (clientName) {
     case 'SolvBTCVaultClient':
       return process.env.NEXT_PUBLIC_VAULT_CONTRACT || '';
+    case 'SolvBTCTokenClient':
+      return process.env.NEXT_PUBLIC_TOKEN_CONTRACT || '';
     default:
       return '';
   }
@@ -269,6 +272,10 @@ const getDefaultContractId = (clientName: string): string => {
 // Register default contract client types
 registeredClientTypes.set('SolvBTCVaultClient', {
   constructor: SolvBTCVaultClient,
+});
+
+registeredClientTypes.set('SolvBTCTokenClient', {
+  constructor: SolvBTCTokenClient,
 });
 
 // Generic contract client Hook
@@ -289,6 +296,11 @@ export const useContractClient = <T extends ContractClient = ContractClient>(
 // SolvBTCVaultClient dedicated Hook
 export const useSolvBTCVaultClient = (): SolvBTCVaultClient | null => {
   return useContractClient<SolvBTCVaultClient>('SolvBTCVaultClient');
+};
+
+// SolvBTCTokenClient dedicated Hook
+export const useSolvBTCTokenClient = (): SolvBTCTokenClient | null => {
+  return useContractClient<SolvBTCTokenClient>('SolvBTCTokenClient');
 };
 
 // Utility function: ensure all contract clients are initialized
@@ -314,6 +326,7 @@ export const ensureClientInitialized = async (
 // Utility function to get all contract clients
 export const getContractClients = (): Record<string, ContractClient> => {
   const { clients } = useContractStore.getState();
+  console.log('🔍 getContractClients:', clients);
   const result: Record<string, ContractClient> = {};
 
   clients.forEach((client, name) => {
