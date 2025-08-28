@@ -2,6 +2,7 @@
 
 import { ClaimIcon } from '@/assets/svg/svg';
 import { DataTableComplex } from '@/components/DataTableComplex';
+import { DataTable } from '@/components/DataTableComplex/test';
 import { TokenIcon } from '@/components/TokenIcon';
 import { Button } from '@solvprotocol/ui-v2';
 import { ColumnDef } from '@tanstack/react-table';
@@ -122,5 +123,13 @@ interface RedemptionTableProps {
 }
 
 export function RedemptionTable({ data }: RedemptionTableProps) {
-  return <DataTableComplex columns={columns} data={data} />;
+  return (
+    <>
+      <DataTableComplex
+        columns={columns}
+        data={data}
+        gridTemplateColumns='2fr 1fr 1fr 1.5fr 1fr'
+      />
+    </>
+  );
 }

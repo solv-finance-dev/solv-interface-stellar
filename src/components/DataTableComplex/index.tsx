@@ -42,7 +42,7 @@ export function DataTableComplex<TData, TValue>({
   columns,
   data,
   onRowClick,
-  gridTemplateColumns = '1fr',
+  gridTemplateColumns = 'repeat(auto-fit, minmax(120px, 1fr))',
 }: DataTableComplexProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -114,13 +114,14 @@ export function DataTableComplex<TData, TValue>({
 
   return (
     <>
-      <div className='grid' style={{ gridTemplateColumns }}>
+      <div>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map(headerGroup => (
               <TableRow
                 key={headerGroup.id}
                 className='col-span-full grid grid-cols-subgrid hover:bg-transparent'
+                style={{ gridTemplateColumns }}
               >
                 {headerGroup.headers.map(header => {
                   const canSort = header.column.getCanSort();
@@ -185,6 +186,7 @@ export function DataTableComplex<TData, TValue>({
                     'hover:bg-transparent',
                     'col-span-full grid grid-cols-subgrid'
                   )}
+                  style={{ gridTemplateColumns }}
                 >
                   {row.getVisibleCells().map(cell => {
                     const align = cell.column.columnDef.meta?.align || 'left';
