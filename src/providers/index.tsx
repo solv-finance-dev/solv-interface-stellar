@@ -18,7 +18,8 @@ const Provider = ({ children }: { children: ReactNode }) => {
     const initialize = async () => {
       try {
         // Initialize wallets and contracts in parallel
-        await Promise.all([initializeWallets(), initializeContracts()]);
+        await initializeContracts();
+        await initializeWallets();
       } catch (error) {
         console.error('Failed to initialize app:', error);
       }

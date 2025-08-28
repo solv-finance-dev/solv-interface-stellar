@@ -35,12 +35,14 @@ interface DataTableComplexProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   onRowClick?: (row: TData) => void;
+  gridTemplateColumns?: string;
 }
 
 export function DataTableComplex<TData, TValue>({
   columns,
   data,
   onRowClick,
+  gridTemplateColumns = '1fr',
 }: DataTableComplexProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -112,11 +114,14 @@ export function DataTableComplex<TData, TValue>({
 
   return (
     <>
-      <div>
+      <div className='grid' style={{ gridTemplateColumns }}>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map(headerGroup => (
-              <TableRow key={headerGroup.id} className='hover:bg-transparent'>
+              <TableRow
+                key={headerGroup.id}
+                className='col-span-full grid grid-cols-subgrid hover:bg-transparent'
+              >
                 {headerGroup.headers.map(header => {
                   const canSort = header.column.getCanSort();
                   const align = header.column.columnDef.meta?.align || 'left';
@@ -167,6 +172,7 @@ export function DataTableComplex<TData, TValue>({
               </TableRow>
             ))}
           </TableHeader>
+
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map(row => (
@@ -176,7 +182,8 @@ export function DataTableComplex<TData, TValue>({
                   onClick={() => handleRowClick(row)}
                   className={cn(
                     onRowClick && 'cursor-pointer transition-colors',
-                    'hover:bg-transparent'
+                    'hover:bg-transparent',
+                    'col-span-full grid grid-cols-subgrid'
                   )}
                 >
                   {row.getVisibleCells().map(cell => {
