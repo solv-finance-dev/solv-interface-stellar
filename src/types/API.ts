@@ -13,7 +13,7 @@ export type LoginInput = {
 };
 
 export type AccountInfo = {
-  __typename: "AccountInfo";
+  __typename: 'AccountInfo';
   id?: number | null;
   address?: string | null;
   // latestLoginId: Int
@@ -62,7 +62,7 @@ export type IssueInput = {
 };
 
 export type BondInfo = {
-  __typename: "BondInfo";
+  __typename: 'BondInfo';
   id: number;
   productInfo?: ProductInfo | null;
   issuerInfo?: IssuerInfo | null;
@@ -96,7 +96,7 @@ export type BondInfo = {
 };
 
 export type ProductInfo = {
-  __typename: "ProductInfo";
+  __typename: 'ProductInfo';
   id: number;
   chainId?: number | null;
   contractInfo?: ContractInfo | null;
@@ -116,7 +116,7 @@ export type ProductInfo = {
 };
 
 export type ContractInfo = {
-  __typename: "ContractInfo";
+  __typename: 'ContractInfo';
   id: number;
   contractAddress?: string | null;
   contractType?: string | null;
@@ -138,19 +138,19 @@ export type ContractInfo = {
 };
 
 export type Currency = {
-  __typename: "Currency";
+  __typename: 'Currency';
   symbol?: string | null;
   currencyAddress?: string | null;
   decimals?: number | null;
 };
 
 export type Tag = {
-  __typename: "Tag";
+  __typename: 'Tag';
   tag?: string | null;
 };
 
 export type IssuerInfo = {
-  __typename: "IssuerInfo";
+  __typename: 'IssuerInfo';
   id: number;
   accountInfo?: AccountInfo | null;
   category?: string | null;
@@ -166,7 +166,7 @@ export type IssuerInfo = {
 };
 
 export type Issuance = {
-  __typename: "Issuance";
+  __typename: 'Issuance';
   id: number;
   // productInfo: ProductInfo
   // issuerInfo: IssuerInfo
@@ -195,7 +195,7 @@ export type Issuance = {
 };
 
 export type RepayInfo = {
-  __typename: "RepayInfo";
+  __typename: 'RepayInfo';
   id: number;
   address?: string | null;
   repayValue?: string | null;
@@ -208,7 +208,7 @@ export type RepayInfo = {
 };
 
 export type SupervisorInfo = {
-  __typename: "SupervisorInfo";
+  __typename: 'SupervisorInfo';
   id: number;
   name?: string | null;
   label?: string | null;
@@ -288,7 +288,7 @@ export type PoolInput = {
 };
 
 export type PoolSlotInfo = {
-  __typename: "PoolSlotInfo";
+  __typename: 'PoolSlotInfo';
   id: number;
   productInfo?: ProductInfo | null;
   issuerInfo?: IssuerInfo | null;
@@ -326,7 +326,7 @@ export type PoolSlotInfo = {
 };
 
 export type PoolOrderInfo = {
-  __typename: "PoolOrderInfo";
+  __typename: 'PoolOrderInfo';
   id: number;
   poolId?: string | null;
   marketInfo?: MarketInfo | null;
@@ -367,7 +367,7 @@ export type PoolOrderInfo = {
 };
 
 export type MarketInfo = {
-  __typename: "MarketInfo";
+  __typename: 'MarketInfo';
   id: number;
   name?: string | null;
   chainId?: number | null;
@@ -379,13 +379,13 @@ export type MarketInfo = {
 };
 
 export type PoolStrategy = {
-  __typename: "PoolStrategy";
+  __typename: 'PoolStrategy';
   id: number;
   strategyInfo?: Strategies | null;
 };
 
 export type Strategies = {
-  __typename: "Strategies";
+  __typename: 'Strategies';
   id: number;
   strategy?: string | null;
   label?: string | null;
@@ -411,7 +411,7 @@ export type OriginalNavInput = {
 };
 
 export type OriginalNavInfo = {
-  __typename: "OriginalNavInfo";
+  __typename: 'OriginalNavInfo';
   id: number;
   poolId?: string | null;
   navDate?: number | null;
@@ -436,7 +436,7 @@ export type ReferralInput = {
 };
 
 export type ReferralInfo = {
-  __typename: "ReferralInfo";
+  __typename: 'ReferralInfo';
   id?: number | null;
   referralCode?: string | null;
   userAddress?: string | null;
@@ -455,7 +455,7 @@ export type PointSysBindRegInput = {
 };
 
 export type PointSysAccountInfo = {
-  __typename: "PointSysAccountInfo";
+  __typename: 'PointSysAccountInfo';
   address?: string | null;
   isRegistered?: boolean | null;
   seedUserInviteCode?: string | null;
@@ -473,7 +473,7 @@ export type PointSysAccountInfo = {
 };
 
 export type PointSysActivityCard = {
-  __typename: "PointSysActivityCard";
+  __typename: 'PointSysActivityCard';
   type?: string | null;
   accelerationRatio?: string | null;
   startTime?: string | null;
@@ -488,7 +488,7 @@ export type WalletInfoInput = {
 };
 
 export type WalletInfo = {
-  __typename: "WalletInfo";
+  __typename: 'WalletInfo';
   chainId?: number | null;
   userAddress?: string | null;
   txHash?: string | null;
@@ -509,7 +509,7 @@ export type BtcRecordsInput = {
 };
 
 export type BtcDepositMintRecord = {
-  __typename: "BtcDepositMintRecord";
+  __typename: 'BtcDepositMintRecord';
   id: number;
   depositAmount?: string | null;
   depositHash?: string | null;
@@ -537,7 +537,7 @@ export type BtcStakeRecordsInput = {
 };
 
 export type BtcStakeRecord = {
-  __typename: "BtcStakeRecord";
+  __typename: 'BtcStakeRecord';
   id: number;
   chainId: number;
   poolId: string;
@@ -565,7 +565,7 @@ export type BtcMintRegisterInput = {
 };
 
 export type BtcMintRegisterInfo = {
-  __typename: "BtcMintRegisterInfo";
+  __typename: 'BtcMintRegisterInfo';
   id?: number | null;
   btcAddress?: string | null;
   chainId?: number | null;
@@ -586,7 +586,7 @@ export type EvmBabylonConnectionInput = {
 };
 
 export type EvmBabylonConnectionInfo = {
-  __typename: "EvmBabylonConnectionInfo";
+  __typename: 'EvmBabylonConnectionInfo';
   evmAddress?: string | null;
   babylonAddress?: string | null;
   signMessage?: string | null;
@@ -609,7 +609,7 @@ export type NewsletterRecordsInput = {
 };
 
 export type LoginMessage = {
-  __typename: "LoginMessage";
+  __typename: 'LoginMessage';
   message: string;
 };
 
@@ -636,7 +636,7 @@ export type Sort = {
 };
 
 export type Accounts = {
-  __typename: "Accounts";
+  __typename: 'Accounts';
   totalCount?: number | null;
   accountsInfo: Array<AccountInfo>;
 };
@@ -668,7 +668,7 @@ export type totalValueFilter = {
 };
 
 export type Bonds = {
-  __typename: "Bonds";
+  __typename: 'Bonds';
   totalCount: number;
   bondsInfo: Array<BondInfo>;
 };
@@ -684,13 +684,13 @@ export type AssetFilter = {
 };
 
 export type Assets = {
-  __typename: "Assets";
+  __typename: 'Assets';
   totalCount?: number | null;
   assetsInfo: Array<AssetInfo>;
 };
 
 export type AssetInfo = {
-  __typename: "AssetInfo";
+  __typename: 'AssetInfo';
   id?: number | null;
   // 有的需要从bondInfo中拿
   poolSlotInfoId?: number | null;
@@ -744,13 +744,13 @@ export type IssueContractInput = {
 };
 
 export type IssueContracts = {
-  __typename: "IssueContracts";
+  __typename: 'IssueContracts';
   totalCount?: number | null;
   issueContracts?: Array<IssueContract | null> | null;
 };
 
 export type IssueContract = {
-  __typename: "IssueContract";
+  __typename: 'IssueContract';
   contractInfo?: ContractInfo | null;
 };
 
@@ -764,13 +764,13 @@ export type RoadshowFilter = {
 };
 
 export type Roadshows = {
-  __typename: "Roadshows";
+  __typename: 'Roadshows';
   totalCount?: number | null;
   roadshowsInfo: Array<Roadshow>;
 };
 
 export type Roadshow = {
-  __typename: "Roadshow";
+  __typename: 'Roadshow';
   id?: number | null;
   chainId?: number | null;
   roadshowType?: string | null;
@@ -796,13 +796,13 @@ export type ActivityFilter = {
 };
 
 export type Activities = {
-  __typename: "Activities";
+  __typename: 'Activities';
   totalCount?: number | null;
   activitiesInfo: Array<Activity>;
 };
 
 export type Activity = {
-  __typename: "Activity";
+  __typename: 'Activity';
   id: number;
   chainId?: number | null;
   contractAddress?: string | null;
@@ -833,7 +833,7 @@ export type Activity = {
 };
 
 export type IssuerStats = {
-  __typename: "IssuerStats";
+  __typename: 'IssuerStats';
   totalIssued?: string | null;
   totalRepaid?: string | null;
   totalInterest?: string | null;
@@ -848,7 +848,7 @@ export type SupervisorFilter = {
 };
 
 export type Supervisors = {
-  __typename: "Supervisors";
+  __typename: 'Supervisors';
   totalCount: number;
   supervisorsInfo: Array<SupervisorInfo>;
 };
@@ -858,21 +858,21 @@ export type NavFilter = {
 };
 
 export type NavInfo = {
-  __typename: "NavInfo";
+  __typename: 'NavInfo';
   bondId?: number | null;
   symbol?: string | null;
   serialData?: Array<NavData | null> | null;
 };
 
 export type NavData = {
-  __typename: "NavData";
+  __typename: 'NavData';
   nav?: string | null;
   yield?: string | null;
   fetchDate?: string | null;
 };
 
 export type MarketContractInfo = {
-  __typename: "MarketContractInfo";
+  __typename: 'MarketContractInfo';
   marketContractAddress?: string | null;
   decimals?: number | null;
   defautFeeRate?: string | null;
@@ -896,7 +896,7 @@ export type PoolFilter = {
 };
 
 export type Pools = {
-  __typename: "Pools";
+  __typename: 'Pools';
   totalCount: number;
   poolsInfo: Array<PoolSlotInfo>;
 };
@@ -907,7 +907,7 @@ export type NavHistoryFilter = {
 };
 
 export type NavHistoryInfo = {
-  __typename: "NavHistoryInfo";
+  __typename: 'NavHistoryInfo';
   totalCount?: number | null;
   poolSlotInfoId?: number | null;
   symbol?: string | null;
@@ -917,7 +917,7 @@ export type NavHistoryInfo = {
 };
 
 export type NavHistoryData = {
-  __typename: "NavHistoryData";
+  __typename: 'NavHistoryData';
   nav?: string | null;
   adjustedNav?: string | null;
   navDate?: string | null;
@@ -931,7 +931,7 @@ export type NavOpenFundFilter = {
 };
 
 export type AssetsCountInfo = {
-  __typename: "AssetsCountInfo";
+  __typename: 'AssetsCountInfo';
   productType?: string | null;
   count?: number | null;
 };
@@ -941,13 +941,13 @@ export type RedemptionFilter = {
 };
 
 export type Redemptions = {
-  __typename: "Redemptions";
+  __typename: 'Redemptions';
   totalCount: number;
   redemptionsInfo: Array<RedeemInfo>;
 };
 
 export type RedeemInfo = {
-  __typename: "RedeemInfo";
+  __typename: 'RedeemInfo';
   id: number;
   poolId?: string | null;
   currencyInfo?: Currency | null;
@@ -966,7 +966,7 @@ export type RedeemInfo = {
 };
 
 export type Stats = {
-  __typename: "Stats";
+  __typename: 'Stats';
   totalAssetsValue?: string | null;
   totalBtcStaked?: string | null;
   totalBtcTvlUSD?: string | null;
@@ -981,7 +981,7 @@ export type AumFilter = {
 };
 
 export type AumHistoryInfo = {
-  __typename: "AumHistoryInfo";
+  __typename: 'AumHistoryInfo';
   totalCount?: number | null;
   totalShares?: string | null;
   investors?: number | null;
@@ -993,7 +993,7 @@ export type AumHistoryInfo = {
 };
 
 export type AumHistoryData = {
-  __typename: "AumHistoryData";
+  __typename: 'AumHistoryData';
   aum?: string | null;
   nav?: string | null;
   fetchDate?: string | null;
@@ -1005,7 +1005,7 @@ export type NavRecordsFilter = {
 };
 
 export type NavRecordsInfo = {
-  __typename: "NavRecordsInfo";
+  __typename: 'NavRecordsInfo';
   totalCount?: number | null;
   symbol?: string | null;
   currencyDecimals?: number | null;
@@ -1013,14 +1013,14 @@ export type NavRecordsInfo = {
 };
 
 export type NavRecordsData = {
-  __typename: "NavRecordsData";
+  __typename: 'NavRecordsData';
   nav?: string | null;
   navType?: string | null;
   time?: number | null;
 };
 
 export type CarryCollectorInfo = {
-  __typename: "CarryCollectorInfo";
+  __typename: 'CarryCollectorInfo';
   id: number;
   chainId?: number | null;
   carryCollector?: string | null;
@@ -1029,7 +1029,7 @@ export type CarryCollectorInfo = {
 };
 
 export type AllocationInfo = {
-  __typename: "AllocationInfo";
+  __typename: 'AllocationInfo';
   name?: string | null;
   percentage?: string | null;
   value?: string | null;
@@ -1038,13 +1038,13 @@ export type AllocationInfo = {
 };
 
 export type UserAssetsInfo = {
-  __typename: "UserAssetsInfo";
+  __typename: 'UserAssetsInfo';
   totalBalanceUSD?: string | null;
   assetsInfo?: Array<PoolAssetInfo | null> | null;
 };
 
 export type PoolAssetInfo = {
-  __typename: "PoolAssetInfo";
+  __typename: 'PoolAssetInfo';
   poolId?: string | null;
   balance?: string | null;
   // currencyPrice: String
@@ -1052,7 +1052,7 @@ export type PoolAssetInfo = {
 };
 
 export type WrappedTokenInfo = {
-  __typename: "WrappedTokenInfo";
+  __typename: 'WrappedTokenInfo';
   tokenAddress?: string | null;
   symbol?: string | null;
   decimals?: number | null;
@@ -1065,20 +1065,20 @@ export type WrappedAssetFilter = {
 };
 
 export type WrappedAssets = {
-  __typename: "WrappedAssets";
+  __typename: 'WrappedAssets';
   totalCount?: number | null;
   wrappedAssets?: Array<WrappedAssetInfo | null> | null;
 };
 
 export type Allocation = {
-  __typename: "Allocation";
+  __typename: 'Allocation';
   assetName?: string | null;
   percentage?: string | null;
   color?: string | null;
 };
 
 export type WrappedAssetInfo = {
-  __typename: "WrappedAssetInfo";
+  __typename: 'WrappedAssetInfo';
   chainId?: number | null;
   tokenAddress?: string | null;
   holder?: string | null;
@@ -1108,13 +1108,13 @@ export type WrappedAssetInfo = {
 };
 
 export type PoolCurrencies = {
-  __typename: "PoolCurrencies";
+  __typename: 'PoolCurrencies';
   totalCount?: number | null;
   currencies?: Array<PoolCurrencyInfo | null> | null;
 };
 
 export type PoolCurrencyInfo = {
-  __typename: "PoolCurrencyInfo";
+  __typename: 'PoolCurrencyInfo';
   chainId?: number | null;
   poolId?: string | null;
   currencyAddress?: string | null;
@@ -1124,13 +1124,13 @@ export type PoolCurrencyInfo = {
 };
 
 export type RouterContractInfo = {
-  __typename: "RouterContractInfo";
+  __typename: 'RouterContractInfo';
   chainId?: number | null;
   contractAddress?: string | null;
 };
 
 export type MarketCoreData = {
-  __typename: "MarketCoreData";
+  __typename: 'MarketCoreData';
   totalValueLocked?: string | null;
   totalYieldGenerated?: string | null;
   totalUsers?: string | null;
@@ -1155,7 +1155,7 @@ export type MarketCoreData = {
 };
 
 export type PointSysRankingInfo = {
-  __typename: "PointSysRankingInfo";
+  __typename: 'PointSysRankingInfo';
   address?: string | null;
   avatar?: string | null;
   username?: string | null;
@@ -1167,7 +1167,7 @@ export type PointSysRankingInfo = {
 };
 
 export type BTCStats = {
-  __typename: "BTCStats";
+  __typename: 'BTCStats';
   supportedChains?: Array<BtcFofInfo | null> | null;
   totalInvestors?: number | null;
   totalTvlUSD?: string | null;
@@ -1178,21 +1178,21 @@ export type BTCStats = {
 };
 
 export type BtcFofInfo = {
-  __typename: "BtcFofInfo";
+  __typename: 'BtcFofInfo';
   chainId?: number | null;
   poolSlotInfoId?: number | null;
   order?: number | null;
 };
 
 export type TvlDetail = {
-  __typename: "TvlDetail";
+  __typename: 'TvlDetail';
   chainId?: number | null;
   amount?: string | null;
   tvl?: string | null;
 };
 
 export type BTCDetail = {
-  __typename: "BTCDetail";
+  __typename: 'BTCDetail';
   chainId?: number | null;
   slot?: string | null;
   symbol?: string | null;
@@ -1201,14 +1201,14 @@ export type BTCDetail = {
 };
 
 export type BTCTvlInfo = {
-  __typename: "BTCTvlInfo";
+  __typename: 'BTCTvlInfo';
   chainId?: number | null;
   tvl?: string | null;
   investors?: number | null;
 };
 
 export type BtcPoolInfo = {
-  __typename: "BtcPoolInfo";
+  __typename: 'BtcPoolInfo';
   poolInfo?: PoolSlotInfo | null;
   wrappedTokenInfo?: WrappedTokenInfo | null;
   routerContract?: RouterContractInfo | null;
@@ -1216,7 +1216,7 @@ export type BtcPoolInfo = {
 };
 
 export type YieldPoolInfo = {
-  __typename: "YieldPoolInfo";
+  __typename: 'YieldPoolInfo';
   chainId?: number | null;
   poolSlotInfoId?: number | null;
   poolId?: string | null;
@@ -1229,20 +1229,20 @@ export type YieldPoolInfo = {
 };
 
 export type BtcMainnetInfo = {
-  __typename: "BtcMainnetInfo";
+  __typename: 'BtcMainnetInfo';
   depositAddress?: string | null;
   depositNetwork?: string | null;
 };
 
 export type BtcWhitelistInfo = {
-  __typename: "BtcWhitelistInfo";
+  __typename: 'BtcWhitelistInfo';
   isBtcWhitelist: boolean;
   btcDepositPlatForm?: string | null;
   btcDepositAddress?: string | null;
 };
 
 export type DefiPointRatioInfo = {
-  __typename: "DefiPointRatioInfo";
+  __typename: 'DefiPointRatioInfo';
   chainId?: number | null;
   chainName?: string | null;
   protocol?: string | null;
@@ -1255,7 +1255,7 @@ export type DefiPointRatioInfo = {
 };
 
 export type BtcYieldPoolInfo = {
-  __typename: "BtcYieldPoolInfo";
+  __typename: 'BtcYieldPoolInfo';
   chainId?: number | null;
   poolSlotInfoId?: number | null;
   yieldType?: string | null;
@@ -1264,7 +1264,7 @@ export type BtcYieldPoolInfo = {
 };
 
 export type YieldPoolStats = {
-  __typename: "YieldPoolStats";
+  __typename: 'YieldPoolStats';
   yieldType?: string | null;
   tvl?: string | null;
   apy?: string | null;
@@ -1274,20 +1274,20 @@ export type YieldPoolStats = {
 };
 
 export type BtcFofInfoM = {
-  __typename: "BtcFofInfoM";
+  __typename: 'BtcFofInfoM';
   chainId?: number | null;
   idAndCurrency?: Array<IdAndCurrency | null> | null;
   order?: number | null;
 };
 
 export type IdAndCurrency = {
-  __typename: "IdAndCurrency";
+  __typename: 'IdAndCurrency';
   poolSlotInfoId?: number | null;
   currencySymbol?: string | null;
 };
 
 export type ChainLiquidityInfo = {
-  __typename: "ChainLiquidityInfo";
+  __typename: 'ChainLiquidityInfo';
   chainId?: number | null;
   chainName?: string | null;
   totalTvl?: string | null;
@@ -1301,7 +1301,7 @@ export type ChainLiquidityInfo = {
 };
 
 export type LiquidityInfo = {
-  __typename: "LiquidityInfo";
+  __typename: 'LiquidityInfo';
   chainId?: number | null;
   chainName?: string | null;
   protocol?: string | null;
@@ -1324,7 +1324,7 @@ export type LiquidityInfo = {
 };
 
 export type ProtocolLiquidityInfo = {
-  __typename: "ProtocolLiquidityInfo";
+  __typename: 'ProtocolLiquidityInfo';
   protocol?: string | null;
   totalTvl?: string | null;
   highestApy?: string | null;
@@ -1334,7 +1334,7 @@ export type ProtocolLiquidityInfo = {
 };
 
 export type AssetsLiquidityInfo = {
-  __typename: "AssetsLiquidityInfo";
+  __typename: 'AssetsLiquidityInfo';
   assetType?: string | null;
   totalTvl?: string | null;
   highestApy?: string | null;
@@ -1345,14 +1345,14 @@ export type AssetsLiquidityInfo = {
 };
 
 export type SolvBtcAssets = {
-  __typename: "SolvBtcAssets";
+  __typename: 'SolvBtcAssets';
   snapshotTime?: number | null;
   totalAmount?: string | null;
   assets?: Array<SolvBtcAsset | null> | null;
 };
 
 export type SolvBtcAsset = {
-  __typename: "SolvBtcAsset";
+  __typename: 'SolvBtcAsset';
   assetName?: string | null;
   assetAmount?: string | null;
   order: number;
@@ -1360,7 +1360,7 @@ export type SolvBtcAsset = {
 };
 
 export type SolvBtcAssetDetail = {
-  __typename: "SolvBtcAssetDetail";
+  __typename: 'SolvBtcAssetDetail';
   vault?: string | null;
   vaultAddress?: string | null;
   url?: string | null;
@@ -1368,14 +1368,14 @@ export type SolvBtcAssetDetail = {
 };
 
 export type SolvBtcLiabilities = {
-  __typename: "SolvBtcLiabilities";
+  __typename: 'SolvBtcLiabilities';
   snapshotTime?: number | null;
   totalAmount?: string | null;
   liabilities?: Array<SolvBtcLiability | null> | null;
 };
 
 export type SolvBtcLiability = {
-  __typename: "SolvBtcLiability";
+  __typename: 'SolvBtcLiability';
   chainName?: string | null;
   tokenAddress?: string | null;
   url?: string | null;
@@ -1385,7 +1385,7 @@ export type SolvBtcLiability = {
 };
 
 export type SolvBtcLiabilityDetail = {
-  __typename: "SolvBtcLiabilityDetail";
+  __typename: 'SolvBtcLiabilityDetail';
   vault?: string | null;
   vaultAddress?: string | null;
   url?: string | null;
@@ -1398,7 +1398,7 @@ export type DexFilter = {
 };
 
 export type DexInfo = {
-  __typename: "DexInfo";
+  __typename: 'DexInfo';
   chainId?: number | null;
   chainName?: string | null;
   assetName?: string | null;
@@ -1409,7 +1409,7 @@ export type DexInfo = {
 };
 
 export type RedeemableInfo = {
-  __typename: "RedeemableInfo";
+  __typename: 'RedeemableInfo';
   chainId?: number | null;
   chainName?: string | null;
   redeemableAmount?: string | null;
@@ -1419,14 +1419,14 @@ export type RedeemableInfo = {
 };
 
 export type SolvBtcYTReserves = {
-  __typename: "SolvBtcYTReserves";
+  __typename: 'SolvBtcYTReserves';
   snapshotTime?: number | null;
   totalAmount?: string | null;
   reserves?: Array<SolvBtcYTReserve | null> | null;
 };
 
 export type SolvBtcYTReserve = {
-  __typename: "SolvBtcYTReserve";
+  __typename: 'SolvBtcYTReserve';
   vault?: string | null;
   vaultAddress?: string | null;
   url?: string | null;
@@ -1434,14 +1434,14 @@ export type SolvBtcYTReserve = {
 };
 
 export type SolvBtcYTIssuances = {
-  __typename: "SolvBtcYTIssuances";
+  __typename: 'SolvBtcYTIssuances';
   snapshotTime?: number | null;
   totalAmount?: string | null;
   issuances?: Array<SolvBtcYTIssuance | null> | null;
 };
 
 export type SolvBtcYTIssuance = {
-  __typename: "SolvBtcYTIssuance";
+  __typename: 'SolvBtcYTIssuance';
   chainName?: string | null;
   tokenAddress?: string | null;
   url?: string | null;
@@ -1450,7 +1450,7 @@ export type SolvBtcYTIssuance = {
 };
 
 export type Lsts = {
-  __typename: "Lsts";
+  __typename: 'Lsts';
   stakingBTCAmount?: string | null;
   users?: number | null;
   ecosystems?: string | null;
@@ -1458,7 +1458,7 @@ export type Lsts = {
 };
 
 export type LstInfo = {
-  __typename: "LstInfo";
+  __typename: 'LstInfo';
   protocol?: string | null;
   alias?: string | null;
   category?: string | null;
@@ -1476,27 +1476,27 @@ export type LstInfo = {
 };
 
 export type Chains = {
-  __typename: "Chains";
+  __typename: 'Chains';
   fromChains?: Array<ChainInfo | null> | null;
   toChains?: Array<ChainInfo | null> | null;
 };
 
 export type ChainInfo = {
-  __typename: "ChainInfo";
+  __typename: 'ChainInfo';
   chainName: string;
   chainId: number;
   tokenAddress?: string | null;
 };
 
 export type Bridge = {
-  __typename: "Bridge";
+  __typename: 'Bridge';
   bridgeName: string;
   bridgeUrl: string;
   description: string;
 };
 
 export type AirdropInfo = {
-  __typename: "AirdropInfo";
+  __typename: 'AirdropInfo';
   totalPoints?: string | null;
   userType?: string | null;
   chainId?: number | null;
@@ -1506,7 +1506,7 @@ export type AirdropInfo = {
 };
 
 export type StageInfo = {
-  __typename: "StageInfo";
+  __typename: 'StageInfo';
   stageNo?: number | null;
   rewardType?: string | null;
   totalClaimable?: string | null;
@@ -1533,13 +1533,13 @@ export type BtcRecordsFilter = {
 };
 
 export type ManagementBtcStakeRecords = {
-  __typename: "ManagementBtcStakeRecords";
+  __typename: 'ManagementBtcStakeRecords';
   totalCount?: number | null;
   btcStakeMintRecord?: Array<ManagementBtcStakeRecord | null> | null;
 };
 
 export type ManagementBtcStakeRecord = {
-  __typename: "ManagementBtcStakeRecord";
+  __typename: 'ManagementBtcStakeRecord';
   id: number;
   chainId: number;
   recordType: string;
@@ -1562,13 +1562,13 @@ export type UserBtcRecordsFilter = {
 };
 
 export type UserBtcStakeRecords = {
-  __typename: "UserBtcStakeRecords";
+  __typename: 'UserBtcStakeRecords';
   totalCount?: number | null;
   btcStakeMintRecord?: Array<UserBtcStakeRecord | null> | null;
 };
 
 export type UserBtcStakeRecord = {
-  __typename: "UserBtcStakeRecord";
+  __typename: 'UserBtcStakeRecord';
   id: number;
   chainId: number;
   tokenAddress: string;
@@ -1584,7 +1584,7 @@ export type UserBtcStakeRecord = {
 };
 
 export type BtcTxInfo = {
-  __typename: "BtcTxInfo";
+  __typename: 'BtcTxInfo';
   depositFromAddress?: string | null;
   depositToAddress?: string | null;
   depositAmount?: string | null;
@@ -1595,13 +1595,13 @@ export type BtcTxInfo = {
 };
 
 export type SigningRecords = {
-  __typename: "SigningRecords";
+  __typename: 'SigningRecords';
   totalCount?: number | null;
   signingRecords?: Array<SigningRecord | null> | null;
 };
 
 export type SigningRecord = {
-  __typename: "SigningRecord";
+  __typename: 'SigningRecord';
   depositTxHash?: string | null;
   message?: string | null;
   signMessageHash?: string | null;
@@ -1609,7 +1609,7 @@ export type SigningRecord = {
 };
 
 export type StakingStats = {
-  __typename: "StakingStats";
+  __typename: 'StakingStats';
   stakingTvl?: string | null;
   totalStakingRewards?: string | null;
   airdropRewards?: string | null;
@@ -1620,21 +1620,21 @@ export type StakingStats = {
 };
 
 export type EstimatedReward = {
-  __typename: "EstimatedReward";
+  __typename: 'EstimatedReward';
   stakingPower?: string | null;
   currentTotalStakingPower?: string | null;
   estimatedReward?: string | null;
 };
 
 export type SolvBtcJupReserves = {
-  __typename: "SolvBtcJupReserves";
+  __typename: 'SolvBtcJupReserves';
   snapshotTime?: number | null;
   totalAmount?: string | null;
   reserves?: Array<SolvBtcJupReserve | null> | null;
 };
 
 export type SolvBtcJupReserve = {
-  __typename: "SolvBtcJupReserve";
+  __typename: 'SolvBtcJupReserve';
   vault?: string | null;
   vaultAddress?: string | null;
   url?: string | null;
@@ -1644,7 +1644,7 @@ export type SolvBtcJupReserve = {
 };
 
 export type BabylonRelationInfo = {
-  __typename: "BabylonRelationInfo";
+  __typename: 'BabylonRelationInfo';
   isRelation?: boolean | null;
   evmAddress?: string | null;
   babylonAddress?: string | null;
@@ -1652,20 +1652,20 @@ export type BabylonRelationInfo = {
 };
 
 export type ProtocolInfo = {
-  __typename: "ProtocolInfo";
+  __typename: 'ProtocolInfo';
   protocol?: string | null;
   logoUrl?: string | null;
 };
 
 export type BroInfo = {
-  __typename: "BroInfo";
+  __typename: 'BroInfo';
   totalRaised?: string | null;
   revenueFromBRO?: string | null;
   pieChartData?: Array<FundDistribution | null> | null;
 };
 
 export type FundDistribution = {
-  __typename: "FundDistribution";
+  __typename: 'FundDistribution';
   name?: string | null;
   value?: string | null;
 };
@@ -1675,13 +1675,13 @@ export type NonEvmAssetFilter = {
 };
 
 export type NonEvmAssets = {
-  __typename: "NonEvmAssets";
+  __typename: 'NonEvmAssets';
   totalCount?: number | null;
   nonEvmAssets?: Array<NonEvmAssetInfo | null> | null;
 };
 
 export type NonEvmAssetInfo = {
-  __typename: "NonEvmAssetInfo";
+  __typename: 'NonEvmAssetInfo';
   chainId?: number | null;
   tokenAddress?: string | null;
   holder?: string | null;
@@ -1694,7 +1694,7 @@ export type NonEvmAssetInfo = {
 };
 
 export type UserNonEvmAssetsInfo = {
-  __typename: "UserNonEvmAssetsInfo";
+  __typename: 'UserNonEvmAssetsInfo';
   totalBalanceUSD?: string | null;
   numberOfVaults?: number | null;
 };
@@ -1707,13 +1707,13 @@ export type NonEvmActivityFilter = {
 };
 
 export type NonEvmActivities = {
-  __typename: "NonEvmActivities";
+  __typename: 'NonEvmActivities';
   totalCount?: number | null;
   activitiesInfo: Array<NonEvmActivity>;
 };
 
 export type NonEvmActivity = {
-  __typename: "NonEvmActivity";
+  __typename: 'NonEvmActivity';
   id: number;
   chainId?: number | null;
   txHash?: string | null;
@@ -1731,7 +1731,7 @@ export type NonEvmActivity = {
 };
 
 export type NonEvmVaultInfo = {
-  __typename: "NonEvmVaultInfo";
+  __typename: 'NonEvmVaultInfo';
   vaultAddress?: string | null;
   vaultName?: string | null;
   description?: string | null;
@@ -1745,13 +1745,13 @@ export type NonEvmVaultInfo = {
 };
 
 export type NonEvmSaleInfo = {
-  __typename: "NonEvmSaleInfo";
+  __typename: 'NonEvmSaleInfo';
   amountRaised?: string | null;
   amountRemaining?: string | null;
 };
 
 export type SolvBtcData = {
-  __typename: "SolvBtcData";
+  __typename: 'SolvBtcData';
   tvl?: string | null;
   tvlUSD?: string | null;
   users?: number | null;
@@ -1759,7 +1759,7 @@ export type SolvBtcData = {
 };
 
 export type XSolvBtcData = {
-  __typename: "XSolvBtcData";
+  __typename: 'XSolvBtcData';
   tvl?: string | null;
   tvlUSD?: string | null;
   price?: string | null;
@@ -1768,37 +1768,37 @@ export type XSolvBtcData = {
 };
 
 export type SolvBtcInCirculation = {
-  __typename: "SolvBtcInCirculation";
+  __typename: 'SolvBtcInCirculation';
   tvl?: string | null;
   details?: Array<PercentageByChain | null> | null;
 };
 
 export type PercentageByChain = {
-  __typename: "PercentageByChain";
+  __typename: 'PercentageByChain';
   chainName?: string | null;
   percentage?: string | null;
 };
 
 export type XSolvBtcInCirculation = {
-  __typename: "XSolvBtcInCirculation";
+  __typename: 'XSolvBtcInCirculation';
   tvl?: string | null;
   details?: Array<PercentageByChain | null> | null;
 };
 
 export type SolvBtcBacking = {
-  __typename: "SolvBtcBacking";
+  __typename: 'SolvBtcBacking';
   tvl?: string | null;
   details?: Array<PercentageByAsset | null> | null;
 };
 
 export type PercentageByAsset = {
-  __typename: "PercentageByAsset";
+  __typename: 'PercentageByAsset';
   assetName?: string | null;
   percentage?: string | null;
 };
 
 export type RedeemContractInfo = {
-  __typename: "RedeemContractInfo";
+  __typename: 'RedeemContractInfo';
   redeemContract?: string | null;
   solvbtcAddress?: string | null;
 };
@@ -1809,13 +1809,13 @@ export type BtcRedeemFilter = {
 };
 
 export type BtcRedeemRecords = {
-  __typename: "BtcRedeemRecords";
+  __typename: 'BtcRedeemRecords';
   totalCount?: number | null;
   records?: Array<BtcRedeemRecord | null> | null;
 };
 
 export type BtcRedeemRecord = {
-  __typename: "BtcRedeemRecord";
+  __typename: 'BtcRedeemRecord';
   id?: number | null;
   burnAmount?: string | null;
   burnHash?: string | null;
@@ -1836,7 +1836,7 @@ export type LoginMutationVariables = {
 
 export type LoginMutation = {
   login?: {
-    __typename: "AccountInfo";
+    __typename: 'AccountInfo';
     id?: number | null;
     address?: string | null;
     // latestLoginId: Int
@@ -1860,10 +1860,10 @@ export type BeforeIssueMutationVariables = {
 
 export type BeforeIssueMutation = {
   beforeIssue?: {
-    __typename: "BondInfo";
+    __typename: 'BondInfo';
     id: number;
     productInfo?: {
-      __typename: "ProductInfo";
+      __typename: 'ProductInfo';
       id: number;
       chainId?: number | null;
       // contractType: String
@@ -1880,7 +1880,7 @@ export type BeforeIssueMutation = {
       updatedAt?: string | null;
     } | null;
     issuerInfo?: {
-      __typename: "IssuerInfo";
+      __typename: 'IssuerInfo';
       id: number;
       category?: string | null;
       // institutionUrl: String
@@ -1894,7 +1894,7 @@ export type BeforeIssueMutation = {
       updatedAt?: string | null;
     } | null;
     issuances?: Array<{
-      __typename: "Issuance";
+      __typename: 'Issuance';
       id: number;
       // productInfo: ProductInfo
       // issuerInfo: IssuerInfo
@@ -1925,7 +1925,7 @@ export type BeforeIssueMutation = {
     convertibility?: boolean | null;
     creditType?: string | null;
     currencyInfo?: {
-      __typename: "Currency";
+      __typename: 'Currency';
       symbol?: string | null;
       currencyAddress?: string | null;
       decimals?: number | null;
@@ -1941,7 +1941,7 @@ export type BeforeIssueMutation = {
     repaidValue?: string | null;
     claimedValue?: string | null;
     repayInfos?: Array<{
-      __typename: "RepayInfo";
+      __typename: 'RepayInfo';
       id: number;
       address?: string | null;
       repayValue?: string | null;
@@ -1959,7 +1959,7 @@ export type BeforeIssueMutation = {
     fundType?: string | null;
     showNav?: boolean | null;
     supervisorInfo?: {
-      __typename: "SupervisorInfo";
+      __typename: 'SupervisorInfo';
       id: number;
       name?: string | null;
       label?: string | null;
@@ -1982,10 +1982,10 @@ export type AfterIssueMutationVariables = {
 
 export type AfterIssueMutation = {
   afterIssue?: {
-    __typename: "BondInfo";
+    __typename: 'BondInfo';
     id: number;
     productInfo?: {
-      __typename: "ProductInfo";
+      __typename: 'ProductInfo';
       id: number;
       chainId?: number | null;
       // contractType: String
@@ -2002,7 +2002,7 @@ export type AfterIssueMutation = {
       updatedAt?: string | null;
     } | null;
     issuerInfo?: {
-      __typename: "IssuerInfo";
+      __typename: 'IssuerInfo';
       id: number;
       category?: string | null;
       // institutionUrl: String
@@ -2016,7 +2016,7 @@ export type AfterIssueMutation = {
       updatedAt?: string | null;
     } | null;
     issuances?: Array<{
-      __typename: "Issuance";
+      __typename: 'Issuance';
       id: number;
       // productInfo: ProductInfo
       // issuerInfo: IssuerInfo
@@ -2047,7 +2047,7 @@ export type AfterIssueMutation = {
     convertibility?: boolean | null;
     creditType?: string | null;
     currencyInfo?: {
-      __typename: "Currency";
+      __typename: 'Currency';
       symbol?: string | null;
       currencyAddress?: string | null;
       decimals?: number | null;
@@ -2063,7 +2063,7 @@ export type AfterIssueMutation = {
     repaidValue?: string | null;
     claimedValue?: string | null;
     repayInfos?: Array<{
-      __typename: "RepayInfo";
+      __typename: 'RepayInfo';
       id: number;
       address?: string | null;
       repayValue?: string | null;
@@ -2081,7 +2081,7 @@ export type AfterIssueMutation = {
     fundType?: string | null;
     showNav?: boolean | null;
     supervisorInfo?: {
-      __typename: "SupervisorInfo";
+      __typename: 'SupervisorInfo';
       id: number;
       name?: string | null;
       label?: string | null;
@@ -2105,10 +2105,10 @@ export type IssuerUpdateMutationVariables = {
 export type IssuerUpdateMutation = {
   // inquire(inquireInput: InquireInput): InquireInfo
   issuerUpdate?: {
-    __typename: "IssuerInfo";
+    __typename: 'IssuerInfo';
     id: number;
     accountInfo?: {
-      __typename: "AccountInfo";
+      __typename: 'AccountInfo';
       id?: number | null;
       address?: string | null;
       // latestLoginId: Int
@@ -2143,7 +2143,7 @@ export type UserUpdateMutationVariables = {
 
 export type UserUpdateMutation = {
   userUpdate?: {
-    __typename: "AccountInfo";
+    __typename: 'AccountInfo';
     id?: number | null;
     address?: string | null;
     // latestLoginId: Int
@@ -2175,7 +2175,7 @@ export type UpdateAvatarMutationVariables = {
 
 export type UpdateAvatarMutation = {
   updateAvatar?: {
-    __typename: "AccountInfo";
+    __typename: 'AccountInfo';
     id?: number | null;
     address?: string | null;
     // latestLoginId: Int
@@ -2207,10 +2207,10 @@ export type BeforeCreatePoolMutationVariables = {
 
 export type BeforeCreatePoolMutation = {
   beforeCreatePool?: {
-    __typename: "PoolSlotInfo";
+    __typename: 'PoolSlotInfo';
     id: number;
     productInfo?: {
-      __typename: "ProductInfo";
+      __typename: 'ProductInfo';
       id: number;
       chainId?: number | null;
       // contractType: String
@@ -2227,7 +2227,7 @@ export type BeforeCreatePoolMutation = {
       updatedAt?: string | null;
     } | null;
     issuerInfo?: {
-      __typename: "IssuerInfo";
+      __typename: 'IssuerInfo';
       id: number;
       category?: string | null;
       // institutionUrl: String
@@ -2241,7 +2241,7 @@ export type BeforeCreatePoolMutation = {
       updatedAt?: string | null;
     } | null;
     poolOrderInfo?: {
-      __typename: "PoolOrderInfo";
+      __typename: 'PoolOrderInfo';
       id: number;
       poolId?: string | null;
       openFundShare?: string | null;
@@ -2279,7 +2279,7 @@ export type BeforeCreatePoolMutation = {
       updatedAt?: string | null;
     } | null;
     supervisorInfo?: {
-      __typename: "SupervisorInfo";
+      __typename: 'SupervisorInfo';
       id: number;
       name?: string | null;
       label?: string | null;
@@ -2290,7 +2290,7 @@ export type BeforeCreatePoolMutation = {
       updatedAt?: string | null;
     } | null;
     currencyInfo?: {
-      __typename: "Currency";
+      __typename: 'Currency';
       symbol?: string | null;
       currencyAddress?: string | null;
       decimals?: number | null;
@@ -2332,10 +2332,10 @@ export type AfterCreatePoolMutationVariables = {
 
 export type AfterCreatePoolMutation = {
   afterCreatePool?: {
-    __typename: "PoolSlotInfo";
+    __typename: 'PoolSlotInfo';
     id: number;
     productInfo?: {
-      __typename: "ProductInfo";
+      __typename: 'ProductInfo';
       id: number;
       chainId?: number | null;
       // contractType: String
@@ -2352,7 +2352,7 @@ export type AfterCreatePoolMutation = {
       updatedAt?: string | null;
     } | null;
     issuerInfo?: {
-      __typename: "IssuerInfo";
+      __typename: 'IssuerInfo';
       id: number;
       category?: string | null;
       // institutionUrl: String
@@ -2366,7 +2366,7 @@ export type AfterCreatePoolMutation = {
       updatedAt?: string | null;
     } | null;
     poolOrderInfo?: {
-      __typename: "PoolOrderInfo";
+      __typename: 'PoolOrderInfo';
       id: number;
       poolId?: string | null;
       openFundShare?: string | null;
@@ -2404,7 +2404,7 @@ export type AfterCreatePoolMutation = {
       updatedAt?: string | null;
     } | null;
     supervisorInfo?: {
-      __typename: "SupervisorInfo";
+      __typename: 'SupervisorInfo';
       id: number;
       name?: string | null;
       label?: string | null;
@@ -2415,7 +2415,7 @@ export type AfterCreatePoolMutation = {
       updatedAt?: string | null;
     } | null;
     currencyInfo?: {
-      __typename: "Currency";
+      __typename: 'Currency';
       symbol?: string | null;
       currencyAddress?: string | null;
       decimals?: number | null;
@@ -2457,7 +2457,7 @@ export type OriginalNavAddMutationVariables = {
 
 export type OriginalNavAddMutation = {
   originalNavAdd?: {
-    __typename: "OriginalNavInfo";
+    __typename: 'OriginalNavInfo';
     id: number;
     poolId?: string | null;
     navDate?: number | null;
@@ -2473,7 +2473,7 @@ export type OriginalNavUpdateHashMutationVariables = {
 
 export type OriginalNavUpdateHashMutation = {
   originalNavUpdateHash?: {
-    __typename: "OriginalNavInfo";
+    __typename: 'OriginalNavInfo';
     id: number;
     poolId?: string | null;
     navDate?: number | null;
@@ -2489,7 +2489,7 @@ export type CreateAccountMutationVariables = {
 
 export type CreateAccountMutation = {
   createAccount?: {
-    __typename: "AccountInfo";
+    __typename: 'AccountInfo';
     id?: number | null;
     address?: string | null;
     // latestLoginId: Int
@@ -2514,7 +2514,7 @@ export type CreateReferralMutationVariables = {
 export type CreateReferralMutation = {
   // updateRewardApy(poolSlotInfoId: Int, apy: String): Boolean
   createReferral?: {
-    __typename: "ReferralInfo";
+    __typename: 'ReferralInfo';
     id?: number | null;
     referralCode?: string | null;
     userAddress?: string | null;
@@ -2529,7 +2529,7 @@ export type PointSysBindRegMutationVariables = {
 
 export type PointSysBindRegMutation = {
   pointSysBindReg?: {
-    __typename: "PointSysAccountInfo";
+    __typename: 'PointSysAccountInfo';
     address?: string | null;
     isRegistered?: boolean | null;
     seedUserInviteCode?: string | null;
@@ -2544,7 +2544,7 @@ export type PointSysBindRegMutation = {
     nextLevelHoldingTVL?: string | null;
     nextLevelHoldingAccelerationRatio?: string | null;
     activityCards?: Array<{
-      __typename: "PointSysActivityCard";
+      __typename: 'PointSysActivityCard';
       type?: string | null;
       accelerationRatio?: string | null;
       startTime?: string | null;
@@ -2559,7 +2559,7 @@ export type Phase2PointSysBindRegMutationVariables = {
 
 export type Phase2PointSysBindRegMutation = {
   phase2PointSysBindReg?: {
-    __typename: "PointSysAccountInfo";
+    __typename: 'PointSysAccountInfo';
     address?: string | null;
     isRegistered?: boolean | null;
     seedUserInviteCode?: string | null;
@@ -2574,7 +2574,7 @@ export type Phase2PointSysBindRegMutation = {
     nextLevelHoldingTVL?: string | null;
     nextLevelHoldingAccelerationRatio?: string | null;
     activityCards?: Array<{
-      __typename: "PointSysActivityCard";
+      __typename: 'PointSysActivityCard';
       type?: string | null;
       accelerationRatio?: string | null;
       startTime?: string | null;
@@ -2589,7 +2589,7 @@ export type SaveWalletInfoMutationVariables = {
 
 export type SaveWalletInfoMutation = {
   saveWalletInfo?: {
-    __typename: "WalletInfo";
+    __typename: 'WalletInfo';
     chainId?: number | null;
     userAddress?: string | null;
     txHash?: string | null;
@@ -2604,7 +2604,7 @@ export type AddBtcRecordsMutationVariables = {
 
 export type AddBtcRecordsMutation = {
   addBtcRecords?: {
-    __typename: "BtcDepositMintRecord";
+    __typename: 'BtcDepositMintRecord';
     id: number;
     depositAmount?: string | null;
     depositHash?: string | null;
@@ -2638,7 +2638,7 @@ export type AddStakeBtcRecordMutationVariables = {
 
 export type AddStakeBtcRecordMutation = {
   addStakeBtcRecord?: {
-    __typename: "BtcStakeRecord";
+    __typename: 'BtcStakeRecord';
     id: number;
     chainId: number;
     poolId: string;
@@ -2659,7 +2659,7 @@ export type UpdateStakeBtcRecordMutationVariables = {
 
 export type UpdateStakeBtcRecordMutation = {
   updateStakeBtcRecord?: {
-    __typename: "BtcStakeRecord";
+    __typename: 'BtcStakeRecord';
     id: number;
     chainId: number;
     poolId: string;
@@ -2725,7 +2725,7 @@ export type BtcMintRegisterMutationVariables = {
 
 export type BtcMintRegisterMutation = {
   btcMintRegister?: {
-    __typename: "BtcMintRegisterInfo";
+    __typename: 'BtcMintRegisterInfo';
     id?: number | null;
     btcAddress?: string | null;
     chainId?: number | null;
@@ -2743,7 +2743,7 @@ export type AddEvmBabylonConnectionMutationVariables = {
 
 export type AddEvmBabylonConnectionMutation = {
   addEvmBabylonConnection?: {
-    __typename: "EvmBabylonConnectionInfo";
+    __typename: 'EvmBabylonConnectionInfo';
     evmAddress?: string | null;
     babylonAddress?: string | null;
     signMessage?: string | null;
@@ -2773,7 +2773,7 @@ export type LoginMessageQueryVariables = {
 
 export type LoginMessageQuery = {
   loginMessage?: {
-    __typename: "LoginMessage";
+    __typename: 'LoginMessage';
     message: string;
   } | null;
 };
@@ -2784,7 +2784,7 @@ export type UserAccountInfoQueryVariables = {
 
 export type UserAccountInfoQuery = {
   userAccountInfo?: {
-    __typename: "AccountInfo";
+    __typename: 'AccountInfo';
     id?: number | null;
     address?: string | null;
     // latestLoginId: Int
@@ -2810,10 +2810,10 @@ export type AccountsQueryVariables = {
 
 export type AccountsQuery = {
   accounts?: {
-    __typename: "Accounts";
+    __typename: 'Accounts';
     totalCount?: number | null;
     accountsInfo: Array<{
-      __typename: "AccountInfo";
+      __typename: 'AccountInfo';
       id?: number | null;
       address?: string | null;
       // latestLoginId: Int
@@ -2840,10 +2840,10 @@ export type IssuancesQueryVariables = {
 
 export type IssuancesQuery = {
   issuances?: {
-    __typename: "Bonds";
+    __typename: 'Bonds';
     totalCount: number;
     bondsInfo: Array<{
-      __typename: "BondInfo";
+      __typename: 'BondInfo';
       id: number;
       interestType?: string | null;
       convertibility?: boolean | null;
@@ -2880,10 +2880,10 @@ export type AssetsQueryVariables = {
 
 export type AssetsQuery = {
   assets?: {
-    __typename: "Assets";
+    __typename: 'Assets';
     totalCount?: number | null;
     assetsInfo: Array<{
-      __typename: "AssetInfo";
+      __typename: 'AssetInfo';
       id?: number | null;
       // 有的需要从bondInfo中拿
       poolSlotInfoId?: number | null;
@@ -2952,11 +2952,11 @@ export type ProductQueryVariables = {
 
 export type ProductQuery = {
   product?: {
-    __typename: "ProductInfo";
+    __typename: 'ProductInfo';
     id: number;
     chainId?: number | null;
     contractInfo?: {
-      __typename: "ContractInfo";
+      __typename: 'ContractInfo';
       id: number;
       contractAddress?: string | null;
       contractType?: string | null;
@@ -2986,7 +2986,7 @@ export type ProductQuery = {
     createTxHash?: string | null;
     txStatus?: string | null;
     tags?: Array<{
-      __typename: "Tag";
+      __typename: 'Tag';
       tag?: string | null;
     } | null> | null;
     createdAt?: string | null;
@@ -3000,10 +3000,10 @@ export type IssueContractQueryVariables = {
 
 export type IssueContractQuery = {
   issueContract?: {
-    __typename: "IssueContracts";
+    __typename: 'IssueContracts';
     totalCount?: number | null;
     issueContracts?: Array<{
-      __typename: "IssueContract";
+      __typename: 'IssueContract';
     } | null> | null;
   } | null;
 };
@@ -3014,10 +3014,10 @@ export type IssuerInfoQueryVariables = {
 
 export type IssuerInfoQuery = {
   issuerInfo?: {
-    __typename: "IssuerInfo";
+    __typename: 'IssuerInfo';
     id: number;
     accountInfo?: {
-      __typename: "AccountInfo";
+      __typename: 'AccountInfo';
       id?: number | null;
       address?: string | null;
       // latestLoginId: Int
@@ -3054,10 +3054,10 @@ export type RoadshowsQueryVariables = {
 
 export type RoadshowsQuery = {
   roadshows?: {
-    __typename: "Roadshows";
+    __typename: 'Roadshows';
     totalCount?: number | null;
     roadshowsInfo: Array<{
-      __typename: "Roadshow";
+      __typename: 'Roadshow';
       id?: number | null;
       chainId?: number | null;
       roadshowType?: string | null;
@@ -3083,10 +3083,10 @@ export type ActivitiesQueryVariables = {
 
 export type ActivitiesQuery = {
   activities?: {
-    __typename: "Activities";
+    __typename: 'Activities';
     totalCount?: number | null;
     activitiesInfo: Array<{
-      __typename: "Activity";
+      __typename: 'Activity';
       id: number;
       chainId?: number | null;
       contractAddress?: string | null;
@@ -3130,7 +3130,7 @@ export type IssuerStatsQueryVariables = {
 
 export type IssuerStatsQuery = {
   issuerStats?: {
-    __typename: "IssuerStats";
+    __typename: 'IssuerStats';
     totalIssued?: string | null;
     totalRepaid?: string | null;
     totalInterest?: string | null;
@@ -3145,10 +3145,10 @@ export type SupervisorsQueryVariables = {
 
 export type SupervisorsQuery = {
   supervisors?: {
-    __typename: "Supervisors";
+    __typename: 'Supervisors';
     totalCount: number;
     supervisorsInfo: Array<{
-      __typename: "SupervisorInfo";
+      __typename: 'SupervisorInfo';
       id: number;
       name?: string | null;
       label?: string | null;
@@ -3169,11 +3169,11 @@ export type NavsQueryVariables = {
 
 export type NavsQuery = {
   navs?: {
-    __typename: "NavInfo";
+    __typename: 'NavInfo';
     bondId?: number | null;
     symbol?: string | null;
     serialData?: Array<{
-      __typename: "NavData";
+      __typename: 'NavData';
       nav?: string | null;
       yield?: string | null;
       fetchDate?: string | null;
@@ -3188,7 +3188,7 @@ export type MarketContractQueryVariables = {
 
 export type MarketContractQuery = {
   marketContract?: {
-    __typename: "MarketContractInfo";
+    __typename: 'MarketContractInfo';
     marketContractAddress?: string | null;
     decimals?: number | null;
     defautFeeRate?: string | null;
@@ -3203,10 +3203,10 @@ export type PoolsQueryVariables = {
 
 export type PoolsQuery = {
   pools?: {
-    __typename: "Pools";
+    __typename: 'Pools';
     totalCount: number;
     poolsInfo: Array<{
-      __typename: "PoolSlotInfo";
+      __typename: 'PoolSlotInfo';
       id: number;
       fundType?: string | null;
       interestType?: string | null;
@@ -3248,14 +3248,14 @@ export type NavHistoryQueryVariables = {
 
 export type NavHistoryQuery = {
   navHistory?: {
-    __typename: "NavHistoryInfo";
+    __typename: 'NavHistoryInfo';
     totalCount?: number | null;
     poolSlotInfoId?: number | null;
     symbol?: string | null;
     currencyDecimals?: number | null;
     allTimeHigh?: string | null;
     serialData?: Array<{
-      __typename: "NavHistoryData";
+      __typename: 'NavHistoryData';
       nav?: string | null;
       adjustedNav?: string | null;
       navDate?: string | null;
@@ -3271,14 +3271,14 @@ export type NavsOpenFundQueryVariables = {
 
 export type NavsOpenFundQuery = {
   navsOpenFund?: {
-    __typename: "NavHistoryInfo";
+    __typename: 'NavHistoryInfo';
     totalCount?: number | null;
     poolSlotInfoId?: number | null;
     symbol?: string | null;
     currencyDecimals?: number | null;
     allTimeHigh?: string | null;
     serialData?: Array<{
-      __typename: "NavHistoryData";
+      __typename: 'NavHistoryData';
       nav?: string | null;
       adjustedNav?: string | null;
       navDate?: string | null;
@@ -3292,7 +3292,7 @@ export type AssetsCountQueryVariables = {
 
 export type AssetsCountQuery = {
   assetsCount?: Array<{
-    __typename: "AssetsCountInfo";
+    __typename: 'AssetsCountInfo';
     productType?: string | null;
     count?: number | null;
   } | null> | null;
@@ -3306,10 +3306,10 @@ export type RedemptionsQueryVariables = {
 
 export type RedemptionsQuery = {
   redemptions?: {
-    __typename: "Redemptions";
+    __typename: 'Redemptions';
     totalCount: number;
     redemptionsInfo: Array<{
-      __typename: "RedeemInfo";
+      __typename: 'RedeemInfo';
       id: number;
       poolId?: string | null;
       redeemSlot?: string | null;
@@ -3332,7 +3332,7 @@ export type StatsQueryVariables = {};
 
 export type StatsQuery = {
   stats?: {
-    __typename: "Stats";
+    __typename: 'Stats';
     totalAssetsValue?: string | null;
     totalBtcStaked?: string | null;
     totalBtcTvlUSD?: string | null;
@@ -3349,7 +3349,7 @@ export type AumsQueryVariables = {
 
 export type AumsQuery = {
   aums?: {
-    __typename: "AumHistoryInfo";
+    __typename: 'AumHistoryInfo';
     totalCount?: number | null;
     totalShares?: string | null;
     investors?: number | null;
@@ -3358,7 +3358,7 @@ export type AumsQuery = {
     symbol?: string | null;
     currencyDecimals?: number | null;
     serialData?: Array<{
-      __typename: "AumHistoryData";
+      __typename: 'AumHistoryData';
       aum?: string | null;
       nav?: string | null;
       fetchDate?: string | null;
@@ -3384,12 +3384,12 @@ export type NavRecordsQueryVariables = {
 
 export type NavRecordsQuery = {
   navRecords?: {
-    __typename: "NavRecordsInfo";
+    __typename: 'NavRecordsInfo';
     totalCount?: number | null;
     symbol?: string | null;
     currencyDecimals?: number | null;
     serialData?: Array<{
-      __typename: "NavRecordsData";
+      __typename: 'NavRecordsData';
       nav?: string | null;
       navType?: string | null;
       time?: number | null;
@@ -3403,7 +3403,7 @@ export type CarryCollectorsQueryVariables = {
 
 export type CarryCollectorsQuery = {
   carryCollectors?: Array<{
-    __typename: "CarryCollectorInfo";
+    __typename: 'CarryCollectorInfo';
     id: number;
     chainId?: number | null;
     carryCollector?: string | null;
@@ -3420,7 +3420,7 @@ export type AllocationsQueryVariables = {
 
 export type AllocationsQuery = {
   allocations?: Array<{
-    __typename: "AllocationInfo";
+    __typename: 'AllocationInfo';
     name?: string | null;
     percentage?: string | null;
     value?: string | null;
@@ -3435,10 +3435,10 @@ export type AssetsByHolderQueryVariables = {
 
 export type AssetsByHolderQuery = {
   assetsByHolder?: {
-    __typename: "UserAssetsInfo";
+    __typename: 'UserAssetsInfo';
     totalBalanceUSD?: string | null;
     assetsInfo?: Array<{
-      __typename: "PoolAssetInfo";
+      __typename: 'PoolAssetInfo';
       poolId?: string | null;
       balance?: string | null;
       // currencyPrice: String
@@ -3453,7 +3453,7 @@ export type GetWrappedTokenQueryVariables = {
 
 export type GetWrappedTokenQuery = {
   getWrappedToken?: {
-    __typename: "WrappedTokenInfo";
+    __typename: 'WrappedTokenInfo';
     tokenAddress?: string | null;
     symbol?: string | null;
     decimals?: number | null;
@@ -3469,10 +3469,10 @@ export type WrappedAssetsQueryVariables = {
 
 export type WrappedAssetsQuery = {
   wrappedAssets?: {
-    __typename: "WrappedAssets";
+    __typename: 'WrappedAssets';
     totalCount?: number | null;
     wrappedAssets?: Array<{
-      __typename: "WrappedAssetInfo";
+      __typename: 'WrappedAssetInfo';
       chainId?: number | null;
       tokenAddress?: string | null;
       holder?: string | null;
@@ -3509,10 +3509,10 @@ export type GetPoolCurrenciesQueryVariables = {
 
 export type GetPoolCurrenciesQuery = {
   getPoolCurrencies?: {
-    __typename: "PoolCurrencies";
+    __typename: 'PoolCurrencies';
     totalCount?: number | null;
     currencies?: Array<{
-      __typename: "PoolCurrencyInfo";
+      __typename: 'PoolCurrencyInfo';
       chainId?: number | null;
       poolId?: string | null;
       currencyAddress?: string | null;
@@ -3538,7 +3538,7 @@ export type RouterContractQueryVariables = {
 
 export type RouterContractQuery = {
   routerContract?: {
-    __typename: "RouterContractInfo";
+    __typename: 'RouterContractInfo';
     chainId?: number | null;
     contractAddress?: string | null;
   } | null;
@@ -3548,7 +3548,7 @@ export type MarketCoreDataQueryVariables = {};
 
 export type MarketCoreDataQuery = {
   marketCoreData?: {
-    __typename: "MarketCoreData";
+    __typename: 'MarketCoreData';
     totalValueLocked?: string | null;
     totalYieldGenerated?: string | null;
     totalUsers?: string | null;
@@ -3587,7 +3587,7 @@ export type PointSysAccountInfoQueryVariables = {
 
 export type PointSysAccountInfoQuery = {
   pointSysAccountInfo?: {
-    __typename: "PointSysAccountInfo";
+    __typename: 'PointSysAccountInfo';
     address?: string | null;
     isRegistered?: boolean | null;
     seedUserInviteCode?: string | null;
@@ -3602,7 +3602,7 @@ export type PointSysAccountInfoQuery = {
     nextLevelHoldingTVL?: string | null;
     nextLevelHoldingAccelerationRatio?: string | null;
     activityCards?: Array<{
-      __typename: "PointSysActivityCard";
+      __typename: 'PointSysActivityCard';
       type?: string | null;
       accelerationRatio?: string | null;
       startTime?: string | null;
@@ -3615,7 +3615,7 @@ export type PointSysRankingQueryVariables = {};
 
 export type PointSysRankingQuery = {
   pointSysRanking?: Array<{
-    __typename: "PointSysRankingInfo";
+    __typename: 'PointSysRankingInfo';
     address?: string | null;
     avatar?: string | null;
     username?: string | null;
@@ -3641,7 +3641,7 @@ export type Phase2PointSysAccountInfoQueryVariables = {
 
 export type Phase2PointSysAccountInfoQuery = {
   phase2PointSysAccountInfo?: {
-    __typename: "PointSysAccountInfo";
+    __typename: 'PointSysAccountInfo';
     address?: string | null;
     isRegistered?: boolean | null;
     seedUserInviteCode?: string | null;
@@ -3656,7 +3656,7 @@ export type Phase2PointSysAccountInfoQuery = {
     nextLevelHoldingTVL?: string | null;
     nextLevelHoldingAccelerationRatio?: string | null;
     activityCards?: Array<{
-      __typename: "PointSysActivityCard";
+      __typename: 'PointSysActivityCard';
       type?: string | null;
       accelerationRatio?: string | null;
       startTime?: string | null;
@@ -3669,7 +3669,7 @@ export type Phase2PointSysRankingQueryVariables = {};
 
 export type Phase2PointSysRankingQuery = {
   phase2PointSysRanking?: Array<{
-    __typename: "PointSysRankingInfo";
+    __typename: 'PointSysRankingInfo';
     address?: string | null;
     avatar?: string | null;
     username?: string | null;
@@ -3685,9 +3685,9 @@ export type BtcStatsQueryVariables = {};
 
 export type BtcStatsQuery = {
   btcStats?: {
-    __typename: "BTCStats";
+    __typename: 'BTCStats';
     supportedChains?: Array<{
-      __typename: "BtcFofInfo";
+      __typename: 'BtcFofInfo';
       chainId?: number | null;
       poolSlotInfoId?: number | null;
       order?: number | null;
@@ -3697,13 +3697,13 @@ export type BtcStatsQuery = {
     totalAmount?: string | null;
     totalSolvBtcAmount?: string | null;
     tvlDetail?: Array<{
-      __typename: "TvlDetail";
+      __typename: 'TvlDetail';
       chainId?: number | null;
       amount?: string | null;
       tvl?: string | null;
     } | null> | null;
     detail?: Array<{
-      __typename: "BTCDetail";
+      __typename: 'BTCDetail';
       chainId?: number | null;
       slot?: string | null;
       symbol?: string | null;
@@ -3721,10 +3721,10 @@ export type PoolsApyQueryVariables = {
 
 export type PoolsApyQuery = {
   poolsApy?: {
-    __typename: "Pools";
+    __typename: 'Pools';
     totalCount: number;
     poolsInfo: Array<{
-      __typename: "PoolSlotInfo";
+      __typename: 'PoolSlotInfo';
       id: number;
       fundType?: string | null;
       interestType?: string | null;
@@ -3764,7 +3764,7 @@ export type BtcTvlByChainQueryVariables = {
 
 export type BtcTvlByChainQuery = {
   btcTvlByChain?: {
-    __typename: "BTCTvlInfo";
+    __typename: 'BTCTvlInfo';
     chainId?: number | null;
     tvl?: string | null;
     investors?: number | null;
@@ -3777,9 +3777,9 @@ export type BtcPoolInfoQueryVariables = {
 
 export type BtcPoolInfoQuery = {
   btcPoolInfo?: {
-    __typename: "BtcPoolInfo";
+    __typename: 'BtcPoolInfo';
     poolInfo?: {
-      __typename: "PoolSlotInfo";
+      __typename: 'PoolSlotInfo';
       id: number;
       fundType?: string | null;
       interestType?: string | null;
@@ -3811,14 +3811,14 @@ export type BtcPoolInfoQuery = {
       isUpgradedRouterV2?: boolean | null;
     } | null;
     wrappedTokenInfo?: {
-      __typename: "WrappedTokenInfo";
+      __typename: 'WrappedTokenInfo';
       tokenAddress?: string | null;
       symbol?: string | null;
       decimals?: number | null;
       name?: string | null;
     } | null;
     routerContract?: {
-      __typename: "RouterContractInfo";
+      __typename: 'RouterContractInfo';
       chainId?: number | null;
       contractAddress?: string | null;
     } | null;
@@ -3830,7 +3830,7 @@ export type SupportedChainsQueryVariables = {};
 
 export type SupportedChainsQuery = {
   supportedChains?: Array<{
-    __typename: "BtcFofInfo";
+    __typename: 'BtcFofInfo';
     chainId?: number | null;
     poolSlotInfoId?: number | null;
     order?: number | null;
@@ -3843,7 +3843,7 @@ export type YieldPoolInfoQueryVariables = {
 
 export type YieldPoolInfoQuery = {
   yieldPoolInfo?: {
-    __typename: "YieldPoolInfo";
+    __typename: 'YieldPoolInfo';
     chainId?: number | null;
     poolSlotInfoId?: number | null;
     poolId?: string | null;
@@ -3869,7 +3869,7 @@ export type BtcMainnetInfoQueryVariables = {};
 
 export type BtcMainnetInfoQuery = {
   btcMainnetInfo?: {
-    __typename: "BtcMainnetInfo";
+    __typename: 'BtcMainnetInfo';
     depositAddress?: string | null;
     depositNetwork?: string | null;
   } | null;
@@ -3881,7 +3881,7 @@ export type BtcWhitelistInfoQueryVariables = {
 
 export type BtcWhitelistInfoQuery = {
   btcWhitelistInfo?: {
-    __typename: "BtcWhitelistInfo";
+    __typename: 'BtcWhitelistInfo';
     isBtcWhitelist: boolean;
     btcDepositPlatForm?: string | null;
     btcDepositAddress?: string | null;
@@ -3892,7 +3892,7 @@ export type DefiPointRatioQueryVariables = {};
 
 export type DefiPointRatioQuery = {
   defiPointRatio?: Array<{
-    __typename: "DefiPointRatioInfo";
+    __typename: 'DefiPointRatioInfo';
     chainId?: number | null;
     chainName?: string | null;
     protocol?: string | null;
@@ -3911,7 +3911,7 @@ export type YieldPoolSupportedChainsQueryVariables = {
 
 export type YieldPoolSupportedChainsQuery = {
   yieldPoolSupportedChains?: Array<{
-    __typename: "BtcYieldPoolInfo";
+    __typename: 'BtcYieldPoolInfo';
     chainId?: number | null;
     poolSlotInfoId?: number | null;
     yieldType?: string | null;
@@ -3926,7 +3926,7 @@ export type YieldPoolStatsQueryVariables = {
 
 export type YieldPoolStatsQuery = {
   yieldPoolStats?: {
-    __typename: "YieldPoolStats";
+    __typename: 'YieldPoolStats';
     yieldType?: string | null;
     tvl?: string | null;
     apy?: string | null;
@@ -3940,10 +3940,10 @@ export type SupportedChainsMQueryVariables = {};
 
 export type SupportedChainsMQuery = {
   supportedChainsM?: Array<{
-    __typename: "BtcFofInfoM";
+    __typename: 'BtcFofInfoM';
     chainId?: number | null;
     idAndCurrency?: Array<{
-      __typename: "IdAndCurrency";
+      __typename: 'IdAndCurrency';
       poolSlotInfoId?: number | null;
       currencySymbol?: string | null;
     } | null> | null;
@@ -3959,7 +3959,7 @@ export type LiquidityByChainQueryVariables = {
 
 export type LiquidityByChainQuery = {
   liquidityByChain?: Array<{
-    __typename: "ChainLiquidityInfo";
+    __typename: 'ChainLiquidityInfo';
     chainId?: number | null;
     chainName?: string | null;
     totalTvl?: string | null;
@@ -3968,7 +3968,7 @@ export type LiquidityByChainQuery = {
     url?: string | null;
     order?: number | null;
     details?: Array<{
-      __typename: "LiquidityInfo";
+      __typename: 'LiquidityInfo';
       chainId?: number | null;
       chainName?: string | null;
       protocol?: string | null;
@@ -4001,14 +4001,14 @@ export type LiquidityByProtocolQueryVariables = {
 
 export type LiquidityByProtocolQuery = {
   liquidityByProtocol?: Array<{
-    __typename: "ProtocolLiquidityInfo";
+    __typename: 'ProtocolLiquidityInfo';
     protocol?: string | null;
     totalTvl?: string | null;
     highestApy?: string | null;
     highestPointRatio?: number | null;
     order?: number | null;
     details?: Array<{
-      __typename: "LiquidityInfo";
+      __typename: 'LiquidityInfo';
       chainId?: number | null;
       chainName?: string | null;
       protocol?: string | null;
@@ -4038,7 +4038,7 @@ export type LiquidityByAssetQueryVariables = {
 
 export type LiquidityByAssetQuery = {
   liquidityByAsset?: Array<{
-    __typename: "AssetsLiquidityInfo";
+    __typename: 'AssetsLiquidityInfo';
     assetType?: string | null;
     totalTvl?: string | null;
     highestApy?: string | null;
@@ -4046,7 +4046,7 @@ export type LiquidityByAssetQuery = {
     url?: string | null;
     order?: number | null;
     details?: Array<{
-      __typename: "LiquidityInfo";
+      __typename: 'LiquidityInfo';
       chainId?: number | null;
       chainName?: string | null;
       protocol?: string | null;
@@ -4074,11 +4074,11 @@ export type SolvbtcAssetsQueryVariables = {};
 
 export type SolvbtcAssetsQuery = {
   solvbtcAssets?: {
-    __typename: "SolvBtcAssets";
+    __typename: 'SolvBtcAssets';
     snapshotTime?: number | null;
     totalAmount?: string | null;
     assets?: Array<{
-      __typename: "SolvBtcAsset";
+      __typename: 'SolvBtcAsset';
       assetName?: string | null;
       assetAmount?: string | null;
       order: number;
@@ -4090,11 +4090,11 @@ export type SolvbtcLiabilitiesQueryVariables = {};
 
 export type SolvbtcLiabilitiesQuery = {
   solvbtcLiabilities?: {
-    __typename: "SolvBtcLiabilities";
+    __typename: 'SolvBtcLiabilities';
     snapshotTime?: number | null;
     totalAmount?: string | null;
     liabilities?: Array<{
-      __typename: "SolvBtcLiability";
+      __typename: 'SolvBtcLiability';
       chainName?: string | null;
       tokenAddress?: string | null;
       url?: string | null;
@@ -4110,7 +4110,7 @@ export type DexsQueryVariables = {
 
 export type DexsQuery = {
   dexs?: Array<{
-    __typename: "DexInfo";
+    __typename: 'DexInfo';
     chainId?: number | null;
     chainName?: string | null;
     assetName?: string | null;
@@ -4128,7 +4128,7 @@ export type RedeemablesQueryVariables = {
 
 export type RedeemablesQuery = {
   redeemables?: Array<{
-    __typename: "RedeemableInfo";
+    __typename: 'RedeemableInfo';
     chainId?: number | null;
     chainName?: string | null;
     redeemableAmount?: string | null;
@@ -4142,11 +4142,11 @@ export type SolvbtcReservesQueryVariables = {};
 
 export type SolvbtcReservesQuery = {
   solvbtcReserves?: {
-    __typename: "SolvBtcAssets";
+    __typename: 'SolvBtcAssets';
     snapshotTime?: number | null;
     totalAmount?: string | null;
     assets?: Array<{
-      __typename: "SolvBtcAsset";
+      __typename: 'SolvBtcAsset';
       assetName?: string | null;
       assetAmount?: string | null;
       order: number;
@@ -4158,11 +4158,11 @@ export type SolvbtcIssuancesQueryVariables = {};
 
 export type SolvbtcIssuancesQuery = {
   solvbtcIssuances?: {
-    __typename: "SolvBtcLiabilities";
+    __typename: 'SolvBtcLiabilities';
     snapshotTime?: number | null;
     totalAmount?: string | null;
     liabilities?: Array<{
-      __typename: "SolvBtcLiability";
+      __typename: 'SolvBtcLiability';
       chainName?: string | null;
       tokenAddress?: string | null;
       url?: string | null;
@@ -4176,11 +4176,11 @@ export type SolvbtcBbnReservesQueryVariables = {};
 
 export type SolvbtcBbnReservesQuery = {
   solvbtcBbnReserves?: {
-    __typename: "SolvBtcYTReserves";
+    __typename: 'SolvBtcYTReserves';
     snapshotTime?: number | null;
     totalAmount?: string | null;
     reserves?: Array<{
-      __typename: "SolvBtcYTReserve";
+      __typename: 'SolvBtcYTReserve';
       vault?: string | null;
       vaultAddress?: string | null;
       url?: string | null;
@@ -4193,11 +4193,11 @@ export type SolvbtcBbnIssuancesQueryVariables = {};
 
 export type SolvbtcBbnIssuancesQuery = {
   solvbtcBbnIssuances?: {
-    __typename: "SolvBtcYTIssuances";
+    __typename: 'SolvBtcYTIssuances';
     snapshotTime?: number | null;
     totalAmount?: string | null;
     issuances?: Array<{
-      __typename: "SolvBtcYTIssuance";
+      __typename: 'SolvBtcYTIssuance';
       chainName?: string | null;
       tokenAddress?: string | null;
       url?: string | null;
@@ -4211,11 +4211,11 @@ export type SolvbtcEnaReservesQueryVariables = {};
 
 export type SolvbtcEnaReservesQuery = {
   solvbtcEnaReserves?: {
-    __typename: "SolvBtcYTReserves";
+    __typename: 'SolvBtcYTReserves';
     snapshotTime?: number | null;
     totalAmount?: string | null;
     reserves?: Array<{
-      __typename: "SolvBtcYTReserve";
+      __typename: 'SolvBtcYTReserve';
       vault?: string | null;
       vaultAddress?: string | null;
       url?: string | null;
@@ -4228,11 +4228,11 @@ export type SolvbtcEnaIssuancesQueryVariables = {};
 
 export type SolvbtcEnaIssuancesQuery = {
   solvbtcEnaIssuances?: {
-    __typename: "SolvBtcYTIssuances";
+    __typename: 'SolvBtcYTIssuances';
     snapshotTime?: number | null;
     totalAmount?: string | null;
     issuances?: Array<{
-      __typename: "SolvBtcYTIssuance";
+      __typename: 'SolvBtcYTIssuance';
       chainName?: string | null;
       tokenAddress?: string | null;
       url?: string | null;
@@ -4254,12 +4254,12 @@ export type LstsQueryVariables = {};
 
 export type LstsQuery = {
   lsts?: {
-    __typename: "Lsts";
+    __typename: 'Lsts';
     stakingBTCAmount?: string | null;
     users?: number | null;
     ecosystems?: string | null;
     details?: Array<{
-      __typename: "LstInfo";
+      __typename: 'LstInfo';
       protocol?: string | null;
       alias?: string | null;
       category?: string | null;
@@ -4290,15 +4290,15 @@ export type BridgeSupportedChainsQueryVariables = {
 
 export type BridgeSupportedChainsQuery = {
   bridgeSupportedChains?: {
-    __typename: "Chains";
+    __typename: 'Chains';
     fromChains?: Array<{
-      __typename: "ChainInfo";
+      __typename: 'ChainInfo';
       chainName: string;
       chainId: number;
       tokenAddress?: string | null;
     } | null> | null;
     toChains?: Array<{
-      __typename: "ChainInfo";
+      __typename: 'ChainInfo';
       chainName: string;
       chainId: number;
       tokenAddress?: string | null;
@@ -4314,7 +4314,7 @@ export type GetSupportedBridgesQueryVariables = {
 
 export type GetSupportedBridgesQuery = {
   getSupportedBridges?: Array<{
-    __typename: "Bridge";
+    __typename: 'Bridge';
     bridgeName: string;
     bridgeUrl: string;
     description: string;
@@ -4328,14 +4328,14 @@ export type EligibilityCheckQueryVariables = {
 
 export type EligibilityCheckQuery = {
   eligibilityCheck?: {
-    __typename: "AirdropInfo";
+    __typename: 'AirdropInfo';
     totalPoints?: string | null;
     userType?: string | null;
     chainId?: number | null;
     tokenAddress?: string | null;
     signer?: string | null;
     stagesInfo?: Array<{
-      __typename: "StageInfo";
+      __typename: 'StageInfo';
       stageNo?: number | null;
       rewardType?: string | null;
       totalClaimable?: string | null;
@@ -4363,10 +4363,10 @@ export type ManagementBtcStakeRecordsQueryVariables = {
 
 export type ManagementBtcStakeRecordsQuery = {
   managementBtcStakeRecords?: {
-    __typename: "ManagementBtcStakeRecords";
+    __typename: 'ManagementBtcStakeRecords';
     totalCount?: number | null;
     btcStakeMintRecord?: Array<{
-      __typename: "ManagementBtcStakeRecord";
+      __typename: 'ManagementBtcStakeRecord';
       id: number;
       chainId: number;
       recordType: string;
@@ -4392,10 +4392,10 @@ export type UserBtcStakeRecordsQueryVariables = {
 
 export type UserBtcStakeRecordsQuery = {
   userBtcStakeRecords?: {
-    __typename: "UserBtcStakeRecords";
+    __typename: 'UserBtcStakeRecords';
     totalCount?: number | null;
     btcStakeMintRecord?: Array<{
-      __typename: "UserBtcStakeRecord";
+      __typename: 'UserBtcStakeRecord';
       id: number;
       chainId: number;
       tokenAddress: string;
@@ -4418,7 +4418,7 @@ export type GetBtcTxInfoQueryVariables = {
 
 export type GetBtcTxInfoQuery = {
   getBtcTxInfo?: {
-    __typename: "BtcTxInfo";
+    __typename: 'BtcTxInfo';
     depositFromAddress?: string | null;
     depositToAddress?: string | null;
     depositAmount?: string | null;
@@ -4459,10 +4459,10 @@ export type SigningRecordsQueryVariables = {
 
 export type SigningRecordsQuery = {
   signingRecords?: {
-    __typename: "SigningRecords";
+    __typename: 'SigningRecords';
     totalCount?: number | null;
     signingRecords?: Array<{
-      __typename: "SigningRecord";
+      __typename: 'SigningRecord';
       depositTxHash?: string | null;
       message?: string | null;
       signMessageHash?: string | null;
@@ -4484,7 +4484,7 @@ export type StakingStatsQueryVariables = {
 
 export type StakingStatsQuery = {
   stakingStats?: {
-    __typename: "StakingStats";
+    __typename: 'StakingStats';
     stakingTvl?: string | null;
     totalStakingRewards?: string | null;
     airdropRewards?: string | null;
@@ -4502,7 +4502,7 @@ export type EstimatedRewardsQueryVariables = {
 
 export type EstimatedRewardsQuery = {
   estimatedRewards?: {
-    __typename: "EstimatedReward";
+    __typename: 'EstimatedReward';
     stakingPower?: string | null;
     currentTotalStakingPower?: string | null;
     estimatedReward?: string | null;
@@ -4513,11 +4513,11 @@ export type SolvbtcCoreReservesQueryVariables = {};
 
 export type SolvbtcCoreReservesQuery = {
   solvbtcCoreReserves?: {
-    __typename: "SolvBtcYTReserves";
+    __typename: 'SolvBtcYTReserves';
     snapshotTime?: number | null;
     totalAmount?: string | null;
     reserves?: Array<{
-      __typename: "SolvBtcYTReserve";
+      __typename: 'SolvBtcYTReserve';
       vault?: string | null;
       vaultAddress?: string | null;
       url?: string | null;
@@ -4530,11 +4530,11 @@ export type SolvbtcCoreIssuancesQueryVariables = {};
 
 export type SolvbtcCoreIssuancesQuery = {
   solvbtcCoreIssuances?: {
-    __typename: "SolvBtcYTIssuances";
+    __typename: 'SolvBtcYTIssuances';
     snapshotTime?: number | null;
     totalAmount?: string | null;
     issuances?: Array<{
-      __typename: "SolvBtcYTIssuance";
+      __typename: 'SolvBtcYTIssuance';
       chainName?: string | null;
       tokenAddress?: string | null;
       url?: string | null;
@@ -4548,11 +4548,11 @@ export type SolvbtcJupReservesQueryVariables = {};
 
 export type SolvbtcJupReservesQuery = {
   solvbtcJupReserves?: {
-    __typename: "SolvBtcJupReserves";
+    __typename: 'SolvBtcJupReserves';
     snapshotTime?: number | null;
     totalAmount?: string | null;
     reserves?: Array<{
-      __typename: "SolvBtcJupReserve";
+      __typename: 'SolvBtcJupReserve';
       vault?: string | null;
       vaultAddress?: string | null;
       url?: string | null;
@@ -4567,11 +4567,11 @@ export type SolvbtcJupIssuancesQueryVariables = {};
 
 export type SolvbtcJupIssuancesQuery = {
   solvbtcJupIssuances?: {
-    __typename: "SolvBtcYTIssuances";
+    __typename: 'SolvBtcYTIssuances';
     snapshotTime?: number | null;
     totalAmount?: string | null;
     issuances?: Array<{
-      __typename: "SolvBtcYTIssuance";
+      __typename: 'SolvBtcYTIssuance';
       chainName?: string | null;
       tokenAddress?: string | null;
       url?: string | null;
@@ -4585,11 +4585,11 @@ export type SolvbtcMReservesQueryVariables = {};
 
 export type SolvbtcMReservesQuery = {
   solvbtcMReserves?: {
-    __typename: "SolvBtcYTReserves";
+    __typename: 'SolvBtcYTReserves';
     snapshotTime?: number | null;
     totalAmount?: string | null;
     reserves?: Array<{
-      __typename: "SolvBtcYTReserve";
+      __typename: 'SolvBtcYTReserve';
       vault?: string | null;
       vaultAddress?: string | null;
       url?: string | null;
@@ -4602,11 +4602,11 @@ export type SolvbtcMIssuancesQueryVariables = {};
 
 export type SolvbtcMIssuancesQuery = {
   solvbtcMIssuances?: {
-    __typename: "SolvBtcYTIssuances";
+    __typename: 'SolvBtcYTIssuances';
     snapshotTime?: number | null;
     totalAmount?: string | null;
     issuances?: Array<{
-      __typename: "SolvBtcYTIssuance";
+      __typename: 'SolvBtcYTIssuance';
       chainName?: string | null;
       tokenAddress?: string | null;
       url?: string | null;
@@ -4622,7 +4622,7 @@ export type BabylonRelationQueryVariables = {
 
 export type BabylonRelationQuery = {
   babylonRelation?: {
-    __typename: "BabylonRelationInfo";
+    __typename: 'BabylonRelationInfo';
     isRelation?: boolean | null;
     evmAddress?: string | null;
     babylonAddress?: string | null;
@@ -4640,7 +4640,7 @@ export type ProtocolInfoListQueryVariables = {};
 
 export type ProtocolInfoListQuery = {
   protocolInfoList?: Array<{
-    __typename: "ProtocolInfo";
+    __typename: 'ProtocolInfo';
     protocol?: string | null;
     logoUrl?: string | null;
   } | null> | null;
@@ -4650,11 +4650,11 @@ export type BroInfoQueryVariables = {};
 
 export type BroInfoQuery = {
   broInfo?: {
-    __typename: "BroInfo";
+    __typename: 'BroInfo';
     totalRaised?: string | null;
     revenueFromBRO?: string | null;
     pieChartData?: Array<{
-      __typename: "FundDistribution";
+      __typename: 'FundDistribution';
       name?: string | null;
       value?: string | null;
     } | null> | null;
@@ -4678,10 +4678,10 @@ export type NonEvmAssetsQueryVariables = {
 
 export type NonEvmAssetsQuery = {
   nonEvmAssets?: {
-    __typename: "NonEvmAssets";
+    __typename: 'NonEvmAssets';
     totalCount?: number | null;
     nonEvmAssets?: Array<{
-      __typename: "NonEvmAssetInfo";
+      __typename: 'NonEvmAssetInfo';
       chainId?: number | null;
       tokenAddress?: string | null;
       holder?: string | null;
@@ -4702,7 +4702,7 @@ export type NonEvmAssetsByHolderQueryVariables = {
 
 export type NonEvmAssetsByHolderQuery = {
   nonEvmAssetsByHolder?: {
-    __typename: "UserNonEvmAssetsInfo";
+    __typename: 'UserNonEvmAssetsInfo';
     totalBalanceUSD?: string | null;
     numberOfVaults?: number | null;
   } | null;
@@ -4716,10 +4716,10 @@ export type NonEvmActivitiesQueryVariables = {
 
 export type NonEvmActivitiesQuery = {
   nonEvmActivities?: {
-    __typename: "NonEvmActivities";
+    __typename: 'NonEvmActivities';
     totalCount?: number | null;
     activitiesInfo: Array<{
-      __typename: "NonEvmActivity";
+      __typename: 'NonEvmActivity';
       id: number;
       chainId?: number | null;
       txHash?: string | null;
@@ -4744,7 +4744,7 @@ export type NonEvmVaultInfoQueryVariables = {
 
 export type NonEvmVaultInfoQuery = {
   nonEvmVaultInfo?: {
-    __typename: "NonEvmVaultInfo";
+    __typename: 'NonEvmVaultInfo';
     vaultAddress?: string | null;
     vaultName?: string | null;
     description?: string | null;
@@ -4764,7 +4764,7 @@ export type NonEvmSaleInfoQueryVariables = {
 
 export type NonEvmSaleInfoQuery = {
   nonEvmSaleInfo?: {
-    __typename: "NonEvmSaleInfo";
+    __typename: 'NonEvmSaleInfo';
     amountRaised?: string | null;
     amountRemaining?: string | null;
   } | null;
@@ -4774,7 +4774,7 @@ export type SolvBtcGenernalQueryVariables = {};
 
 export type SolvBtcGenernalQuery = {
   solvBtcGenernal?: {
-    __typename: "SolvBtcData";
+    __typename: 'SolvBtcData';
     tvl?: string | null;
     tvlUSD?: string | null;
     users?: number | null;
@@ -4786,7 +4786,7 @@ export type XSolvBtcGenernalQueryVariables = {};
 
 export type XSolvBtcGenernalQuery = {
   xSolvBtcGenernal?: {
-    __typename: "XSolvBtcData";
+    __typename: 'XSolvBtcData';
     tvl?: string | null;
     tvlUSD?: string | null;
     price?: string | null;
@@ -4799,10 +4799,10 @@ export type SolvbtcInCirculationQueryVariables = {};
 
 export type SolvbtcInCirculationQuery = {
   solvbtcInCirculation?: {
-    __typename: "SolvBtcInCirculation";
+    __typename: 'SolvBtcInCirculation';
     tvl?: string | null;
     details?: Array<{
-      __typename: "PercentageByChain";
+      __typename: 'PercentageByChain';
       chainName?: string | null;
       percentage?: string | null;
     } | null> | null;
@@ -4813,10 +4813,10 @@ export type XSolvbtcInCirculationQueryVariables = {};
 
 export type XSolvbtcInCirculationQuery = {
   xSolvbtcInCirculation?: {
-    __typename: "XSolvBtcInCirculation";
+    __typename: 'XSolvBtcInCirculation';
     tvl?: string | null;
     details?: Array<{
-      __typename: "PercentageByChain";
+      __typename: 'PercentageByChain';
       chainName?: string | null;
       percentage?: string | null;
     } | null> | null;
@@ -4827,10 +4827,10 @@ export type SolvBtcBackingQueryVariables = {};
 
 export type SolvBtcBackingQuery = {
   solvBtcBacking?: {
-    __typename: "SolvBtcBacking";
+    __typename: 'SolvBtcBacking';
     tvl?: string | null;
     details?: Array<{
-      __typename: "PercentageByAsset";
+      __typename: 'PercentageByAsset';
       assetName?: string | null;
       percentage?: string | null;
     } | null> | null;
@@ -4851,7 +4851,7 @@ export type GetBtcRedeemContractQueryVariables = {
 
 export type GetBtcRedeemContractQuery = {
   getBtcRedeemContract?: {
-    __typename: "RedeemContractInfo";
+    __typename: 'RedeemContractInfo';
     redeemContract?: string | null;
     solvbtcAddress?: string | null;
   } | null;
@@ -4865,10 +4865,10 @@ export type BtcWithdrawHistoryQueryVariables = {
 
 export type BtcWithdrawHistoryQuery = {
   btcWithdrawHistory?: {
-    __typename: "BtcRedeemRecords";
+    __typename: 'BtcRedeemRecords';
     totalCount?: number | null;
     records?: Array<{
-      __typename: "BtcRedeemRecord";
+      __typename: 'BtcRedeemRecord';
       id?: number | null;
       burnAmount?: string | null;
       burnHash?: string | null;

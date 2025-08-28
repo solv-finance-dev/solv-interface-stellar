@@ -1,7 +1,7 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
-import { persistConfig } from "./config";
+import { persistConfig } from './config';
 
 interface useSolvBtcStore {
   navOpen: boolean;
@@ -10,11 +10,11 @@ interface useSolvBtcStore {
 
 const useSolvBtcStore = create<useSolvBtcStore>()(
   persist(
-    (set) => ({
+    set => ({
       navOpen: false,
-      setNavOpen: (navOpen: boolean) => set({ navOpen })
+      setNavOpen: (navOpen: boolean) => set({ navOpen }),
     }),
-    persistConfig("solvbtc-storage")
+    persistConfig('solvbtc-storage')
   )
 );
 

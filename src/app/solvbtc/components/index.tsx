@@ -4,10 +4,10 @@ import {
   TabsList,
   TabsTrigger,
   TabsContent,
-} from "@solvprotocol/ui-v2";
-import Deposit from "./Deposit";
-import Withdraw from "./Withdraw";
-import Details from "./Details";
+} from '@solvprotocol/ui-v2';
+import Deposit from './Deposit';
+import Withdraw from './Withdraw';
+import Details from './Details';
 
 interface TabItem {
   value: string;
@@ -18,33 +18,33 @@ interface TabItem {
 export default function SolvBtc() {
   const tabs: TabItem[] = [
     {
-      value: "deposit",
-      label: "Deposit",
+      value: 'deposit',
+      label: 'Deposit',
       content: <Deposit />,
     },
     {
-      value: "withdraw",
-      label: "Withdraw",
+      value: 'withdraw',
+      label: 'Withdraw',
       content: <Withdraw />,
     },
     {
-      value: "details",
-      label: "Details",
+      value: 'details',
+      label: 'Details',
       content: <Details />,
     },
   ];
   return (
     <Card
-      className="box-border md:!p-8 !p-4 md:mb-8 mb-4 rounded-3xl"
-      id="transaction"
+      className='mb-4 box-border rounded-3xl !p-4 md:mb-8 md:!p-8'
+      id='transaction'
     >
-      <Tabs defaultValue="deposit" className="w-full">
-        <TabsList className="w-[17.6875rem] h-[2.75rem] !p-0 !bg-transparent !space-x-1 mb-[2.25rem]">
+      <Tabs defaultValue='deposit' className='w-full'>
+        <TabsList className='mb-[2.25rem] h-[2.75rem] w-[17.6875rem] !space-x-1 !bg-transparent !p-0'>
           {tabs.map(({ value, label }) => (
             <TabsTrigger
               key={value}
               value={value}
-              className="rounded-full text-[1rem]"
+              className='rounded-full text-[1rem]'
             >
               {label}
             </TabsTrigger>

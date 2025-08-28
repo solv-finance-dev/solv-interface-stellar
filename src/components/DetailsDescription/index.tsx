@@ -1,8 +1,8 @@
-import { Skeleton } from "@solvprotocol/ui-v2";
-import classNames from "classnames";
-import React, { ReactNode, useEffect, useRef, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import { Skeleton } from '@solvprotocol/ui-v2';
+import classNames from 'classnames';
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export default function DetailsDescription({
   description,
@@ -21,11 +21,11 @@ export default function DetailsDescription({
   }, [descriptionRef]);
   return (
     <div>
-      {" "}
+      {' '}
       <div
         className={classNames(
-          "text-[13px] mt-4 overflow-hidden",
-          showMore ? "h-auto" : "h-40"
+          'mt-4 overflow-hidden text-[13px]',
+          showMore ? 'h-auto' : 'h-40'
         )}
       >
         <div ref={descriptionRef}>
@@ -33,15 +33,15 @@ export default function DetailsDescription({
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
-                a: ({ ...attrs }) => <a {...attrs} target="_blank"></a>,
-                ul: ({ ...attrs }) => <ul {...attrs} className="ml-4"></ul>,
+                a: ({ ...attrs }) => <a {...attrs} target='_blank'></a>,
+                ul: ({ ...attrs }) => <ul {...attrs} className='ml-4'></ul>,
                 li: ({ ...attrs }) => (
-                  <li {...attrs} className="list-disc"></li>
+                  <li {...attrs} className='list-disc'></li>
                 ),
                 h2: ({ ...attrs }) => (
                   <h2
                     {...attrs}
-                    className="text-[14px] font-bold pt-4 pb-2"
+                    className='pb-2 pt-4 text-[14px] font-bold'
                   ></h2>
                 ),
               }}
@@ -49,10 +49,10 @@ export default function DetailsDescription({
               {description}
             </ReactMarkdown>
           ) : (
-            <div className="flex flex-col gap-2">
-              {[1, 2, 3, 4, 5, 6].map((item) => {
+            <div className='flex flex-col gap-2'>
+              {[1, 2, 3, 4, 5, 6].map(item => {
                 return (
-                  <Skeleton key={item} className="w-full h-4 mt-1"></Skeleton>
+                  <Skeleton key={item} className='mt-1 h-4 w-full'></Skeleton>
                 );
               })}
             </div>
@@ -61,10 +61,10 @@ export default function DetailsDescription({
       </div>
       {showBtn && (
         <div
-          className="text-sm pt-4 text-mainColor cursor-pointer font-bold"
+          className='cursor-pointer pt-4 text-sm font-bold text-mainColor'
           onClick={() => setShowMore(!showMore)}
         >
-          {showMore ? "See less" : "See more"}
+          {showMore ? 'See less' : 'See more'}
         </div>
       )}
     </div>

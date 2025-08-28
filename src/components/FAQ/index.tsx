@@ -1,20 +1,19 @@
-"use client";
+'use client';
 
+import { Card } from '@solvprotocol/ui-v2';
 
-import { Card } from "@solvprotocol/ui-v2";
+import DynamicAccordion, { SolvInfo } from '../Accordion';
 
-import DynamicAccordion, { SolvInfo } from "../Accordion";
-
-const FAQ = ({ hash, faqData }: { hash?: string; faqData:SolvInfo[] }) => {
+const FAQ = ({ hash, faqData }: { hash?: string; faqData: SolvInfo[] }) => {
   return (
     <Card
-      className="box-border md:!p-8 !p-4 md:mb-8 mb-4 rounded-3xl"
-      id="faqs"
+      className='mb-4 box-border rounded-3xl !p-4 md:mb-8 md:!p-8'
+      id='faqs'
     >
-      <div className="text-3xl font-medium font-MatterSQ-Medium">FAQs</div>
+      <div className='font-MatterSQ-Medium text-3xl font-medium'>FAQs</div>
       <DynamicAccordion
         data={faqData}
-        defaultValue={hash ? ["How do I redeem my SolvBTC?"] : []}
+        defaultValue={hash ? ['How do I redeem my SolvBTC?'] : []}
       />
     </Card>
   );

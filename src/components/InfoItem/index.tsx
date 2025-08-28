@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode } from 'react';
 
 export default function c({
   label,
@@ -10,15 +10,15 @@ export default function c({
   url?: string;
 }) {
   return (
-    <div className="text-sm flex flex-col">
-      <span className="text-textColor mb-1">{label}</span>
+    <div className='flex flex-col text-sm'>
+      <span className='mb-1 text-textColor'>{label}</span>
 
       <span>
         <a
           href={url}
-          className="underline hover:text-brand"
-          target="_blank"
-          rel="noreferrer"
+          className='underline hover:text-brand'
+          target='_blank'
+          rel='noreferrer'
         >
           {value}
         </a>

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import React from "react";
-import MyRedemption from "./components/MyRedemption";
+import React from 'react';
+import MyRedemption from './components/MyRedemption';
 
 export default function MyPortfolio() {
   return (

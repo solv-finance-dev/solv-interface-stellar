@@ -1,8 +1,8 @@
 // src/components/ui/TokenIcon.tsx
 
-import { Avatar, AvatarFallback, AvatarImage } from "@solvprotocol/ui-v2";
+import { Avatar, AvatarFallback, AvatarImage } from '@solvprotocol/ui-v2';
 
-import cn from "classnames";
+import cn from 'classnames';
 
 interface TokenIconProps {
   src?: string;
@@ -12,13 +12,13 @@ interface TokenIconProps {
 }
 
 export const TokenIcon = ({
-  src = "https://res1.sft-api.com/token/SolvBTC.png",
-  alt = "token",
+  src = 'https://res1.sft-api.com/token/SolvBTC.png',
+  alt = 'token',
   className,
-  fallback = "CN",
+  fallback = 'CN',
 }: TokenIconProps) => {
   return (
-    <Avatar className={cn("w-6 h-6 mr-[2px]", className)}>
+    <Avatar className={cn('mr-[2px] h-6 w-6', className)}>
       <AvatarImage src={src} alt={alt} />
       <AvatarFallback>{fallback}</AvatarFallback>
     </Avatar>

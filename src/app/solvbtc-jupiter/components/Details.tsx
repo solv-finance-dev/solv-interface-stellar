@@ -1,20 +1,20 @@
-import DetailsDescription from "@/components/DetailsDescription";
-import InfoItem from "@/components/InfoItem";
+import DetailsDescription from '@/components/DetailsDescription';
+import InfoItem from '@/components/InfoItem';
 
-import React from "react";
+import React from 'react';
 
 export default function Details() {
   return (
     <div>
-      <div className="text-xl font-MatterSQ-Medium mb-4">Contract Info</div>
+      <div className='mb-4 font-MatterSQ-Medium text-xl'>Contract Info</div>
 
-      <div className="flex md:space-x-[3.875rem] mb-6 space-x-[2rem]">
-        <InfoItem label="Vault Address" value={`0x9537...d185`} url={""} />
+      <div className='mb-6 flex space-x-[2rem] md:space-x-[3.875rem]'>
+        <InfoItem label='Vault Address' value={`0x9537...d185`} url={''} />
 
-        <InfoItem label="Token Address" value={`0x9537...d185`} url={""} />
+        <InfoItem label='Token Address' value={`0x9537...d185`} url={''} />
       </div>
 
-      <div className="text-xl font-MatterSQ-Medium mb-4">Description</div>
+      <div className='mb-4 font-MatterSQ-Medium text-xl'>Description</div>
 
       <DetailsDescription
         /* Placeholder text */

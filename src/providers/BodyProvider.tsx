@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { ReactNode } from "react";
+import { ReactNode } from 'react';
 
 const BodyProvider = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="max-w-[1200px] mx-auto lg:pt-[6.5rem] pt-[5.75rem]">
+    <div className='mx-auto max-w-[1200px] pt-[5.75rem] lg:pt-[6.5rem]'>
       {children}
     </div>
   );

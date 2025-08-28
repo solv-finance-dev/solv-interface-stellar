@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import React, { useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 import {
   Button,
   Form,
@@ -19,18 +19,18 @@ import {
   SelectLabel,
   SelectTrigger,
   toast,
-} from "@solvprotocol/ui-v2";
-import { ArrowRight } from "lucide-react";
-import { InputComplex } from "@/components/InputComplex";
-import { TooltipComplex } from "@/components/TooltipComplex";
-import { TokenIcon } from "@/components/TokenIcon";
+} from '@solvprotocol/ui-v2';
+import { ArrowRight } from 'lucide-react';
+import { InputComplex } from '@/components/InputComplex';
+import { TooltipComplex } from '@/components/TooltipComplex';
+import { TokenIcon } from '@/components/TokenIcon';
 
 const FormSchema = z.object({
   deposit: z.string().min(2, {
-    message: "deposit must be xxx.",
+    message: 'deposit must be xxx.',
   }),
   receive: z.string().min(2, {
-    message: "receive must be xxx.",
+    message: 'receive must be xxx.',
   }),
 });
 
@@ -38,25 +38,25 @@ export default function Deposit() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      deposit: "",
-      receive: "",
+      deposit: '',
+      receive: '',
     },
   });
 
-  const [selected, setSelected] = useState("cbBTC");
+  const [selected, setSelected] = useState('cbBTC');
   const options = [
-    { label: "cbBTC", value: "cbBTC" },
-    { label: "FBTC", value: "FBTC" },
+    { label: 'cbBTC', value: 'cbBTC' },
+    { label: 'FBTC', value: 'FBTC' },
   ];
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     toast(
       <div>
-        <div className="font-bold mb-2">
+        <div className='mb-2 font-bold'>
           You submitted the following values:
         </div>
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+        <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
+          <code className='text-white'>{JSON.stringify(data, null, 2)}</code>
         </pre>
       </div>
     );
@@ -66,26 +66,26 @@ export default function Deposit() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="w-full space-y-6 flex flex-col"
+        className='flex w-full flex-col space-y-6'
       >
-        <div className="flex justify-between flex-col md:flex-row">
+        <div className='flex flex-col justify-between md:flex-row'>
           <FormField
             control={form.control}
-            name="deposit"
+            name='deposit'
             render={({ field }) => (
-              <FormItem className="md:w-[45.4%] gap-[10px] w-full">
-                <FormLabel className="text-[.75rem] leading-[1rem] flex items-end justify-between">
+              <FormItem className='w-full gap-[10px] md:w-[45.4%]'>
+                <FormLabel className='flex items-end justify-between text-[.75rem] leading-[1rem]'>
                   <span>Deposit</span>
-                  <div className="flex items-end text-[.875rem]">
+                  <div className='flex items-end text-[.875rem]'>
                     {/*  Sample code error : !text-errorColor */}
-                    <span className="text-grayColor mr-2 !text-errorColor">
+                    <span className='mr-2 !text-errorColor text-grayColor'>
                       Balance:
                     </span>
-                    <div className="text-textColor"> 128.34 mBTC</div>
+                    <div className='text-textColor'> 128.34 mBTC</div>
                   </div>
                 </FormLabel>
 
-                <div className="flex items-center">
+                <div className='flex items-center'>
                   <FormControl>
                     {/* <Input
                       placeholder="0.00"
@@ -94,28 +94,28 @@ export default function Deposit() {
                     /> */}
 
                     <InputComplex
-                      className="h-[2.75rem]"
+                      className='h-[2.75rem]'
                       error={true} // Sample code error
                       inputValue={field.value}
                       onInputChange={field.onChange}
                       inputProps={{
-                        placeholder: "0.00",
+                        placeholder: '0.00',
                         className:
-                          "h-[2.75rem] outline-none !border-none !ring-transparent",
+                          'h-[2.75rem] outline-none !border-none !ring-transparent',
                       }}
                       iSuffix={
-                        <div className="flex items-center h-full justify-end">
-                          <div className="w-[2.875rem] h-[1.5rem] rounded-[4px] cursor-pointer text-brand-500 bg-brand-50 text-[.75rem] px-2 flex items-center justify-center ">
+                        <div className='flex h-full items-center justify-end'>
+                          <div className='flex h-[1.5rem] w-[2.875rem] cursor-pointer items-center justify-center rounded-[4px] bg-brand-50 px-2 text-[.75rem] text-brand-500'>
                             MAX
                           </div>
 
                           <Select value={selected} onValueChange={setSelected}>
-                            <SelectTrigger className="outline-none focus-visible:ring-0 border-0 !pr-0 !pl-2 !bg-transparent">
-                              <div className="flex items-center justify-between text-[1rem]">
+                            <SelectTrigger className='border-0 !bg-transparent !pl-2 !pr-0 outline-none focus-visible:ring-0'>
+                              <div className='flex items-center justify-between text-[1rem]'>
                                 <TokenIcon
-                                  src="https://res1.sft-api.com/token/cbBTC.png"
-                                  alt="cbBTC"
-                                  fallback="cbBTC"
+                                  src='https://res1.sft-api.com/token/cbBTC.png'
+                                  alt='cbBTC'
+                                  fallback='cbBTC'
                                 />
 
                                 {selected}
@@ -126,13 +126,13 @@ export default function Deposit() {
                               <SelectGroup>
                                 {/* <SelectLabel>Token List</SelectLabel> */}
 
-                                {options.map((opt) => (
+                                {options.map(opt => (
                                   <SelectItem key={opt.value} value={opt.value}>
-                                    <div className="flex items-center justify-between text-[1rem]">
+                                    <div className='flex items-center justify-between text-[1rem]'>
                                       <TokenIcon
-                                        src="https://res1.sft-api.com/token/SolvBTC.png"
-                                        alt="SolvBTC"
-                                        fallback="SolvBTC"
+                                        src='https://res1.sft-api.com/token/SolvBTC.png'
+                                        alt='SolvBTC'
+                                        fallback='SolvBTC'
                                       />
                                       {opt.label}
                                     </div>
@@ -152,18 +152,18 @@ export default function Deposit() {
             )}
           />
 
-          <div className="flex items-center justify-center px-[2.5rem] h-[2.75rem] md:mt-[1.625rem] box-border">
-            <ArrowRight className="w-4 h-4 rotate-90 md:w-6 md:h-6 md:rotate-0" />
+          <div className='box-border flex h-[2.75rem] items-center justify-center px-[2.5rem] md:mt-[1.625rem]'>
+            <ArrowRight className='h-4 w-4 rotate-90 md:h-6 md:w-6 md:rotate-0' />
           </div>
 
           <FormField
             control={form.control}
-            name="receive"
+            name='receive'
             render={({ field }) => (
-              <FormItem className="md:w-[45.4%] gap-[10px] w-full">
-                <FormLabel className="text-[.75rem] leading-[1rem] flex items-center !gap-1">
+              <FormItem className='w-full gap-[10px] md:w-[45.4%]'>
+                <FormLabel className='flex items-center !gap-1 text-[.75rem] leading-[1rem]'>
                   You Will Receive
-                  <TooltipComplex content={"tips"}></TooltipComplex>
+                  <TooltipComplex content={'tips'}></TooltipComplex>
                 </FormLabel>
                 <FormControl>
                   {/* <Input
@@ -172,22 +172,22 @@ export default function Deposit() {
                     className="h-[2.75rem]"
                   /> */}
                   <InputComplex
-                    className="h-[2.75rem]"
+                    className='h-[2.75rem]'
                     inputValue={field.value}
                     onInputChange={field.onChange}
                     inputProps={{
-                      placeholder: "0.00",
+                      placeholder: '0.00',
                       className:
-                        "h-[2.75rem] outline-none !border-none !ring-transparent",
+                        'h-[2.75rem] outline-none !border-none !ring-transparent',
                     }}
                     iSuffix={
-                      <div className="flex items-center h-full justify-end">
-                        {" "}
-                        <div className="flex items-center justify-between text-[1rem]">
+                      <div className='flex h-full items-center justify-end'>
+                        {' '}
+                        <div className='flex items-center justify-between text-[1rem]'>
                           <TokenIcon
-                            src="https://res1.sft-api.com/token/SolvBTC.png"
-                            alt="SolvBTC"
-                            fallback="SolvBTC"
+                            src='https://res1.sft-api.com/token/SolvBTC.png'
+                            alt='SolvBTC'
+                            fallback='SolvBTC'
                           />
 
                           {`SolvBTC`}
@@ -203,10 +203,10 @@ export default function Deposit() {
           />
         </div>
 
-        <div className="flex justify-center items-end">
+        <div className='flex items-end justify-center'>
           <Button
-            type="submit"
-            className="md:w-[25.625rem] w-full rounded-full bg-brand-500 hover:bg-brand-500/90 text-white"
+            type='submit'
+            className='w-full rounded-full bg-brand-500 text-white hover:bg-brand-500/90 md:w-[25.625rem]'
           >
             Select token
           </Button>

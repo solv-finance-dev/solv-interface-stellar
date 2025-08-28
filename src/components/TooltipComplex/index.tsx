@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import * as React from "react";
+import * as React from 'react';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@solvprotocol/ui-v2";
-import { InfoIcon } from "@/assets/svg/svg";
+} from '@solvprotocol/ui-v2';
+import { InfoIcon } from '@/assets/svg/svg';
 
 export interface TooltipComplexProps {
   content: React.ReactNode;
@@ -28,9 +28,9 @@ export function TooltipComplex({
     <TooltipProvider>
       <Tooltip delayDuration={delayDuration} {...tooltipProps}>
         <TooltipTrigger asChild>
-          <div className="flex justify-start items-center">
+          <div className='flex items-center justify-start'>
             {showIcon && (
-              <InfoIcon className="text-grayColor w-[.875rem] h-[.875rem]" />
+              <InfoIcon className='h-[.875rem] w-[.875rem] text-grayColor' />
             )}
             {children && <div>{children}</div>}
           </div>

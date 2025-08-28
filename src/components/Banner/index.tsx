@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { Card } from "@solvprotocol/ui-v2";
-import cn from "classnames";
-import { ReactNode } from "react";
+import { Card } from '@solvprotocol/ui-v2';
+import cn from 'classnames';
+import { ReactNode } from 'react';
 
 interface BannerProps {
   title?: string;
@@ -14,29 +14,29 @@ interface BannerProps {
 }
 
 const Banner = ({
-  title = "",
-  subTitle = "",
-  description = "",
-  slot = "",
+  title = '',
+  subTitle = '',
+  description = '',
+  slot = '',
   showBg = false,
-  className = "",
+  className = '',
 }: BannerProps) => {
   return (
     <Card
       className={cn(
-        "box-border md:!p-8 !p-4 md:mb-8 mb-4 rounded-3xl ",
+        'mb-4 box-border rounded-3xl !p-4 md:mb-8 md:!p-8',
         showBg
-          ? "bg-contain bg-no-repeat lg:bg-[url('../../assets/images/solvbtc-banner-bg.svg')] bg-[url('../../assets/images/solvbtc-banner-bg-h5.svg')] bg-right-top"
-          : "",
+          ? "bg-[url('../../assets/images/solvbtc-banner-bg-h5.svg')] bg-contain bg-right-top bg-no-repeat lg:bg-[url('../../assets/images/solvbtc-banner-bg.svg')]"
+          : '',
         className
       )}
     >
-      <div className="">
-        <div className="text-[4rem] leading-[4rem] mb-4 flex flex-col md:flex-row md:items-end">
+      <div className=''>
+        <div className='mb-4 flex flex-col text-[4rem] leading-[4rem] md:flex-row md:items-end'>
           {title}
 
           {subTitle && (
-            <span className="md:ml-4 text-[2.5rem] leading-[3rem] text-grayColor">
+            <span className='text-[2.5rem] leading-[3rem] text-grayColor md:ml-4'>
               {subTitle}
             </span>
           )}
@@ -45,8 +45,8 @@ const Banner = ({
           <div
             className={cn(
               slot
-                ? "text-[1.125rem] leading-[1.5rem]"
-                : "text-[1.25rem] leading-[1.75rem]"
+                ? 'text-[1.125rem] leading-[1.5rem]'
+                : 'text-[1.25rem] leading-[1.75rem]'
             )}
           >
             {description}
@@ -54,7 +54,7 @@ const Banner = ({
         )}
 
         {slot && (
-          <div className="text-[1.25rem] leading-[1.4375rem] mt-4 font-MatterSQ-Medium">
+          <div className='mt-4 font-MatterSQ-Medium text-[1.25rem] leading-[1.4375rem]'>
             {slot}
           </div>
         )}

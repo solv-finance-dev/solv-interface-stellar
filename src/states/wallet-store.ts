@@ -1,284 +1,297 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import {
-    WalletType,
-    ConnectedWallet,
-    createWalletAdapter,
-    getAvailableWallets,
-    WalletInfo,
-    StellarWalletsKitAdapter,
+  WalletType,
+  ConnectedWallet,
+  createWalletAdapter,
+  getAvailableWallets,
+  WalletInfo,
+  StellarWalletsKitAdapter,
 } from '@/wallet-connector';
 import { getStellarAPI } from '@/stellar';
-import { getCurrentStellarNetwork, getCurrentNetworkType } from '@/config/stellar';
+import {
+  getCurrentStellarNetwork,
+  getCurrentNetworkType,
+} from '@/config/stellar';
 import { Horizon } from '@stellar/stellar-sdk';
 
-
 export interface WalletState {
-    // 连接状态
-    isConnected: boolean;
-    isConnecting: boolean;
-    connectedWallet: ConnectedWallet | null;
-    walletAdapter: StellarWalletsKitAdapter | null;
+  // 连接状态
+  isConnected: boolean;
+  isConnecting: boolean;
+  connectedWallet: ConnectedWallet | null;
+  walletAdapter: StellarWalletsKitAdapter | null;
 
-    // 账户信息
-    accountInfo: Horizon.AccountResponse | null;
-    balances: Horizon.HorizonApi.BalanceLine[];
-    xlmBalance: string;
+  // 账户信息
+  accountInfo: Horizon.AccountResponse | null;
+  balances: Horizon.HorizonApi.BalanceLine[];
+  xlmBalance: string;
 
-    // 可用钱包
-    availableWallets: WalletInfo[];
+  // 可用钱包
+  availableWallets: WalletInfo[];
 
-    // 错误状态
-    error: string | null;
+  // 错误状态
+  error: string | null;
 
-    // 加载状态
-    isLoadingAccount: boolean;
-    isLoadingBalances: boolean;
-
-
+  // 加载状态
+  isLoadingAccount: boolean;
+  isLoadingBalances: boolean;
 }
 
 export interface WalletActions {
-    // 钱包连接
-    connectWallet: (walletType: WalletType) => Promise<void>;
-    disconnectWallet: () => Promise<void>;
+  // 钱包连接
+  connectWallet: (walletType: WalletType) => Promise<void>;
+  disconnectWallet: () => Promise<void>;
 
-    // 数据刷新
-    refreshAccountInfo: () => Promise<void>;
-    refreshBalances: () => Promise<void>;
+  // 数据刷新
+  refreshAccountInfo: () => Promise<void>;
+  refreshBalances: () => Promise<void>;
 
-    // 错误处理
-    setError: (error: string | null) => void;
-    clearError: () => void;
+  // 错误处理
+  setError: (error: string | null) => void;
+  clearError: () => void;
 
-    // 初始化
-    initializeWallets: () => void;
+  // 初始化
+  initializeWallets: () => void;
 
-    // 模态框管理
-    openWalletModal: (onWalletSelected?: (walletType: WalletType) => void) => Promise<void>;
+  // 模态框管理
+  openWalletModal: (
+    onWalletSelected?: (walletType: WalletType) => void
+  ) => Promise<void>;
 
-    // 重置状态
-    reset: () => void;
+  // 重置状态
+  reset: () => void;
 }
 
 type WalletStore = WalletState & WalletActions;
 
 const initialState: WalletState = {
-    isConnected: false,
-    isConnecting: false,
-    connectedWallet: null,
-    walletAdapter: null,
-    accountInfo: null,
-    balances: [],
-    xlmBalance: '0',
-    availableWallets: [],
-    error: null,
-    isLoadingAccount: false,
-    isLoadingBalances: false,
-
+  isConnected: false,
+  isConnecting: false,
+  connectedWallet: null,
+  walletAdapter: null,
+  accountInfo: null,
+  balances: [],
+  xlmBalance: '0',
+  availableWallets: [],
+  error: null,
+  isLoadingAccount: false,
+  isLoadingBalances: false,
 };
 
 export const useWalletStore = create<WalletStore>()(
-    persist(
-        (set, get) => ({
-            ...initialState,
+  persist(
+    (set, get) => ({
+      ...initialState,
 
-            connectWallet: async (walletType: WalletType) => {
-                const { setError } = get();
+      connectWallet: async (walletType: WalletType) => {
+        const { setError } = get();
 
-                try {
-                    set({ isConnecting: true, error: null });
+        try {
+          set({ isConnecting: true, error: null });
 
-                    // 创建或获取适配器 (使用环境变量配置的网络)
-                    const network = getCurrentStellarNetwork();
-                    const adapter = createWalletAdapter(network);
+          // 创建或获取适配器 (使用环境变量配置的网络)
+          const network = getCurrentStellarNetwork();
+          const adapter = createWalletAdapter(network);
 
-                    // 连接指定钱包
-                    const connectedWallet = await adapter.connectWallet(walletType);
+          // 连接指定钱包
+          const connectedWallet = await adapter.connectWallet(walletType);
 
-                    set({
-                        isConnected: true,
-                        isConnecting: false,
-                        connectedWallet,
-                        walletAdapter: adapter,
-                    });
+          set({
+            isConnected: true,
+            isConnecting: false,
+            connectedWallet,
+            walletAdapter: adapter,
+          });
 
-                    // 立即加载账户信息
-                    await get().refreshAccountInfo();
-
-                } catch (error) {
-                    const errorMessage = error instanceof Error ? error.message : 'Failed to connect wallet';
-                    setError(errorMessage);
-                    set({ isConnecting: false });
-                    throw error;
-                }
-            },
-
-            disconnectWallet: async () => {
-                const { walletAdapter } = get();
-
-                try {
-                    if (walletAdapter) {
-                        await walletAdapter.disconnect();
-                    }
-                } catch (error) {
-                    console.warn('Error during wallet disconnect:', error);
-                } finally {
-                    set({
-                        isConnected: false,
-                        isConnecting: false,
-                        connectedWallet: null,
-                        walletAdapter: null,
-                        accountInfo: null,
-                        balances: [],
-                        xlmBalance: '0',
-                        error: null,
-                        isLoadingAccount: false,
-                        isLoadingBalances: false,
-                    });
-                }
-            },
-
-            refreshAccountInfo: async () => {
-                const { connectedWallet, setError } = get();
-
-                if (!connectedWallet) {
-                    setError('No wallet connected');
-                    return;
-                }
-
-                try {
-                    set({ isLoadingAccount: true, error: null });
-
-                    const stellarAPI = getStellarAPI();
-                    const accountInfo = await stellarAPI.getAccount(connectedWallet.publicKey);
-
-                    set({
-                        accountInfo,
-                        isLoadingAccount: false,
-                    });
-
-                    // 同时刷新余额
-                    await get().refreshBalances();
-
-                } catch (error) {
-                    const errorMessage = error instanceof Error ? error.message : 'Failed to load account info';
-                    console.error('❌ Failed to load account info:', errorMessage);
-                    setError(errorMessage);
-                    set({ isLoadingAccount: false });
-                }
-            },
-
-            refreshBalances: async () => {
-                const { connectedWallet, setError } = get();
-
-                if (!connectedWallet) {
-                    setError('No wallet connected');
-                    return;
-                }
-
-                try {
-                    set({ isLoadingBalances: true, error: null });
-
-                    const stellarAPI = getStellarAPI();
-                    const balances = await stellarAPI.getAccountBalances(connectedWallet.publicKey);
-                    const xlmBalance = await stellarAPI.getXLMBalance(connectedWallet.publicKey);
-
-                    const networkType = getCurrentNetworkType();
-                    console.log(`💰 Balances loaded for ${networkType}:`, {
-                        publicKey: connectedWallet.publicKey,
-                        xlmBalance,
-                        totalBalances: balances.length,
-                        network: stellarAPI.isTestnet() ? 'Testnet' : 'Mainnet',
-                        horizonUrl: stellarAPI.getConfig().horizonUrl
-                    });
-
-                    set({
-                        balances,
-                        xlmBalance,
-                        isLoadingBalances: false,
-                    });
-
-                } catch (error) {
-                    const errorMessage = error instanceof Error ? error.message : 'Failed to load balances';
-                    console.error('❌ Failed to load balances:', errorMessage);
-                    setError(errorMessage);
-                    set({ isLoadingBalances: false });
-                }
-            },
-
-            setError: (error: string | null) => {
-                set({ error });
-            },
-
-            clearError: () => {
-                set({ error: null });
-            },
-
-            initializeWallets: async () => {
-                const network = getCurrentStellarNetwork();
-                const adapter = createWalletAdapter(network);
-                const availableWallets = await getAvailableWallets(adapter.getKit());
-                set({ availableWallets, walletAdapter: adapter });
-
-
-            },
-
-            openWalletModal: async (onWalletSelected?: (walletType: WalletType) => void) => {
-                const { walletAdapter, connectWallet, setError } = get();
-
-                // 如果 walletAdapter 不存在，重新创建一个
-                let adapter = walletAdapter;
-                if (!adapter) {
-                    try {
-                        const network = getCurrentStellarNetwork();
-                        adapter = createWalletAdapter(network);
-                        set({ walletAdapter: adapter });
-                    } catch (error) {
-                        setError('Failed to initialize wallet adapter');
-                        return;
-                    }
-                }
-
-                try {
-                    await adapter.openModal({
-                        onWalletSelected: async (walletType: WalletType) => {
-                            try {
-                                await connectWallet(walletType);
-                                if (onWalletSelected) {
-                                    onWalletSelected(walletType);
-                                }
-                            } catch (error) {
-                                console.error('Failed to connect wallet from modal:', error);
-                            }
-                        },
-                        onClosed: (error?: Error) => {
-                            if (error) {
-                                setError(error.message);
-                            }
-                        },
-                        modalTitle: 'Connect Your Wallet',
-                        notAvailableText: 'Wallet not available. Please install the wallet extension.',
-                    });
-                } catch (error) {
-                    const errorMessage = error instanceof Error ? error.message : 'Failed to open wallet modal';
-                    setError(errorMessage);
-                }
-            },
-
-            reset: () => {
-                set(initialState);
-            },
-        }),
-        {
-            name: 'stellar-wallet-storage',
-            partialize: (state) => ({
-                // 只持久化必要的状态
-                connectedWallet: state.connectedWallet,
-                isConnected: state.isConnected,
-            }),
+          // 立即加载账户信息
+          await get().refreshAccountInfo();
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error ? error.message : 'Failed to connect wallet';
+          setError(errorMessage);
+          set({ isConnecting: false });
+          throw error;
         }
-    )
+      },
+
+      disconnectWallet: async () => {
+        const { walletAdapter } = get();
+
+        try {
+          if (walletAdapter) {
+            await walletAdapter.disconnect();
+          }
+        } catch (error) {
+          console.warn('Error during wallet disconnect:', error);
+        } finally {
+          set({
+            isConnected: false,
+            isConnecting: false,
+            connectedWallet: null,
+            walletAdapter: null,
+            accountInfo: null,
+            balances: [],
+            xlmBalance: '0',
+            error: null,
+            isLoadingAccount: false,
+            isLoadingBalances: false,
+          });
+        }
+      },
+
+      refreshAccountInfo: async () => {
+        const { connectedWallet, setError } = get();
+
+        if (!connectedWallet) {
+          setError('No wallet connected');
+          return;
+        }
+
+        try {
+          set({ isLoadingAccount: true, error: null });
+
+          const stellarAPI = getStellarAPI();
+          const accountInfo = await stellarAPI.getAccount(
+            connectedWallet.publicKey
+          );
+
+          set({
+            accountInfo,
+            isLoadingAccount: false,
+          });
+
+          // 同时刷新余额
+          await get().refreshBalances();
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : 'Failed to load account info';
+          console.error('❌ Failed to load account info:', errorMessage);
+          setError(errorMessage);
+          set({ isLoadingAccount: false });
+        }
+      },
+
+      refreshBalances: async () => {
+        const { connectedWallet, setError } = get();
+
+        if (!connectedWallet) {
+          setError('No wallet connected');
+          return;
+        }
+
+        try {
+          set({ isLoadingBalances: true, error: null });
+
+          const stellarAPI = getStellarAPI();
+          const balances = await stellarAPI.getAccountBalances(
+            connectedWallet.publicKey
+          );
+          const xlmBalance = await stellarAPI.getXLMBalance(
+            connectedWallet.publicKey
+          );
+
+          const networkType = getCurrentNetworkType();
+          console.log(`💰 Balances loaded for ${networkType}:`, {
+            publicKey: connectedWallet.publicKey,
+            xlmBalance,
+            totalBalances: balances.length,
+            network: stellarAPI.isTestnet() ? 'Testnet' : 'Mainnet',
+            horizonUrl: stellarAPI.getConfig().horizonUrl,
+          });
+
+          set({
+            balances,
+            xlmBalance,
+            isLoadingBalances: false,
+          });
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error ? error.message : 'Failed to load balances';
+          console.error('❌ Failed to load balances:', errorMessage);
+          setError(errorMessage);
+          set({ isLoadingBalances: false });
+        }
+      },
+
+      setError: (error: string | null) => {
+        set({ error });
+      },
+
+      clearError: () => {
+        set({ error: null });
+      },
+
+      initializeWallets: async () => {
+        const network = getCurrentStellarNetwork();
+        const adapter = createWalletAdapter(network);
+        const availableWallets = await getAvailableWallets(adapter.getKit());
+        set({ availableWallets, walletAdapter: adapter });
+      },
+
+      openWalletModal: async (
+        onWalletSelected?: (walletType: WalletType) => void
+      ) => {
+        const { walletAdapter, connectWallet, setError } = get();
+
+        // 如果 walletAdapter 不存在，重新创建一个
+        let adapter = walletAdapter;
+        if (!adapter) {
+          try {
+            const network = getCurrentStellarNetwork();
+            adapter = createWalletAdapter(network);
+            set({ walletAdapter: adapter });
+          } catch (error) {
+            setError('Failed to initialize wallet adapter');
+            return;
+          }
+        }
+
+        try {
+          await adapter.openModal({
+            onWalletSelected: async (walletType: WalletType) => {
+              try {
+                await connectWallet(walletType);
+                if (onWalletSelected) {
+                  onWalletSelected(walletType);
+                }
+              } catch (error) {
+                console.error('Failed to connect wallet from modal:', error);
+              }
+            },
+            onClosed: (error?: Error) => {
+              if (error) {
+                setError(error.message);
+              }
+            },
+            modalTitle: 'Connect Your Wallet',
+            notAvailableText:
+              'Wallet not available. Please install the wallet extension.',
+          });
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : 'Failed to open wallet modal';
+          setError(errorMessage);
+        }
+      },
+
+      reset: () => {
+        set(initialState);
+      },
+    }),
+    {
+      name: 'stellar-wallet-storage',
+      partialize: state => ({
+        // 只持久化必要的状态
+        connectedWallet: state.connectedWallet,
+        isConnected: state.isConnected,
+      }),
+    }
+  )
 );
 
 // 订阅器用于自动刷新数据
@@ -286,36 +299,35 @@ let refreshInterval: NodeJS.Timeout | null = null;
 
 // 启动自动刷新
 export const startAutoRefresh = (intervalMs: number = 30000) => {
-    if (refreshInterval) {
-        clearInterval(refreshInterval);
-    }
+  if (refreshInterval) {
+    clearInterval(refreshInterval);
+  }
 
-    refreshInterval = setInterval(() => {
-        const { isConnected, refreshBalances } = useWalletStore.getState();
-        if (isConnected) {
-            refreshBalances();
-        }
-    }, intervalMs);
+  refreshInterval = setInterval(() => {
+    const { isConnected, refreshBalances } = useWalletStore.getState();
+    if (isConnected) {
+      refreshBalances();
+    }
+  }, intervalMs);
 };
 
 // 停止自动刷新
 export const stopAutoRefresh = () => {
-    if (refreshInterval) {
-        clearInterval(refreshInterval);
-        refreshInterval = null;
-    }
+  if (refreshInterval) {
+    clearInterval(refreshInterval);
+    refreshInterval = null;
+  }
 };
 
 // 监听钱包连接状态变化
 let previousConnected = false;
-useWalletStore.subscribe((state) => {
-    if (state.isConnected !== previousConnected) {
-        if (state.isConnected) {
-            startAutoRefresh();
-        } else {
-            stopAutoRefresh();
-        }
-        previousConnected = state.isConnected;
+useWalletStore.subscribe(state => {
+  if (state.isConnected !== previousConnected) {
+    if (state.isConnected) {
+      startAutoRefresh();
+    } else {
+      stopAutoRefresh();
     }
+    previousConnected = state.isConnected;
+  }
 });
-
