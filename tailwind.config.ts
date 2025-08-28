@@ -49,6 +49,33 @@ const config = {
           400: '#575757',
           500: '#202020',
         },
+        green: {
+          DEFAULT: '#00B42A',
+          50: '#E8FFEA', //1
+          100: '#AFF0B5', //2
+          200: '#7BE188', //3
+          300: '#C4FFBD', //4
+          400: '#23C343', //5
+          500: '#00CB00', //6 tag Fundraising
+          600: '#009A29', //7
+          700: '#1DFA00', //8
+          800: '#16C200', //9
+          900: '#108A00', //10
+        },
+        yellow: {
+          DEFAULT: '#F4D27B',
+          50: '#FFFFFF',
+          100: '#FFFFFF',
+          200: '#FFF6E0',
+          300: '#FFEAB8',
+          400: '#FFDD8F',
+          500: '#FFB340', // tag Pending
+          600: '#FFC02E',
+          650: '#F5AB00',
+          700: '#F5AB00',
+          800: '#BD8400',
+          900: '#855D00',
+        },
       },
       fontFamily: {
         'MatterSQ-Bold': ['MatterSQ-Bold'],

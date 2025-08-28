@@ -4,6 +4,52 @@ import { otherAddressFormat } from '@/lib/utils';
 import { useWalletStore } from '@/states';
 import { Card } from '@solvprotocol/ui-v2';
 import React from 'react';
+import { Redemption, RedemptionTable } from './RedemptionTable';
+
+export const mockRedemptions: Redemption[] = [
+  {
+    id: '1',
+    pool: 'SolvBTC Yield Pool',
+    network: 'Solana',
+    withdrawAmount: 10.0,
+    value: '0.001 SolvBTC',
+  },
+  {
+    id: '2',
+    pool: 'SolvBTC Yield Pool',
+    network: 'Solana',
+    withdrawAmount: 10.0,
+    value: '0.001 SolvBTC',
+  },
+  {
+    id: '3',
+    pool: 'SolvBTC Yield Pool',
+    network: 'Solana',
+    withdrawAmount: 10.0,
+    value: '0.001 SolvBTC',
+  },
+  {
+    id: '4',
+    pool: 'SolvBTC Yield Pool',
+    network: 'Solana',
+    withdrawAmount: 10.0,
+    value: '0.001 SolvBTC',
+  },
+  {
+    id: '5',
+    pool: 'SolvBTC Yield Pool',
+    network: 'Solana',
+    withdrawAmount: 10.0,
+    value: '0.001 SolvBTC',
+  },
+  {
+    id: '6',
+    pool: 'SolvBTC Yield Pool',
+    network: 'Solana',
+    withdrawAmount: 10.0,
+    value: '0.001 SolvBTC',
+  },
+];
 
 export default function MyRedemption() {
   const { isConnected, isConnecting, isLoadingAccount, connectedWallet } =
@@ -41,7 +87,7 @@ export default function MyRedemption() {
       </div>
 
       <Card className='mt-8 rounded-3xl border-none p-8'>
-        <div className='p-0'></div>
+        <RedemptionTable data={mockRedemptions}></RedemptionTable>
       </Card>
     </div>
   );
