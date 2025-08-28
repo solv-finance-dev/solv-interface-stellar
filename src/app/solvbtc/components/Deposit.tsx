@@ -24,7 +24,7 @@ import { ArrowRight } from 'lucide-react';
 import { InputComplex } from '@/components/InputComplex';
 import { TooltipComplex } from '@/components/TooltipComplex';
 import { TokenIcon } from '@/components/TokenIcon';
-import { useSolvBTCVaultClient } from "@/states";
+import { useSolvBTCVaultClient } from '@/states';
 
 const FormSchema = z.object({
   deposit: z.string().min(2, {
@@ -36,13 +36,12 @@ const FormSchema = z.object({
 });
 
 export default function Deposit() {
-
   const solvBTCClient = useSolvBTCVaultClient();
 
-  console.log("🔍 SolvBTCVaultClient status:", {
+  console.log('🔍 SolvBTCVaultClient status:', {
     client: solvBTCClient,
     isAvailable: !!solvBTCClient,
-    type: typeof solvBTCClient
+    type: typeof solvBTCClient,
   });
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -53,9 +52,7 @@ export default function Deposit() {
   });
 
   const [selected, setSelected] = useState('SolvBTC');
-  const options = [
-    { label: 'SolvBTC', value: 'SolvBTC' },
-  ];
+  const options = [{ label: 'SolvBTC', value: 'SolvBTC' }];
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     toast(

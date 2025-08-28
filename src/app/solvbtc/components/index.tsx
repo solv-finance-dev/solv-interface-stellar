@@ -4,10 +4,10 @@ import {
   TabsList,
   TabsTrigger,
   TabsContent,
-} from "@solvprotocol/ui-v2";
-import Deposit from "./Deposit";
-import Withdraw from "./withdraw";
-import Details from "./Details";
+} from '@solvprotocol/ui-v2';
+import Deposit from './Deposit';
+import Withdraw from './withdraw';
+import Details from './Details';
 
 interface TabItem {
   value: string;

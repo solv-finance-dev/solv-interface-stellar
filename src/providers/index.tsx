@@ -10,17 +10,15 @@ import { useContractStore, useWalletStore } from '@/states';
 
 const Provider = ({ children }: { children: ReactNode }) => {
   const initializeWallets = useWalletStore(state => state.initializeWallets);
-  const initializeContracts = useContractStore(state => state.initializeContracts);
+  const initializeContracts = useContractStore(
+    state => state.initializeContracts
+  );
   useEffect(() => {
     // Initialize app configuration
     const initialize = async () => {
       try {
         // Initialize wallets and contracts in parallel
-        await Promise.all([
-          initializeWallets(),
-          initializeContracts()
-        ]);
-
+        await Promise.all([initializeWallets(), initializeContracts()]);
       } catch (error) {
         console.error('Failed to initialize app:', error);
       }
