@@ -2,7 +2,6 @@
 
 import { ClaimIcon } from '@/assets/svg/svg';
 import { DataTableComplex } from '@/components/DataTableComplex';
-import { DataTable } from '@/components/DataTableComplex/test';
 import { TokenIcon } from '@/components/TokenIcon';
 import { Button } from '@solvprotocol/ui-v2';
 import { ColumnDef } from '@tanstack/react-table';
@@ -91,7 +90,7 @@ export const columns: ColumnDef<Redemption>[] = [
 
       return (
         <div className='flex flex-col items-end text-[.875rem] leading-4'>
-          <span>{formatted}</span>
+          <span>{formatted} SolvBTC</span>
           <span className='mt-1 text-gray-400'>{`$1007.27`}</span>
         </div>
       );
