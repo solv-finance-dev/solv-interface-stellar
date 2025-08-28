@@ -163,7 +163,7 @@ export function WalletConnector({
             </div>
 
             <div className="space-y-1">
-              <div className="w-full flex cursor-pointer items-center space-x-2 py-3 transition-colors text-left border-b-[1px] border-border border-solid text-[.875rem] leader-5">
+              <div className="w-full flex cursor-pointer items-center space-x-2 py-3 transition-colors text-left border-b-[1px] border-input border-solid text-[.875rem] leader-5">
                 <MyPortfolioIcon className="w-4 h-4" />
                 <span>My Portfolio</span>
               </div>

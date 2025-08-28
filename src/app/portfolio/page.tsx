@@ -1,7 +1,12 @@
 "use client";
 
 import React from "react";
+import MyRedemption from "./components/MyRedemption";
 
-export default function page() {
-  return <div>page</div>;
+export default function MyPortfolio() {
+  return (
+    <div>
+      <MyRedemption />
+    </div>
+  );
 }
