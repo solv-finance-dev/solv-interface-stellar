@@ -1,6 +1,6 @@
 import { CopyHelper } from '@/components/CopyHelper';
 import { TokenIcon } from '@/components/TokenIcon';
-import { addressFormat } from '@/lib/utils';
+import { otherAddressFormat } from '@/lib/utils';
 import { useWalletStore } from '@/states';
 import { Card } from '@solvprotocol/ui-v2';
 import React from 'react';
@@ -32,7 +32,7 @@ export default function MyRedemption() {
 
               <CopyHelper size='18' data={connectedWallet.publicKey}>
                 <div className='w-[7.0625rem] truncate text-right text-[.875rem] leading-5 text-textColor'>
-                  {addressFormat(connectedWallet.publicKey)}
+                  {otherAddressFormat(connectedWallet.publicKey)}
                 </div>
               </CopyHelper>
             </div>

@@ -65,7 +65,7 @@ export function addressFormat(value: string, digits = 4): string {
   return data;
 }
 
-export function otherAddressFormat(value: string, digits = 6): string {
+export function otherAddressFormat(value: string, digits = 5): string {
   if (isEmpty(value)) {
     return '';
   }
