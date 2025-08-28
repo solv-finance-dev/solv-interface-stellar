@@ -30,7 +30,6 @@ export {
   useContractStore,
   useContractClient,
   useSolvBTCVaultClient,
-  useVaultClient,
   ensureContractInitialized,
   ensureClientInitialized,
   getContractClients,

@@ -6,22 +6,28 @@ import Header from '@/components/Header';
 
 import BodyProvider from './BodyProvider';
 import { ThemeProvider } from './ThemeProvider';
-import { useWalletStore } from '@/states';
+import { useContractStore, useWalletStore } from '@/states';
 
 const Provider = ({ children }: { children: ReactNode }) => {
   const initializeWallets = useWalletStore(state => state.initializeWallets);
+  const initializeContracts = useContractStore(state => state.initializeContracts);
   useEffect(() => {
-    // 初始化应用配置
+    // Initialize app configuration
     const initialize = async () => {
       try {
-        await initializeWallets();
+        // Initialize wallets and contracts in parallel
+        await Promise.all([
+          initializeWallets(),
+          initializeContracts()
+        ]);
+
       } catch (error) {
         console.error('Failed to initialize app:', error);
       }
     };
 
     initialize();
-  }, [initializeWallets]);
+  }, [initializeWallets, initializeContracts]);
   return (
     <ThemeProvider attribute='class' defaultTheme='dark'>
       <Header />
