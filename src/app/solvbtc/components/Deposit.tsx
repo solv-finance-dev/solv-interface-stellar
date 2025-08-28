@@ -52,10 +52,9 @@ export default function Deposit() {
     },
   });
 
-  const [selected, setSelected] = useState('cbBTC');
+  const [selected, setSelected] = useState('SolvBTC');
   const options = [
-    { label: 'cbBTC', value: 'cbBTC' },
-    { label: 'FBTC', value: 'FBTC' },
+    { label: 'SolvBTC', value: 'SolvBTC' },
   ];
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
