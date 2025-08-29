@@ -30,7 +30,7 @@ interface useSolvBtcStore {
 
 const useSolvBtcStore = create<useSolvBtcStore>()(
   persist(
-    (set) => ({
+    set => ({
       navOpen: false,
       supportedTokens,
       setNavOpen: (navOpen: boolean) => set({ navOpen }),

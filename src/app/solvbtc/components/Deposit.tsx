@@ -23,7 +23,12 @@ import { ArrowRight, RotateCcw } from 'lucide-react';
 import { InputComplex } from '@/components/InputComplex';
 import { TooltipComplex } from '@/components/TooltipComplex';
 import { TokenIcon } from '@/components/TokenIcon';
-import { useSolvBtcStore, useSolvBTCVaultClient, useWalletStore, Token } from '@/states';
+import {
+  useSolvBtcStore,
+  useSolvBTCVaultClient,
+  useWalletStore,
+  Token,
+} from '@/states';
 import {
   getSolvBTCTokenBalance,
   formatTokenBalance,
@@ -56,58 +61,59 @@ export default function Deposit() {
   const [selected, setSelected] = useState<Token>(supportedTokens[0]);
 
   // Create form validation schema as a function to access current state
-  const createFormSchema = () => z.object({
-    deposit: z
-      .string()
-      .refine(
-        (val) => {
-          // Allow empty values
-          if (!val || val.trim() === '') return true;
-          const num = parseFloat(val);
-          return !isNaN(num) && isFinite(num);
-        },
-        { message: 'Deposit amount must be a valid number' }
-      )
-      .refine(
-        (val) => {
-          // Allow empty values
-          if (!val || val.trim() === '') return true;
-          return parseFloat(val) > 0;
-        },
-        { message: 'Deposit amount must be greater than 0' }
-      )
-      .refine(
-        (val) => {
-          // Allow empty values
-          if (!val || val.trim() === '') return true;
-          const depositAmount = parseFloat(val);
-          const maxBalance = parseFloat(tokenBalance.balance || '0');
-          return depositAmount <= maxBalance;
-        },
-        {
-          message: `Deposit amount cannot exceed your balance of ${formatTokenBalance(tokenBalance.balance, tokenBalance.decimals)} ${selected.name}`
-        }
-      ),
-    receive: z
-      .string()
-      .refine(
-        (val) => {
-          // Allow empty values
-          if (!val || val.trim() === '') return true;
-          const num = parseFloat(val);
-          return !isNaN(num) && isFinite(num);
-        },
-        { message: 'Receive amount must be a valid number' }
-      )
-      .refine(
-        (val) => {
-          // Allow empty values
-          if (!val || val.trim() === '') return true;
-          return parseFloat(val) > 0;
-        },
-        { message: 'Receive amount must be greater than 0' }
-      ),
-  });
+  const createFormSchema = () =>
+    z.object({
+      deposit: z
+        .string()
+        .refine(
+          val => {
+            // Allow empty values
+            if (!val || val.trim() === '') return true;
+            const num = parseFloat(val);
+            return !isNaN(num) && isFinite(num);
+          },
+          { message: 'Deposit amount must be a valid number' }
+        )
+        .refine(
+          val => {
+            // Allow empty values
+            if (!val || val.trim() === '') return true;
+            return parseFloat(val) > 0;
+          },
+          { message: 'Deposit amount must be greater than 0' }
+        )
+        .refine(
+          val => {
+            // Allow empty values
+            if (!val || val.trim() === '') return true;
+            const depositAmount = parseFloat(val);
+            const maxBalance = parseFloat(tokenBalance.balance || '0');
+            return depositAmount <= maxBalance;
+          },
+          {
+            message: `Deposit amount cannot exceed your balance of ${formatTokenBalance(tokenBalance.balance, tokenBalance.decimals)} ${selected.name}`,
+          }
+        ),
+      receive: z
+        .string()
+        .refine(
+          val => {
+            // Allow empty values
+            if (!val || val.trim() === '') return true;
+            const num = parseFloat(val);
+            return !isNaN(num) && isFinite(num);
+          },
+          { message: 'Receive amount must be a valid number' }
+        )
+        .refine(
+          val => {
+            // Allow empty values
+            if (!val || val.trim() === '') return true;
+            return parseFloat(val) > 0;
+          },
+          { message: 'Receive amount must be greater than 0' }
+        ),
+    });
 
   const form = useForm<z.infer<ReturnType<typeof createFormSchema>>>({
     resolver: zodResolver(createFormSchema()),
@@ -167,12 +173,15 @@ export default function Deposit() {
 
       // Convert fee rate from i128 to percentage (assuming fee rate is in basis points)
       // If fee rate is 100, it means 1% (100 basis points)
-      const feeRatePercentage = (Number(feeRateValue) / BASIS_POINTS_DIVISOR).toFixed(4);
+      const feeRatePercentage = (
+        Number(feeRateValue) / BASIS_POINTS_DIVISOR
+      ).toFixed(4);
       setDepositFeeRate(feeRatePercentage);
 
       console.log('Deposit fee rate fetched:', feeRatePercentage + '%');
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch fee rate';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to fetch fee rate';
       setFeeRateError(errorMessage);
       console.error('Error fetching deposit fee rate:', errorMessage);
     } finally {
@@ -199,8 +208,12 @@ export default function Deposit() {
   // Update form resolver when balance or selected token changes
   useEffect(() => {
     // Update the form resolver with new schema
-    form.setValue('deposit', form.getValues('deposit'), { shouldValidate: true });
-    form.setValue('receive', form.getValues('receive'), { shouldValidate: true });
+    form.setValue('deposit', form.getValues('deposit'), {
+      shouldValidate: true,
+    });
+    form.setValue('receive', form.getValues('receive'), {
+      shouldValidate: true,
+    });
   }, [tokenBalance.balance, selected.name, form]);
 
   // Set maximum amount
@@ -214,7 +227,11 @@ export default function Deposit() {
 
   // Calculate receive amount based on deposit amount and fee rate
   const calculateReceiveAmount = (depositAmount: string) => {
-    if (!depositAmount || isNaN(parseFloat(depositAmount)) || parseFloat(depositAmount) <= 0) {
+    if (
+      !depositAmount ||
+      isNaN(parseFloat(depositAmount)) ||
+      parseFloat(depositAmount) <= 0
+    ) {
       form.setValue('receive', '');
       form.trigger('receive');
       return;
@@ -225,17 +242,24 @@ export default function Deposit() {
 
     // Calculate the amount after fee deduction
     // receive = deposit * (1 - fee_rate_percentage)
-    const receiveAmount = depositValue * (1 - feeRateValue / PERCENTAGE_DIVISOR);
+    const receiveAmount =
+      depositValue * (1 - feeRateValue / PERCENTAGE_DIVISOR);
 
     // Format to specified decimal places and remove trailing zeros
-    const formattedReceiveAmount = parseFloat(receiveAmount.toFixed(DECIMAL_PRECISION)).toString();
+    const formattedReceiveAmount = parseFloat(
+      receiveAmount.toFixed(DECIMAL_PRECISION)
+    ).toString();
     form.setValue('receive', formattedReceiveAmount);
     form.trigger('receive');
   };
 
   // Calculate deposit amount based on receive amount and fee rate
   const calculateDepositAmount = (receiveAmount: string) => {
-    if (!receiveAmount || isNaN(parseFloat(receiveAmount)) || parseFloat(receiveAmount) <= 0) {
+    if (
+      !receiveAmount ||
+      isNaN(parseFloat(receiveAmount)) ||
+      parseFloat(receiveAmount) <= 0
+    ) {
       form.setValue('deposit', '');
       form.trigger('deposit');
       return;
@@ -246,10 +270,13 @@ export default function Deposit() {
 
     // Calculate the required deposit amount
     // deposit = receive / (1 - fee_rate_percentage)
-    const depositAmount = receiveValue / (1 - feeRateValue / PERCENTAGE_DIVISOR);
+    const depositAmount =
+      receiveValue / (1 - feeRateValue / PERCENTAGE_DIVISOR);
 
     // Format to specified decimal places and remove trailing zeros
-    const formattedDepositAmount = parseFloat(depositAmount.toFixed(DECIMAL_PRECISION)).toString();
+    const formattedDepositAmount = parseFloat(
+      depositAmount.toFixed(DECIMAL_PRECISION)
+    ).toString();
     form.setValue('deposit', formattedDepositAmount);
     form.trigger('deposit');
   };
@@ -260,7 +287,9 @@ export default function Deposit() {
     const receiveValue = form.getValues('receive');
 
     // Must have at least one value filled
-    const hasValues = (depositValue && depositValue.trim() !== '') || (receiveValue && receiveValue.trim() !== '');
+    const hasValues =
+      (depositValue && depositValue.trim() !== '') ||
+      (receiveValue && receiveValue.trim() !== '');
 
     // Must be connected to wallet
     const isWalletConnected = isConnected && connectedWallet?.publicKey;
@@ -335,7 +364,7 @@ export default function Deposit() {
                     <InputComplex
                       className='h-[2.75rem]'
                       inputValue={field.value}
-                      onInputChange={(value) => {
+                      onInputChange={value => {
                         field.onChange(value);
                         // Calculate receive amount when deposit amount changes
                         calculateReceiveAmount(value);
@@ -359,7 +388,10 @@ export default function Deposit() {
                             MAX
                           </button>
 
-                          <Select value={selected.name} onValueChange={onTokenSelected}>
+                          <Select
+                            value={selected.name}
+                            onValueChange={onTokenSelected}
+                          >
                             <SelectTrigger className='border-0 !bg-transparent !pl-2 !pr-0 outline-none focus-visible:ring-0'>
                               <div className='flex items-center justify-between text-[1rem]'>
                                 <TokenIcon
@@ -422,7 +454,9 @@ export default function Deposit() {
                       {isLoadingFeeRate ? (
                         <span className='animate-pulse'>Loading...</span>
                       ) : feeRateError ? (
-                        <span className='text-red-500' title={feeRateError}>Error</span>
+                        <span className='text-red-500' title={feeRateError}>
+                          Error
+                        </span>
                       ) : (
                         <span className='font-medium text-brand-500'>
                           {depositFeeRate}%
@@ -435,7 +469,7 @@ export default function Deposit() {
                   <InputComplex
                     className='h-[2.75rem]'
                     inputValue={field.value}
-                    onInputChange={(value) => {
+                    onInputChange={value => {
                       field.onChange(value);
                       // Calculate deposit amount when receive amount changes
                       calculateDepositAmount(value);
@@ -472,7 +506,7 @@ export default function Deposit() {
           <Button
             type='submit'
             disabled={!isFormValid()}
-            className='w-full rounded-full bg-brand-500 text-white hover:bg-brand-500/90 disabled:bg-gray-300 disabled:cursor-not-allowed md:w-[25.625rem]'
+            className='w-full rounded-full bg-brand-500 text-white hover:bg-brand-500/90 disabled:cursor-not-allowed disabled:bg-gray-300 md:w-[25.625rem]'
           >
             Deposit
           </Button>
