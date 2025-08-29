@@ -16,7 +16,6 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   toast,
 } from '@solvprotocol/ui-v2';
@@ -31,14 +30,10 @@ import {
   type TokenBalanceResult,
 } from '@/lib/token-balance';
 
-const FormSchema = z.object({
-  deposit: z.string().min(2, {
-    message: 'deposit must be xxx.',
-  }),
-  receive: z.string().min(2, {
-    message: 'receive must be xxx.',
-  }),
-});
+// Constants
+const BASIS_POINTS_DIVISOR = 10000; // Convert basis points to percentage (e.g., 100 basis points = 1%)
+const PERCENTAGE_DIVISOR = 100; // Convert percentage to decimal (e.g., 1% = 0.01)
+const DECIMAL_PRECISION = 6; // Number of decimal places for amount formatting
 
 export default function Deposit() {
   const solvBTCClient = useSolvBTCVaultClient();
@@ -52,17 +47,79 @@ export default function Deposit() {
   });
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
 
-  // SolvBTCVaultClient status check removed for production
+  // Deposit fee rate state
+  const [depositFeeRate, setDepositFeeRate] = useState<string>('0');
+  const [isLoadingFeeRate, setIsLoadingFeeRate] = useState(false);
+  const [feeRateError, setFeeRateError] = useState<string | null>(null);
 
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+  // Selected token state
+  const [selected, setSelected] = useState<Token>(supportedTokens[0]);
+
+  // Create form validation schema as a function to access current state
+  const createFormSchema = () => z.object({
+    deposit: z
+      .string()
+      .refine(
+        (val) => {
+          // Allow empty values
+          if (!val || val.trim() === '') return true;
+          const num = parseFloat(val);
+          return !isNaN(num) && isFinite(num);
+        },
+        { message: 'Deposit amount must be a valid number' }
+      )
+      .refine(
+        (val) => {
+          // Allow empty values
+          if (!val || val.trim() === '') return true;
+          return parseFloat(val) > 0;
+        },
+        { message: 'Deposit amount must be greater than 0' }
+      )
+      .refine(
+        (val) => {
+          // Allow empty values
+          if (!val || val.trim() === '') return true;
+          const depositAmount = parseFloat(val);
+          const maxBalance = parseFloat(tokenBalance.balance || '0');
+          return depositAmount <= maxBalance;
+        },
+        {
+          message: `Deposit amount cannot exceed your balance of ${formatTokenBalance(tokenBalance.balance, tokenBalance.decimals)} ${selected.name}`
+        }
+      ),
+    receive: z
+      .string()
+      .refine(
+        (val) => {
+          // Allow empty values
+          if (!val || val.trim() === '') return true;
+          const num = parseFloat(val);
+          return !isNaN(num) && isFinite(num);
+        },
+        { message: 'Receive amount must be a valid number' }
+      )
+      .refine(
+        (val) => {
+          // Allow empty values
+          if (!val || val.trim() === '') return true;
+          return parseFloat(val) > 0;
+        },
+        { message: 'Receive amount must be greater than 0' }
+      ),
+  });
+
+  const form = useForm<z.infer<ReturnType<typeof createFormSchema>>>({
+    resolver: zodResolver(createFormSchema()),
     defaultValues: {
       deposit: '',
       receive: '',
     },
+    mode: 'onChange', // Enable real-time validation
   });
 
-  const [selected, setSelected] = useState<Token>(supportedTokens[0]);
+  // Watch form values to trigger re-renders when they change
+  const watchedValues = form.watch(['deposit', 'receive']);
   const onTokenSelected = (value: string) => {
     const token = supportedTokens.find(token => token.name === value);
     if (token) {
@@ -95,6 +152,34 @@ export default function Deposit() {
     }
   };
 
+  // Function to fetch deposit fee rate
+  const fetchDepositFeeRate = async () => {
+    if (!solvBTCClient) {
+      setFeeRateError('Contract client not available');
+      return;
+    }
+
+    setIsLoadingFeeRate(true);
+    setFeeRateError(null);
+    try {
+      const feeRateResult = await solvBTCClient.get_deposit_fee_ratio();
+      const feeRateValue = feeRateResult.result;
+
+      // Convert fee rate from i128 to percentage (assuming fee rate is in basis points)
+      // If fee rate is 100, it means 1% (100 basis points)
+      const feeRatePercentage = (Number(feeRateValue) / BASIS_POINTS_DIVISOR).toFixed(4);
+      setDepositFeeRate(feeRatePercentage);
+
+      console.log('Deposit fee rate fetched:', feeRatePercentage + '%');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch fee rate';
+      setFeeRateError(errorMessage);
+      console.error('Error fetching deposit fee rate:', errorMessage);
+    } finally {
+      setIsLoadingFeeRate(false);
+    }
+  };
+
   // Fetch balance when wallet connection status changes
   useEffect(() => {
     if (isConnected && connectedWallet?.publicKey) {
@@ -104,14 +189,90 @@ export default function Deposit() {
     }
   }, [isConnected, connectedWallet?.publicKey]);
 
+  // Fetch deposit fee rate when component mounts or when solvBTCClient is available
+  useEffect(() => {
+    if (solvBTCClient) {
+      fetchDepositFeeRate();
+    }
+  }, [solvBTCClient]);
+
+  // Update form resolver when balance or selected token changes
+  useEffect(() => {
+    // Update the form resolver with new schema
+    form.setValue('deposit', form.getValues('deposit'), { shouldValidate: true });
+    form.setValue('receive', form.getValues('receive'), { shouldValidate: true });
+  }, [tokenBalance.balance, selected.name, form]);
+
   // Set maximum amount
   const handleSetMax = () => {
     if (tokenBalance.balance && parseFloat(tokenBalance.balance) > 0) {
       form.setValue('deposit', tokenBalance.balance);
+      // Calculate and set the receive amount when max is set
+      calculateReceiveAmount(tokenBalance.balance);
     }
   };
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
+  // Calculate receive amount based on deposit amount and fee rate
+  const calculateReceiveAmount = (depositAmount: string) => {
+    if (!depositAmount || isNaN(parseFloat(depositAmount)) || parseFloat(depositAmount) <= 0) {
+      form.setValue('receive', '');
+      form.trigger('receive');
+      return;
+    }
+
+    const depositValue = parseFloat(depositAmount);
+    const feeRateValue = parseFloat(depositFeeRate);
+
+    // Calculate the amount after fee deduction
+    // receive = deposit * (1 - fee_rate_percentage)
+    const receiveAmount = depositValue * (1 - feeRateValue / PERCENTAGE_DIVISOR);
+
+    // Format to specified decimal places and remove trailing zeros
+    const formattedReceiveAmount = parseFloat(receiveAmount.toFixed(DECIMAL_PRECISION)).toString();
+    form.setValue('receive', formattedReceiveAmount);
+    form.trigger('receive');
+  };
+
+  // Calculate deposit amount based on receive amount and fee rate
+  const calculateDepositAmount = (receiveAmount: string) => {
+    if (!receiveAmount || isNaN(parseFloat(receiveAmount)) || parseFloat(receiveAmount) <= 0) {
+      form.setValue('deposit', '');
+      form.trigger('deposit');
+      return;
+    }
+
+    const receiveValue = parseFloat(receiveAmount);
+    const feeRateValue = parseFloat(depositFeeRate);
+
+    // Calculate the required deposit amount
+    // deposit = receive / (1 - fee_rate_percentage)
+    const depositAmount = receiveValue / (1 - feeRateValue / PERCENTAGE_DIVISOR);
+
+    // Format to specified decimal places and remove trailing zeros
+    const formattedDepositAmount = parseFloat(depositAmount.toFixed(DECIMAL_PRECISION)).toString();
+    form.setValue('deposit', formattedDepositAmount);
+    form.trigger('deposit');
+  };
+
+  // Check if form is valid for submission
+  const isFormValid = () => {
+    const depositValue = form.getValues('deposit');
+    const receiveValue = form.getValues('receive');
+
+    // Must have at least one value filled
+    const hasValues = (depositValue && depositValue.trim() !== '') || (receiveValue && receiveValue.trim() !== '');
+
+    // Must be connected to wallet
+    const isWalletConnected = isConnected && connectedWallet?.publicKey;
+
+    // Form must be valid (no errors)
+    const formErrors = form.formState.errors;
+    const hasNoErrors = !formErrors.deposit && !formErrors.receive;
+
+    return hasValues && isWalletConnected && hasNoErrors;
+  };
+
+  function onSubmit(data: z.infer<ReturnType<typeof createFormSchema>>) {
     toast(
       <div>
         <div className='mb-2 font-bold'>
@@ -174,7 +335,11 @@ export default function Deposit() {
                     <InputComplex
                       className='h-[2.75rem]'
                       inputValue={field.value}
-                      onInputChange={field.onChange}
+                      onInputChange={(value) => {
+                        field.onChange(value);
+                        // Calculate receive amount when deposit amount changes
+                        calculateReceiveAmount(value);
+                      }}
                       inputProps={{
                         placeholder: '0.00',
                         className:
@@ -246,15 +411,35 @@ export default function Deposit() {
             name='receive'
             render={({ field }) => (
               <FormItem className='w-full gap-[10px] md:w-[45.4%]'>
-                <FormLabel className='flex items-center !gap-1 text-[.75rem] leading-[1rem]'>
-                  You Will Receive
-                  <TooltipComplex content={'tips'}></TooltipComplex>
+                <FormLabel className='flex items-center justify-between text-[.75rem] leading-[1rem]'>
+                  <div className='flex items-center !gap-1'>
+                    You Will Receive
+                    <TooltipComplex content={'tips'}></TooltipComplex>
+                  </div>
+                  <div className='flex items-center gap-2 text-[.875rem]'>
+                    <span className='text-grayColor'>Fee Rate:</span>
+                    <div className='text-textColor'>
+                      {isLoadingFeeRate ? (
+                        <span className='animate-pulse'>Loading...</span>
+                      ) : feeRateError ? (
+                        <span className='text-red-500' title={feeRateError}>Error</span>
+                      ) : (
+                        <span className='font-medium text-brand-500'>
+                          {depositFeeRate}%
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </FormLabel>
                 <FormControl>
                   <InputComplex
                     className='h-[2.75rem]'
                     inputValue={field.value}
-                    onInputChange={field.onChange}
+                    onInputChange={(value) => {
+                      field.onChange(value);
+                      // Calculate deposit amount when receive amount changes
+                      calculateDepositAmount(value);
+                    }}
                     inputProps={{
                       placeholder: '0.00',
                       className:
@@ -286,9 +471,10 @@ export default function Deposit() {
         <div className='flex items-end justify-center'>
           <Button
             type='submit'
-            className='w-full rounded-full bg-brand-500 text-white hover:bg-brand-500/90 md:w-[25.625rem]'
+            disabled={!isFormValid()}
+            className='w-full rounded-full bg-brand-500 text-white hover:bg-brand-500/90 disabled:bg-gray-300 disabled:cursor-not-allowed md:w-[25.625rem]'
           >
-            Select token
+            Deposit
           </Button>
         </div>
       </form>
