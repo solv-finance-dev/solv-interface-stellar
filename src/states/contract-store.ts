@@ -4,6 +4,7 @@ import { Client as ContractClient } from '@stellar/stellar-sdk/contract';
 import { SolvBTCVaultClient } from '@/contracts/solvBTCVaultContract/src';
 import { SolvBTCTokenClient } from '@/contracts/solvBTCTokenContract/src';
 import { getCurrentStellarNetwork } from '@/config/stellar';
+import useSolvBtcStore from './solvbtc';
 
 // Contract client configuration type definition
 export interface ContractClientConfig {
@@ -263,7 +264,7 @@ const getDefaultContractId = (clientName: string): string => {
     case 'SolvBTCVaultClient':
       return process.env.NEXT_PUBLIC_VAULT_CONTRACT || '';
     case 'SolvBTCTokenClient':
-      return process.env.NEXT_PUBLIC_TOKEN_CONTRACT || '';
+      return useSolvBtcStore.getState().supportedTokens[0].address || '';
     default:
       return '';
   }
