@@ -4,6 +4,7 @@ import * as React from 'react';
 
 import { Loader2 } from 'lucide-react';
 import { useDialogStore } from '@/states/dialog-store';
+import cn from 'classnames';
 import {
   Button,
   Dialog,
@@ -81,7 +82,7 @@ export function GlobalDialog() {
 
         <div className=''>{content}</div>
 
-        <DialogFooter className='mt-1 flex items-center'>
+        <DialogFooter className='mt-1 flex w-full items-center'>
           {showCancel && (
             <Button
               variant='outline'
@@ -96,7 +97,10 @@ export function GlobalDialog() {
           <Button
             onClick={handleConfirm}
             disabled={disableConfirm || loading}
-            className='h-12 flex-1 rounded-full text-[1rem]'
+            className={cn(
+              'h-12 flex-1 rounded-full text-[1rem]',
+              !showCancel && 'w-full'
+            )}
           >
             {loading && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
 
