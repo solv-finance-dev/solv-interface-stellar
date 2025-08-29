@@ -125,7 +125,9 @@ export function RedemptionTable({ data }: RedemptionTableProps) {
   return (
     <>
       <DataTableComplex
+        showSkeleton={false}
         columns={columns}
+        // data={[]}
         data={data}
         gridTemplateColumns='2fr 1fr 1fr 1.5fr 1fr'
       />

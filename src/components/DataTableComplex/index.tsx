@@ -23,6 +23,7 @@ import {
 import cn from 'classnames';
 import {
   Button,
+  Skeleton,
   Table,
   TableBody,
   TableCell,
@@ -30,12 +31,15 @@ import {
   TableHeader,
   TableRow,
 } from '@solvprotocol/ui-v2';
+import NoData from '../NoData';
 
 interface DataTableComplexProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   onRowClick?: (row: TData) => void;
   gridTemplateColumns?: string;
+  showSkeleton?: boolean;
+  skeletonCount?: number;
 }
 
 export function DataTableComplex<TData, TValue>({
@@ -43,6 +47,8 @@ export function DataTableComplex<TData, TValue>({
   data,
   onRowClick,
   gridTemplateColumns = 'repeat(auto-fit, minmax(120px, 1fr))',
+  showSkeleton = false,
+  skeletonCount = 6,
 }: DataTableComplexProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -112,6 +118,22 @@ export function DataTableComplex<TData, TValue>({
     return pageNumbers;
   };
 
+  const renderSkeletonRows = () => {
+    return Array.from({ length: skeletonCount }).map((_, index) => (
+      <TableRow
+        key={`skeleton-${index}`}
+        className='col-span-full grid grid-cols-subgrid hover:bg-transparent'
+        style={{ gridTemplateColumns }}
+      >
+        {columns.map((_, colIndex) => (
+          <TableCell key={`skeleton-cell-${colIndex}`}>
+            <Skeleton className='h-6 w-full' />
+          </TableCell>
+        ))}
+      </TableRow>
+    ));
+  };
+
   return (
     <>
       <div>
@@ -175,7 +197,9 @@ export function DataTableComplex<TData, TValue>({
           </TableHeader>
 
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {showSkeleton ? (
+              renderSkeletonRows()
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map(row => (
                 <TableRow
                   key={row.id}
@@ -209,12 +233,12 @@ export function DataTableComplex<TData, TValue>({
                 </TableRow>
               ))
             ) : (
-              <TableRow>
+              <TableRow className='bg-transparent hover:bg-transparent'>
                 <TableCell
                   colSpan={columns.length}
-                  className='h-24 text-center'
+                  className='h-[12.5rem] md:h-[18.75rem]'
                 >
-                  No results.
+                  <NoData />
                 </TableCell>
               </TableRow>
             )}
