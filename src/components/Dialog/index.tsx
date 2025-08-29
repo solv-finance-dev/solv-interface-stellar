@@ -28,9 +28,11 @@ export function GlobalDialog() {
     onConfirm,
     onCancel,
     showCancel = false,
+    showConfirm = true,
     disableConfirm = false,
     loading = false,
     size = 'md',
+    showCloseButton = true,
   } = options;
 
   const handleConfirm = async () => {
@@ -66,6 +68,7 @@ export function GlobalDialog() {
     <Dialog open={isOpen} onOpenChange={open => !open && closeDialog()}>
       <DialogContent
         className={`${sizeClasses[size]} max-h-[90vh] overflow-y-auto`}
+        showCloseButton={showCloseButton}
       >
         <DialogHeader>
           {title && (
@@ -94,18 +97,20 @@ export function GlobalDialog() {
             </Button>
           )}
 
-          <Button
-            onClick={handleConfirm}
-            disabled={disableConfirm || loading}
-            className={cn(
-              'h-12 flex-1 rounded-full text-[1rem]',
-              !showCancel && 'w-full'
-            )}
-          >
-            {loading && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
+          {showConfirm && (
+            <Button
+              onClick={handleConfirm}
+              disabled={disableConfirm || loading}
+              className={cn(
+                'h-12 flex-1 rounded-full text-[1rem]',
+                !showCancel && 'w-full'
+              )}
+            >
+              {loading && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
 
-            {confirmText}
-          </Button>
+              {confirmText}
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

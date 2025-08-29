@@ -5,6 +5,7 @@ import { DataTableComplex } from '@/components/DataTableComplex';
 import { TokenIcon } from '@/components/TokenIcon';
 import { TooltipComplex } from '@/components/TooltipComplex';
 import { useDialog } from '@/hooks/useDialog';
+import { useLoadingDialog } from '@/hooks/useLoadingDialog';
 import { Button } from '@solvprotocol/ui-v2';
 import { ColumnDef } from '@tanstack/react-table';
 
@@ -23,6 +24,7 @@ interface RedemptionTableProps {
 
 export function RedemptionTable({ data }: RedemptionTableProps) {
   const { openDialog } = useDialog();
+  const { openLoadingDialog, closeLoadingDialog } = useLoadingDialog();
 
   const showClaimDialog = () => {
     openDialog({
@@ -49,6 +51,12 @@ export function RedemptionTable({ data }: RedemptionTableProps) {
       loading: false,
       onConfirm: async () => {
         console.log('Confirm Claim');
+
+        openLoadingDialog({
+          description: '当前操作的描述',
+          chainId: 'xxx',
+          scanUrl: 'xxx',
+        });
       },
     });
   };

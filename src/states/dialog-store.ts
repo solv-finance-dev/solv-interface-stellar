@@ -10,8 +10,10 @@ type DialogOptions = {
   onConfirm?: () => void | Promise<void>;
   onCancel?: () => void;
   showCancel?: boolean;
+  showConfirm?: boolean;
   disableConfirm?: boolean;
   loading?: boolean;
+  showCloseButton?: boolean;
 };
 
 type DialogStore = {

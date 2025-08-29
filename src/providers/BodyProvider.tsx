@@ -3,6 +3,7 @@
 import { ReactNode } from 'react';
 import { Toaster } from '@solvprotocol/ui-v2';
 import { GlobalDialog } from '@/components/Dialog';
+import { GlobalLoadingDialog } from '@/components/Dialog/GlobalLoadingDialog';
 
 const BodyProvider = ({ children }: { children: ReactNode }) => {
   return (
@@ -10,6 +11,7 @@ const BodyProvider = ({ children }: { children: ReactNode }) => {
       {children}
 
       <GlobalDialog />
+      <GlobalLoadingDialog />
       <Toaster />
     </div>
   );
