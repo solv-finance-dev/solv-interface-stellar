@@ -1,7 +1,7 @@
 export * from './types';
 export * from './wallet-connectors';
 export * from './wallet-config';
-export * from './wallet-signer-proxy';
+// 移除 WalletSignerProxy，使用更简洁的 signAndSend 注入方案
 
 // Re-export commonly used items from types
 export {

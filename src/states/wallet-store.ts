@@ -8,7 +8,7 @@ import {
   WalletInfo,
   StellarWalletsKitAdapter,
 } from '@/wallet-connector';
-import { getWalletSignerProxy } from '@/wallet-connector/wallet-signer-proxy';
+// 移除 WalletSignerProxy 导入，不再使用复杂的代理模式
 import { getStellarAPI } from '@/stellar';
 import {
   getCurrentStellarNetwork,
@@ -43,6 +43,7 @@ export interface WalletActions {
   // 钱包连接
   connectWallet: (walletType: WalletType) => Promise<void>;
   disconnectWallet: () => Promise<void>;
+  validateAndFixWalletConnection: () => Promise<boolean>;
 
   // 数据刷新
   refreshAccountInfo: () => Promise<void>;
@@ -105,9 +106,19 @@ export const useWalletStore = create<WalletStore>()(
             walletAdapter: adapter,
           });
 
-          // 更新钱包签名器代理
-          const walletSignerProxy = getWalletSignerProxy();
-          walletSignerProxy.updateWallet(adapter, connectedWallet);
+          console.log('✅ Wallet connected:', {
+            walletType: connectedWallet.id,
+            publicKey: connectedWallet.publicKey,
+          });
+
+          // 批量更新所有 contract client 的签名器
+          try {
+            const { updateAllClientsSignTransaction } = await import('@/states/contract-store');
+            await updateAllClientsSignTransaction(adapter, connectedWallet);
+            console.log('✅ All clients signTransaction updated for connected wallet');
+          } catch (updateError) {
+            console.warn('Failed to update clients signTransaction:', updateError);
+          }
 
           // 立即加载账户信息
           await get().refreshAccountInfo();
@@ -130,9 +141,14 @@ export const useWalletStore = create<WalletStore>()(
         } catch (error) {
           console.warn('Error during wallet disconnect:', error);
         } finally {
-          // 清空钱包签名器代理
-          const walletSignerProxy = getWalletSignerProxy();
-          walletSignerProxy.updateWallet(null, null);
+          // 清除所有 contract client 的签名器
+          try {
+            const { clearAllClientsSignTransaction } = await import('@/states/contract-store');
+            clearAllClientsSignTransaction();
+            console.log('✅ All clients signTransaction cleared');
+          } catch (clearError) {
+            console.warn('Failed to clear clients signTransaction:', clearError);
+          }
 
           set({
             isConnected: false,
@@ -146,7 +162,55 @@ export const useWalletStore = create<WalletStore>()(
             isLoadingAccount: false,
             isLoadingBalances: false,
           });
+
+          console.log('🔌 Wallet disconnected');
         }
+      },
+
+      // 检测并修复钱包连接状态不一致问题
+      validateAndFixWalletConnection: async () => {
+        const { isConnected, connectedWallet, walletAdapter } = get();
+
+        console.log('🔍 Validating wallet connection state...', {
+          globalIsConnected: isConnected,
+          hasConnectedWallet: !!connectedWallet,
+          hasWalletAdapter: !!walletAdapter,
+          walletAdapterIsConnected: walletAdapter?.isConnected?.(),
+        });
+
+        // 检测状态不一致：全局状态说已连接，但适配器说未连接
+        if (isConnected && connectedWallet && walletAdapter && !walletAdapter.isConnected?.()) {
+          console.log('⚠️ Detected wallet state inconsistency after page refresh');
+          console.log('🔄 Attempting to re-establish wallet connection...');
+
+          try {
+            // 尝试重新连接相同的钱包
+            const { connectWallet } = get();
+            await connectWallet(connectedWallet.id as any);
+            console.log('✅ Wallet connection re-established successfully');
+            return true;
+          } catch (reconnectError) {
+            console.error('❌ Failed to re-establish wallet connection:', reconnectError);
+            // 清除不一致的状态
+            const { disconnectWallet } = get();
+            await disconnectWallet();
+            return false;
+          }
+        }
+
+        // 状态一致，无需处理
+        if (isConnected && connectedWallet && walletAdapter?.isConnected?.()) {
+          console.log('✅ Wallet connection state is consistent');
+          return true;
+        }
+
+        // 全局状态说未连接，这是正常的
+        if (!isConnected) {
+          console.log('ℹ️ Wallet is not connected (normal state)');
+          return false;
+        }
+
+        return false;
       },
 
       refreshAccountInfo: async () => {
@@ -201,6 +265,15 @@ export const useWalletStore = create<WalletStore>()(
           const xlmBalance = await stellarAPI.getXLMBalance(
             connectedWallet.publicKey
           );
+
+          const networkType = getCurrentNetworkType();
+          console.log(`💰 Balances loaded for ${networkType}:`, {
+            publicKey: connectedWallet.publicKey,
+            xlmBalance,
+            totalBalances: balances.length,
+            network: stellarAPI.isTestnet() ? 'Testnet' : 'Mainnet',
+            horizonUrl: stellarAPI.getConfig().horizonUrl,
+          });
 
           set({
             balances,

@@ -24,23 +24,14 @@ import { InputComplex } from '@/components/InputComplex';
 import { TooltipComplex } from '@/components/TooltipComplex';
 import { TokenIcon } from '@/components/TokenIcon';
 import { TxResult } from '@/components';
-import {
-  useSolvBtcStore,
-  useSolvBTCVaultClient,
-  useWalletStore,
-  Token,
-} from '@/states';
+import { useSolvBtcStore, useSolvBTCVaultClient, useWalletStore, Token } from '@/states';
+import { useContractStore, updateAllClientsSignTransaction } from '@/states/contract-store';
 import {
   getSolvBTCTokenBalance,
   formatTokenBalance,
   type TokenBalanceResult,
 } from '@/lib/token-balance';
 import { getCurrentStellarNetwork } from '@/config/stellar';
-import {
-  convertAmountToContractFormat,
-  extractTransactionHash,
-  parseTransactionError,
-} from '@/lib/transaction-utils';
 
 // Constants
 const BASIS_POINTS_DIVISOR = 10000; // Convert basis points to percentage (e.g., 100 basis points = 1%)
@@ -64,66 +55,62 @@ export default function Deposit() {
   const [isLoadingFeeRate, setIsLoadingFeeRate] = useState(false);
   const [feeRateError, setFeeRateError] = useState<string | null>(null);
 
-  // Add transaction loading state
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   // Selected token state
   const [selected, setSelected] = useState<Token>(supportedTokens[0]);
 
   // Create form validation schema as a function to access current state
-  const createFormSchema = () =>
-    z.object({
-      deposit: z
-        .string()
-        .refine(
-          val => {
-            // Allow empty values
-            if (!val || val.trim() === '') return true;
-            const num = parseFloat(val);
-            return !isNaN(num) && isFinite(num);
-          },
-          { message: 'Deposit amount must be a valid number' }
-        )
-        .refine(
-          val => {
-            // Allow empty values
-            if (!val || val.trim() === '') return true;
-            return parseFloat(val) > 0;
-          },
-          { message: 'Deposit amount must be greater than 0' }
-        )
-        .refine(
-          val => {
-            // Allow empty values
-            if (!val || val.trim() === '') return true;
-            const depositAmount = parseFloat(val);
-            const maxBalance = parseFloat(tokenBalance.balance || '0');
-            return depositAmount <= maxBalance;
-          },
-          {
-            message: `Deposit amount cannot exceed your balance of ${formatTokenBalance(tokenBalance.balance, tokenBalance.decimals)} ${selected.name}`,
-          }
-        ),
-      receive: z
-        .string()
-        .refine(
-          val => {
-            // Allow empty values
-            if (!val || val.trim() === '') return true;
-            const num = parseFloat(val);
-            return !isNaN(num) && isFinite(num);
-          },
-          { message: 'Receive amount must be a valid number' }
-        )
-        .refine(
-          val => {
-            // Allow empty values
-            if (!val || val.trim() === '') return true;
-            return parseFloat(val) > 0;
-          },
-          { message: 'Receive amount must be greater than 0' }
-        ),
-    });
+  const createFormSchema = () => z.object({
+    deposit: z
+      .string()
+      .refine(
+        (val) => {
+          // Allow empty values
+          if (!val || val.trim() === '') return true;
+          const num = parseFloat(val);
+          return !isNaN(num) && isFinite(num);
+        },
+        { message: 'Deposit amount must be a valid number' }
+      )
+      .refine(
+        (val) => {
+          // Allow empty values
+          if (!val || val.trim() === '') return true;
+          return parseFloat(val) > 0;
+        },
+        { message: 'Deposit amount must be greater than 0' }
+      )
+      .refine(
+        (val) => {
+          // Allow empty values
+          if (!val || val.trim() === '') return true;
+          const depositAmount = parseFloat(val);
+          const maxBalance = parseFloat(tokenBalance.balance || '0');
+          return depositAmount <= maxBalance;
+        },
+        {
+          message: `Deposit amount cannot exceed your balance of ${formatTokenBalance(tokenBalance.balance, tokenBalance.decimals)} ${selected.name}`
+        }
+      ),
+    receive: z
+      .string()
+      .refine(
+        (val) => {
+          // Allow empty values
+          if (!val || val.trim() === '') return true;
+          const num = parseFloat(val);
+          return !isNaN(num) && isFinite(num);
+        },
+        { message: 'Receive amount must be a valid number' }
+      )
+      .refine(
+        (val) => {
+          // Allow empty values
+          if (!val || val.trim() === '') return true;
+          return parseFloat(val) > 0;
+        },
+        { message: 'Receive amount must be greater than 0' }
+      ),
+  });
 
   const form = useForm<z.infer<ReturnType<typeof createFormSchema>>>({
     resolver: zodResolver(createFormSchema()),
@@ -134,6 +121,8 @@ export default function Deposit() {
     mode: 'onChange', // Enable real-time validation
   });
 
+  // Watch form values to trigger re-renders when they change
+  const watchedValues = form.watch(['deposit', 'receive']);
   const onTokenSelected = (value: string) => {
     const token = supportedTokens.find(token => token.name === value);
     if (token) {
@@ -181,13 +170,12 @@ export default function Deposit() {
 
       // Convert fee rate from i128 to percentage (assuming fee rate is in basis points)
       // If fee rate is 100, it means 1% (100 basis points)
-      const feeRatePercentage = (
-        Number(feeRateValue) / BASIS_POINTS_DIVISOR
-      ).toFixed(4);
+      const feeRatePercentage = (Number(feeRateValue) / BASIS_POINTS_DIVISOR).toFixed(4);
       setDepositFeeRate(feeRatePercentage);
+
+      console.log('Deposit fee rate fetched:', feeRatePercentage + '%');
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to fetch fee rate';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch fee rate';
       setFeeRateError(errorMessage);
       console.error('Error fetching deposit fee rate:', errorMessage);
     } finally {
@@ -199,6 +187,19 @@ export default function Deposit() {
   useEffect(() => {
     if (isConnected && connectedWallet?.publicKey) {
       fetchTokenBalance();
+
+      // 验证钱包连接状态，修复页面刷新后的状态不一致问题
+      const validateConnection = async () => {
+        try {
+          console.log('🔍 Validating wallet connection on component mount...');
+          const { validateAndFixWalletConnection } = useWalletStore.getState();
+          await validateAndFixWalletConnection();
+        } catch (error) {
+          console.error('❌ Failed to validate wallet connection:', error);
+        }
+      };
+
+      validateConnection();
     } else {
       setTokenBalance({ balance: '0', decimals: 0 });
     }
@@ -214,12 +215,8 @@ export default function Deposit() {
   // Update form resolver when balance or selected token changes
   useEffect(() => {
     // Update the form resolver with new schema
-    form.setValue('deposit', form.getValues('deposit'), {
-      shouldValidate: true,
-    });
-    form.setValue('receive', form.getValues('receive'), {
-      shouldValidate: true,
-    });
+    form.setValue('deposit', form.getValues('deposit'), { shouldValidate: true });
+    form.setValue('receive', form.getValues('receive'), { shouldValidate: true });
   }, [tokenBalance.balance, selected.name, form]);
 
   // Set maximum amount
@@ -233,11 +230,7 @@ export default function Deposit() {
 
   // Calculate receive amount based on deposit amount and fee rate
   const calculateReceiveAmount = (depositAmount: string) => {
-    if (
-      !depositAmount ||
-      isNaN(parseFloat(depositAmount)) ||
-      parseFloat(depositAmount) <= 0
-    ) {
+    if (!depositAmount || isNaN(parseFloat(depositAmount)) || parseFloat(depositAmount) <= 0) {
       form.setValue('receive', '');
       form.trigger('receive');
       return;
@@ -258,11 +251,7 @@ export default function Deposit() {
 
   // Calculate deposit amount based on receive amount and fee rate
   const calculateDepositAmount = (receiveAmount: string) => {
-    if (
-      !receiveAmount ||
-      isNaN(parseFloat(receiveAmount)) ||
-      parseFloat(receiveAmount) <= 0
-    ) {
+    if (!receiveAmount || isNaN(parseFloat(receiveAmount)) || parseFloat(receiveAmount) <= 0) {
       form.setValue('deposit', '');
       form.trigger('deposit');
       return;
@@ -281,15 +270,16 @@ export default function Deposit() {
     form.trigger('deposit');
   };
 
+  // Add transaction loading state
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   // Check if form is valid for submission
   const isFormValid = () => {
     const depositValue = form.getValues('deposit');
     const receiveValue = form.getValues('receive');
 
     // Must have at least one value filled
-    const hasValues =
-      (depositValue && depositValue.trim() !== '') ||
-      (receiveValue && receiveValue.trim() !== '');
+    const hasValues = (depositValue && depositValue.trim() !== '') || (receiveValue && receiveValue.trim() !== '');
 
     // Must be connected to wallet
     const isWalletConnected = isConnected && connectedWallet?.publicKey;
@@ -298,112 +288,202 @@ export default function Deposit() {
     const formErrors = form.formState.errors;
     const hasNoErrors = !formErrors.deposit && !formErrors.receive;
 
-    return hasValues && isWalletConnected && hasNoErrors && !isSubmitting;
-  };
+    // Must not be currently submitting
+    const notSubmitting = !isSubmitting;
 
-  // Separate validation functions
-  const validateSubmission = (
-    data: z.infer<ReturnType<typeof createFormSchema>>
-  ): string | null => {
-    if (!solvBTCClient) {
-      return 'Contract client not available';
-    }
-    if (!connectedWallet?.publicKey) {
-      return 'Please connect your wallet first';
-    }
-    if (!data.deposit || parseFloat(data.deposit) <= 0) {
-      return 'Please enter a valid deposit amount';
-    }
-    return null;
-  };
-  const verifyCurrencySupport = async (
-    currencyAddress: string
-  ): Promise<void> => {
-    const isCurrencySupported = await solvBTCClient!.is_currency_supported({
-      currency: currencyAddress,
-    });
-
-    if (!isCurrencySupported.result) {
-      throw new Error(
-        `Currency ${selected.name} (${selected.address}) is not supported by the vault contract`
-      );
-    }
-  };
-
-  const executeDepositTransaction = async (
-    from: string,
-    currency: string,
-    amount: bigint
-  ) => {
-    const depositTx = await solvBTCClient!.deposit({
-      from,
-      currency,
-      amount,
-    });
-
-    return await depositTx.signAndSend();
-  };
-
-  const handleSuccess = (depositAmount: string, txHash: string | undefined) => {
-    toast(
-      <TxResult
-        type='success'
-        title='Transaction Successful!'
-        message={`Successfully deposited ${depositAmount} ${selected.name}`}
-        txHash={txHash}
-      />
-    );
-
-    // Reset form after successful submission
-    form.reset();
-
-    // Refresh balance after successful deposit
-    if (isConnected && connectedWallet?.publicKey) {
-      fetchTokenBalance();
-    }
-  };
-
-  const handleError = (error: any) => {
-    console.error('Deposit transaction failed:', error);
-    const { title, message } = parseTransactionError(error);
-
-    toast(<TxResult type='error' title={title} message={message} />);
+    return hasValues && isWalletConnected && hasNoErrors && notSubmitting;
   };
 
   async function onSubmit(data: z.infer<ReturnType<typeof createFormSchema>>) {
-    // Step 1: Validate submission
-    const validationError = validateSubmission(data);
-    if (validationError) {
-      toast(<TxResult type='error' title='Error' message={validationError} />);
+    if (!solvBTCClient) {
+      console.error('❌ SolvBTC client not available, attempting to initialize...');
+      try {
+        await useContractStore.getState().initializeContracts();
+        const newClient = useContractStore.getState().getClient('SolvBTCVaultClient');
+        if (!newClient) {
+          throw new Error('Failed to initialize SolvBTC client');
+        }
+        console.log('✅ SolvBTC client initialized successfully');
+      } catch (initError) {
+        console.error('❌ Failed to initialize contracts:', initError);
+        toast(
+          <TxResult
+            type="error"
+            title="Error"
+            message="Contract client not available and initialization failed"
+          />
+        );
+        return;
+      }
+    }
+
+    if (!connectedWallet?.publicKey) {
+      toast(
+        <TxResult
+          type="error"
+          title="Error"
+          message="Please connect your wallet first"
+        />
+      );
       return;
     }
 
     const depositAmount = data.deposit;
+    if (!depositAmount || parseFloat(depositAmount) <= 0) {
+      toast(
+        <TxResult
+          type="error"
+          title="Error"
+          message="Please enter a valid deposit amount"
+        />
+      );
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      // Step 2: Convert amount to contract format
-      const contractAmount = convertAmountToContractFormat(
-        depositAmount,
-        tokenBalance.decimals || 7
+      // 🎯 简洁方案：直接使用已经配置好签名器的 client
+      console.log('🎯 Using client with pre-configured signTransaction...');
+
+      // 重新获取 client（可能在上面已经重新初始化了）
+      const currentClient = solvBTCClient || useContractStore.getState().getClient('SolvBTCVaultClient');
+
+      if (!currentClient) {
+        throw new Error('SolvBTC client still not available after initialization attempts');
+      }
+
+      console.log('🔍 Client info:', {
+        hasClient: !!currentClient,
+        clientType: currentClient?.constructor?.name,
+        hasOptions: !!(currentClient as any)?.options,
+        hasSignTransaction: typeof (currentClient as any)?.options?.signTransaction === 'function',
+        publicKey: (currentClient as any)?.options?.publicKey,
+      });
+
+      // 详细检查 signTransaction 的存在
+      const clientOptions = (currentClient as any)?.options;
+      console.log('🔍 Detailed options check:', {
+        options: clientOptions,
+        optionsType: typeof clientOptions,
+        optionsKeys: clientOptions ? Object.keys(clientOptions) : [],
+        signTransactionExists: 'signTransaction' in (clientOptions || {}),
+        signTransactionType: typeof clientOptions?.signTransaction,
+        signTransactionFunction: clientOptions?.signTransaction?.toString?.()?.substring(0, 200),
+      });
+
+      // 如果没有 signTransaction，检查钱包连接状态
+      if (!clientOptions?.signTransaction) {
+        console.error('❌ No signTransaction found! Checking wallet state...');
+        console.log('🔍 Wallet state:', {
+          isConnected,
+          connectedWallet: connectedWallet?.id,
+          publicKey: connectedWallet?.publicKey,
+        });
+
+        // 尝试手动更新一次
+        console.log('🔧 Attempting manual signTransaction update...');
+        const { walletAdapter } = useWalletStore.getState();
+        if (walletAdapter && connectedWallet) {
+          await updateAllClientsSignTransaction(walletAdapter, connectedWallet);
+          console.log('✅ Manual update completed');
+
+          // 重新检查
+          console.log('🔍 After manual update:', {
+            hasSignTransaction: typeof (currentClient as any)?.options?.signTransaction === 'function',
+            signTransactionType: typeof (currentClient as any)?.options?.signTransaction,
+          });
+        } else {
+          console.error('❌ No walletAdapter or connectedWallet available for manual update');
+          throw new Error('Wallet not properly connected - no signTransaction available');
+        }
+      }
+
+      // 获取输入金额（以最小单位）
+      const depositAmountBigInt = BigInt(Math.floor(Number(depositAmount) * Math.pow(10, DECIMAL_PRECISION)));
+
+      console.log('💰 Deposit parameters:', {
+        currency: supportedTokens[0]?.address,
+        from: connectedWallet.publicKey,
+        amount: depositAmountBigInt.toString(),
+      });
+
+      // 直接使用已经配置好签名器的 client
+      const depositTx = await currentClient.deposit({
+        currency: supportedTokens[0]?.address,
+        from: connectedWallet.publicKey,
+        amount: depositAmountBigInt,
+      });
+
+      console.log('🔧 Transaction created, calling signAndSend...');
+
+      // 直接调用 signAndSend，签名器已经在钱包连接时配置好了
+      const signedTx = await depositTx.signAndSend();
+
+      console.log('🎉 Deposit transaction completed:', signedTx);
+
+      // Extract transaction hash if available (safely handle different response structures)
+      let txHash: string | undefined;
+      try {
+        // Try to extract transaction hash from the response
+        if (typeof signedTx === 'object' && signedTx && 'hash' in signedTx) {
+          txHash = (signedTx as any).hash;
+        } else if (typeof signedTx === 'object' && signedTx && 'id' in signedTx) {
+          txHash = (signedTx as any).id;
+        }
+      } catch (e) {
+        console.warn('Could not extract transaction hash:', e);
+      }
+
+      toast(
+        <TxResult
+          type="success"
+          title="Transaction Successful!"
+          message={`Successfully deposited ${depositAmount} ${selected.name}`}
+          txHash={txHash}
+        />
       );
 
-      // Step 3: Verify currency support
-      await verifyCurrencySupport(selected.address);
+      // Reset form after successful submission
+      form.reset();
 
-      // Step 4: Execute deposit transaction
-      const signedTx = await executeDepositTransaction(
-        connectedWallet!.publicKey,
-        selected.address,
-        contractAmount
-      );
+      // Refresh balance after successful deposit
+      if (isConnected && connectedWallet?.publicKey) {
+        fetchTokenBalance();
+      }
 
-      // Step 5: Extract transaction hash and handle success
-      const txHash = extractTransactionHash(signedTx);
-      handleSuccess(depositAmount, txHash);
     } catch (error) {
-      // Step 6: Handle any errors that occurred
-      handleError(error);
+      console.error('Deposit transaction failed:', error);
+
+      let errorTitle = "Transaction Failed";
+      let errorMessage = 'Transaction failed. Please try again.';
+
+      if (error instanceof Error) {
+        console.log('Error details:', {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+        });
+
+        // Basic error handling
+        if (error.message.includes('Transaction requires signatures from')) {
+          errorTitle = "Authorization Required";
+          errorMessage = "This transaction requires additional authorization. Please contact the contract administrator.";
+        } else if (error.message.includes('Currency') && error.message.includes('not supported')) {
+          errorTitle = "Unsupported Currency";
+          errorMessage = error.message;
+        } else {
+          errorMessage = error.message;
+        }
+      }
+
+      toast(
+        <TxResult
+          type="error"
+          title={errorTitle}
+          message={errorMessage}
+        />
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -459,7 +539,7 @@ export default function Deposit() {
                     <InputComplex
                       className='h-[2.75rem]'
                       inputValue={field.value}
-                      onInputChange={value => {
+                      onInputChange={(value) => {
                         field.onChange(value);
                         // Calculate receive amount when deposit amount changes
                         calculateReceiveAmount(value);
@@ -483,10 +563,7 @@ export default function Deposit() {
                             MAX
                           </button>
 
-                          <Select
-                            value={selected.name}
-                            onValueChange={onTokenSelected}
-                          >
+                          <Select value={selected.name} onValueChange={onTokenSelected}>
                             <SelectTrigger className='border-0 !bg-transparent !pl-2 !pr-0 outline-none focus-visible:ring-0'>
                               <div className='flex items-center justify-between text-[1rem]'>
                                 <TokenIcon
@@ -549,9 +626,7 @@ export default function Deposit() {
                       {isLoadingFeeRate ? (
                         <span className='animate-pulse'>Loading...</span>
                       ) : feeRateError ? (
-                        <span className='text-red-500' title={feeRateError}>
-                          Error
-                        </span>
+                        <span className='text-red-500' title={feeRateError}>Error</span>
                       ) : (
                         <span className='font-medium text-brand-500'>
                           {depositFeeRate}%
@@ -564,7 +639,7 @@ export default function Deposit() {
                   <InputComplex
                     className='h-[2.75rem]'
                     inputValue={field.value}
-                    onInputChange={value => {
+                    onInputChange={(value) => {
                       field.onChange(value);
                       // Calculate deposit amount when receive amount changes
                       calculateDepositAmount(value);
@@ -601,11 +676,11 @@ export default function Deposit() {
           <Button
             type='submit'
             disabled={!isFormValid()}
-            className='w-full rounded-full bg-brand-500 text-white hover:bg-brand-500/90 disabled:cursor-not-allowed disabled:bg-gray-300 md:w-[25.625rem]'
+            className='w-full rounded-full bg-brand-500 text-white hover:bg-brand-500/90 disabled:bg-gray-300 disabled:cursor-not-allowed md:w-[25.625rem]'
           >
             {isSubmitting ? (
               <>
-                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Processing...
               </>
             ) : (
