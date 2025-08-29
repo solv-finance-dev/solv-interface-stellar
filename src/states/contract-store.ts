@@ -1,9 +1,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Client as ContractClient } from '@stellar/stellar-sdk/contract';
+
 import { SolvBTCVaultClient } from '@/contracts/solvBTCVaultContract/src';
 import { SolvBTCTokenClient } from '@/contracts/solvBTCTokenContract/src';
 import { getCurrentStellarNetwork } from '@/config/stellar';
+import { getWalletSignerProxy } from '@/wallet-connector/wallet-signer-proxy';
 import useSolvBtcStore from './solvbtc';
 
 // Contract client configuration type definition
@@ -106,7 +108,6 @@ export const useContractStore = create<ContractStore>()(
           await Promise.all(initPromises);
 
           set({ isInitializing: false });
-          console.log('✅ All contract clients initialized successfully');
         } catch (error) {
           const errorMessage =
             error instanceof Error
@@ -150,17 +151,23 @@ export const useContractStore = create<ContractStore>()(
             throw new Error(`Contract ID for ${clientName} is required`);
           }
 
-          // Create client instance
-          const client = new registeredType.constructor(clientConfig);
+          // Get wallet signer proxy
+          const walletSignerProxy = getWalletSignerProxy();
+
+          // Create client instance with wallet signer
+          const clientOptions: any = {
+            contractId: clientConfig.contractId,
+            networkPassphrase: clientConfig.networkPassphrase,
+            rpcUrl: clientConfig.rpcUrl,
+            allowHttp: true,
+            // 注入钱包签名器代理
+            signTransaction: walletSignerProxy.signTransaction,
+          };
+
+          const client = new registeredType.constructor(clientOptions);
 
           // Set client
           setClient(clientName, client);
-
-          console.log(`✅ ${clientName} initialized successfully:`, {
-            networkPassphrase: clientConfig.networkPassphrase,
-            contractId: clientConfig.contractId,
-            rpcUrl: clientConfig.rpcUrl,
-          });
         } catch (error) {
           const errorMessage =
             error instanceof Error
@@ -209,7 +216,6 @@ export const useContractStore = create<ContractStore>()(
           clients: new Map(),
           initializedClients: new Map(),
         });
-        console.log('🔄 All contract clients reset');
       },
 
       resetClient: (clientName: string) => {
@@ -225,7 +231,6 @@ export const useContractStore = create<ContractStore>()(
             initializedClients: newInitialized,
           };
         });
-        console.log(`🔄 ${clientName} client reset`);
       },
 
       setInitError: (error: string | null) => {
@@ -327,7 +332,6 @@ export const ensureClientInitialized = async (
 // Utility function to get all contract clients
 export const getContractClients = (): Record<string, ContractClient> => {
   const { clients } = useContractStore.getState();
-  console.log('🔍 getContractClients:', clients);
   const result: Record<string, ContractClient> = {};
 
   clients.forEach((client, name) => {
@@ -359,5 +363,4 @@ export const registerContractClientType = (
   defaultConfig?: Partial<ContractClientConfig>
 ): void => {
   registeredClientTypes.set(clientName, { constructor, defaultConfig });
-  console.log(`📝 Registered client type: ${clientName}`);
 };

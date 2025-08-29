@@ -19,10 +19,11 @@ import {
   SelectTrigger,
   toast,
 } from '@solvprotocol/ui-v2';
-import { ArrowRight, RotateCcw } from 'lucide-react';
+import { ArrowRight, RotateCcw, Loader2 } from 'lucide-react';
 import { InputComplex } from '@/components/InputComplex';
 import { TooltipComplex } from '@/components/TooltipComplex';
 import { TokenIcon } from '@/components/TokenIcon';
+import { TxResult } from '@/components';
 import {
   useSolvBtcStore,
   useSolvBTCVaultClient,
@@ -34,6 +35,12 @@ import {
   formatTokenBalance,
   type TokenBalanceResult,
 } from '@/lib/token-balance';
+import { getCurrentStellarNetwork } from '@/config/stellar';
+import {
+  convertAmountToContractFormat,
+  extractTransactionHash,
+  parseTransactionError,
+} from '@/lib/transaction-utils';
 
 // Constants
 const BASIS_POINTS_DIVISOR = 10000; // Convert basis points to percentage (e.g., 100 basis points = 1%)
@@ -56,6 +63,9 @@ export default function Deposit() {
   const [depositFeeRate, setDepositFeeRate] = useState<string>('0');
   const [isLoadingFeeRate, setIsLoadingFeeRate] = useState(false);
   const [feeRateError, setFeeRateError] = useState<string | null>(null);
+
+  // Add transaction loading state
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Selected token state
   const [selected, setSelected] = useState<Token>(supportedTokens[0]);
@@ -124,8 +134,6 @@ export default function Deposit() {
     mode: 'onChange', // Enable real-time validation
   });
 
-  // Watch form values to trigger re-renders when they change
-  const watchedValues = form.watch(['deposit', 'receive']);
   const onTokenSelected = (value: string) => {
     const token = supportedTokens.find(token => token.name === value);
     if (token) {
@@ -177,8 +185,6 @@ export default function Deposit() {
         Number(feeRateValue) / BASIS_POINTS_DIVISOR
       ).toFixed(4);
       setDepositFeeRate(feeRatePercentage);
-
-      console.log('Deposit fee rate fetched:', feeRatePercentage + '%');
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'Failed to fetch fee rate';
@@ -242,13 +248,10 @@ export default function Deposit() {
 
     // Calculate the amount after fee deduction
     // receive = deposit * (1 - fee_rate_percentage)
-    const receiveAmount =
-      depositValue * (1 - feeRateValue / PERCENTAGE_DIVISOR);
+    const receiveAmount = depositValue * (1 - feeRateValue / PERCENTAGE_DIVISOR);
 
     // Format to specified decimal places and remove trailing zeros
-    const formattedReceiveAmount = parseFloat(
-      receiveAmount.toFixed(DECIMAL_PRECISION)
-    ).toString();
+    const formattedReceiveAmount = parseFloat(receiveAmount.toFixed(DECIMAL_PRECISION)).toString();
     form.setValue('receive', formattedReceiveAmount);
     form.trigger('receive');
   };
@@ -270,13 +273,10 @@ export default function Deposit() {
 
     // Calculate the required deposit amount
     // deposit = receive / (1 - fee_rate_percentage)
-    const depositAmount =
-      receiveValue / (1 - feeRateValue / PERCENTAGE_DIVISOR);
+    const depositAmount = receiveValue / (1 - feeRateValue / PERCENTAGE_DIVISOR);
 
     // Format to specified decimal places and remove trailing zeros
-    const formattedDepositAmount = parseFloat(
-      depositAmount.toFixed(DECIMAL_PRECISION)
-    ).toString();
+    const formattedDepositAmount = parseFloat(depositAmount.toFixed(DECIMAL_PRECISION)).toString();
     form.setValue('deposit', formattedDepositAmount);
     form.trigger('deposit');
   };
@@ -298,20 +298,115 @@ export default function Deposit() {
     const formErrors = form.formState.errors;
     const hasNoErrors = !formErrors.deposit && !formErrors.receive;
 
-    return hasValues && isWalletConnected && hasNoErrors;
+    return hasValues && isWalletConnected && hasNoErrors && !isSubmitting;
   };
 
-  function onSubmit(data: z.infer<ReturnType<typeof createFormSchema>>) {
+  // Separate validation functions
+  const validateSubmission = (
+    data: z.infer<ReturnType<typeof createFormSchema>>
+  ): string | null => {
+    if (!solvBTCClient) {
+      return 'Contract client not available';
+    }
+    if (!connectedWallet?.publicKey) {
+      return 'Please connect your wallet first';
+    }
+    if (!data.deposit || parseFloat(data.deposit) <= 0) {
+      return 'Please enter a valid deposit amount';
+    }
+    return null;
+  };
+  const verifyCurrencySupport = async (
+    currencyAddress: string
+  ): Promise<void> => {
+    const isCurrencySupported = await solvBTCClient!.is_currency_supported({
+      currency: currencyAddress,
+    });
+
+    if (!isCurrencySupported.result) {
+      throw new Error(
+        `Currency ${selected.name} (${selected.address}) is not supported by the vault contract`
+      );
+    }
+  };
+
+  const executeDepositTransaction = async (
+    from: string,
+    currency: string,
+    amount: bigint
+  ) => {
+    const depositTx = await solvBTCClient!.deposit({
+      from,
+      currency,
+      amount,
+    });
+
+    return await depositTx.signAndSend();
+  };
+
+  const handleSuccess = (depositAmount: string, txHash: string | undefined) => {
     toast(
-      <div>
-        <div className='mb-2 font-bold'>
-          You submitted the following values:
-        </div>
-        <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
-          <code className='text-white'>{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      </div>
+      <TxResult
+        type='success'
+        title='Transaction Successful!'
+        message={`Successfully deposited ${depositAmount} ${selected.name}`}
+        txHash={txHash}
+      />
     );
+
+    // Reset form after successful submission
+    form.reset();
+
+    // Refresh balance after successful deposit
+    if (isConnected && connectedWallet?.publicKey) {
+      fetchTokenBalance();
+    }
+  };
+
+  const handleError = (error: any) => {
+    console.error('Deposit transaction failed:', error);
+    const { title, message } = parseTransactionError(error);
+
+    toast(<TxResult type='error' title={title} message={message} />);
+  };
+
+  async function onSubmit(data: z.infer<ReturnType<typeof createFormSchema>>) {
+    // Step 1: Validate submission
+    const validationError = validateSubmission(data);
+    if (validationError) {
+      toast(<TxResult type='error' title='Error' message={validationError} />);
+      return;
+    }
+
+    const depositAmount = data.deposit;
+    setIsSubmitting(true);
+
+    try {
+      // Step 2: Convert amount to contract format
+      const contractAmount = convertAmountToContractFormat(
+        depositAmount,
+        tokenBalance.decimals || 7
+      );
+
+      // Step 3: Verify currency support
+      await verifyCurrencySupport(selected.address);
+
+      // Step 4: Execute deposit transaction
+      const signedTx = await executeDepositTransaction(
+        connectedWallet!.publicKey,
+        selected.address,
+        contractAmount
+      );
+
+      // Step 5: Extract transaction hash and handle success
+      const txHash = extractTransactionHash(signedTx);
+      handleSuccess(depositAmount, txHash);
+    } catch (error) {
+      // Step 6: Handle any errors that occurred
+      handleError(error);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -508,7 +603,14 @@ export default function Deposit() {
             disabled={!isFormValid()}
             className='w-full rounded-full bg-brand-500 text-white hover:bg-brand-500/90 disabled:cursor-not-allowed disabled:bg-gray-300 md:w-[25.625rem]'
           >
-            Deposit
+            {isSubmitting ? (
+              <>
+                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                Processing...
+              </>
+            ) : (
+              'Deposit'
+            )}
           </Button>
         </div>
       </form>

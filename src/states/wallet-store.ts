@@ -8,6 +8,7 @@ import {
   WalletInfo,
   StellarWalletsKitAdapter,
 } from '@/wallet-connector';
+import { getWalletSignerProxy } from '@/wallet-connector/wallet-signer-proxy';
 import { getStellarAPI } from '@/stellar';
 import {
   getCurrentStellarNetwork,
@@ -104,6 +105,10 @@ export const useWalletStore = create<WalletStore>()(
             walletAdapter: adapter,
           });
 
+          // 更新钱包签名器代理
+          const walletSignerProxy = getWalletSignerProxy();
+          walletSignerProxy.updateWallet(adapter, connectedWallet);
+
           // 立即加载账户信息
           await get().refreshAccountInfo();
         } catch (error) {
@@ -125,6 +130,10 @@ export const useWalletStore = create<WalletStore>()(
         } catch (error) {
           console.warn('Error during wallet disconnect:', error);
         } finally {
+          // 清空钱包签名器代理
+          const walletSignerProxy = getWalletSignerProxy();
+          walletSignerProxy.updateWallet(null, null);
+
           set({
             isConnected: false,
             isConnecting: false,
@@ -192,15 +201,6 @@ export const useWalletStore = create<WalletStore>()(
           const xlmBalance = await stellarAPI.getXLMBalance(
             connectedWallet.publicKey
           );
-
-          const networkType = getCurrentNetworkType();
-          console.log(`💰 Balances loaded for ${networkType}:`, {
-            publicKey: connectedWallet.publicKey,
-            xlmBalance,
-            totalBalances: balances.length,
-            network: stellarAPI.isTestnet() ? 'Testnet' : 'Mainnet',
-            horizonUrl: stellarAPI.getConfig().horizonUrl,
-          });
 
           set({
             balances,

@@ -1,6 +1,7 @@
 export * from './types';
 export * from './wallet-connectors';
 export * from './wallet-config';
+export * from './wallet-signer-proxy';
 
 // Re-export commonly used items from types
 export {
