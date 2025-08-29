@@ -2,7 +2,7 @@ import { create } from 'zustand';
 export * from './wallet-store';
 export * from './contract-store';
 
-import useSolvBtcStore from './solvbtc';
+import useSolvBtcStore, { Token } from './solvbtc';
 
 interface Store {
   noticeOpen: boolean;
@@ -14,7 +14,7 @@ const useStore = create<Store>(set => ({
   setNoticeOpen: (noticeOpen: boolean) => set({ noticeOpen }),
 }));
 
-export { useSolvBtcStore, useStore };
+export { useSolvBtcStore, useStore, type Token };
 
 // Re-export commonly used hooks and utilities
 export {

@@ -24,7 +24,7 @@ import { ArrowRight, RotateCcw } from 'lucide-react';
 import { InputComplex } from '@/components/InputComplex';
 import { TooltipComplex } from '@/components/TooltipComplex';
 import { TokenIcon } from '@/components/TokenIcon';
-import { useSolvBTCVaultClient, useWalletStore } from '@/states';
+import { useSolvBtcStore, useSolvBTCVaultClient, useWalletStore, Token } from '@/states';
 import {
   getSolvBTCTokenBalance,
   formatTokenBalance,
@@ -43,6 +43,7 @@ const FormSchema = z.object({
 export default function Deposit() {
   const solvBTCClient = useSolvBTCVaultClient();
   const { isConnected, connectedWallet } = useWalletStore();
+  const { supportedTokens } = useSolvBtcStore();
 
   // Token balance state
   const [tokenBalance, setTokenBalance] = useState<TokenBalanceResult>({
@@ -61,9 +62,13 @@ export default function Deposit() {
     },
   });
 
-  const [selected, setSelected] = useState('SolvBTC');
-  const options = [{ label: 'SolvBTC', value: 'SolvBTC' }];
-
+  const [selected, setSelected] = useState<Token>(supportedTokens[0]);
+  const onTokenSelected = (value: string) => {
+    const token = supportedTokens.find(token => token.name === value);
+    if (token) {
+      setSelected(token);
+    }
+  };
   // Function to fetch token balance
   const fetchTokenBalance = async () => {
     if (!connectedWallet?.publicKey) {
@@ -146,7 +151,7 @@ export default function Deposit() {
                             tokenBalance.balance,
                             tokenBalance.decimals
                           )}{' '}
-                          SolvBTC
+                          {selected.name}
                         </span>
                       )}
                     </div>
@@ -166,15 +171,8 @@ export default function Deposit() {
 
                 <div className='flex items-center'>
                   <FormControl>
-                    {/* <Input
-                      placeholder="0.00"
-                      {...field}
-                      className="h-[2.75rem] outline-none !border-none !ring-transparent"
-                    /> */}
-
                     <InputComplex
                       className='h-[2.75rem]'
-                      error={true} // Sample code error
                       inputValue={field.value}
                       onInputChange={field.onChange}
                       inputProps={{
@@ -196,16 +194,16 @@ export default function Deposit() {
                             MAX
                           </button>
 
-                          <Select value={selected} onValueChange={setSelected}>
+                          <Select value={selected.name} onValueChange={onTokenSelected}>
                             <SelectTrigger className='border-0 !bg-transparent !pl-2 !pr-0 outline-none focus-visible:ring-0'>
                               <div className='flex items-center justify-between text-[1rem]'>
                                 <TokenIcon
-                                  src='https://res1.sft-api.com/token/cbBTC.png'
-                                  alt='cbBTC'
-                                  fallback='cbBTC'
+                                  src={selected.icon}
+                                  alt={selected.name}
+                                  fallback={selected.name}
                                 />
 
-                                {selected}
+                                {selected.name}
                               </div>
                             </SelectTrigger>
 
@@ -213,15 +211,15 @@ export default function Deposit() {
                               <SelectGroup>
                                 {/* <SelectLabel>Token List</SelectLabel> */}
 
-                                {options.map(opt => (
-                                  <SelectItem key={opt.value} value={opt.value}>
+                                {supportedTokens.map((opt: any) => (
+                                  <SelectItem key={opt.name} value={opt.name}>
                                     <div className='flex items-center justify-between text-[1rem]'>
                                       <TokenIcon
-                                        src='https://res1.sft-api.com/token/SolvBTC.png'
-                                        alt='SolvBTC'
-                                        fallback='SolvBTC'
+                                        src={opt.icon}
+                                        alt={opt.name}
+                                        fallback={opt.name}
                                       />
-                                      {opt.label}
+                                      {opt.name}
                                     </div>
                                   </SelectItem>
                                 ))}
@@ -253,11 +251,6 @@ export default function Deposit() {
                   <TooltipComplex content={'tips'}></TooltipComplex>
                 </FormLabel>
                 <FormControl>
-                  {/* <Input
-                    placeholder="0.00"
-                    {...field}
-                    className="h-[2.75rem]"
-                  /> */}
                   <InputComplex
                     className='h-[2.75rem]'
                     inputValue={field.value}
