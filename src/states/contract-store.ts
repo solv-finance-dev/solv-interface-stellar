@@ -7,6 +7,7 @@ import { SolvBTCTokenClient } from '@/contracts/solvBTCTokenContract/src';
 import { getCurrentStellarNetwork } from '@/config/stellar';
 import { TransactionBuilder, FeeBumpTransaction } from '@stellar/stellar-sdk';
 import { useWalletStore } from '@/states/wallet-store';
+import { StellarWalletsKitAdapter, ConnectedWallet } from '@/wallet-connector';
 import useSolvBtcStore from './solvbtc';
 
 // Contract client configuration type definition
@@ -174,7 +175,9 @@ export const useContractStore = create<ContractStore>()(
           console.log('✅ Client created:', {
             clientType: client.constructor.name,
             hasOptions: !!(client as any).options,
-            optionsKeys: (client as any).options ? Object.keys((client as any).options) : [],
+            optionsKeys: (client as any).options
+              ? Object.keys((client as any).options)
+              : [],
           });
 
           // Set client
@@ -350,7 +353,8 @@ export const ensureClientInitialized = async (
 
 // Utility function: initialize all contracts (can be called externally)
 export const initializeContracts = async (): Promise<void> => {
-  const { initializeContracts: storeInitializeContracts } = useContractStore.getState();
+  const { initializeContracts: storeInitializeContracts } =
+    useContractStore.getState();
   await storeInitializeContracts();
 };
 
@@ -382,29 +386,15 @@ export const getContractClient = <T extends ContractClient = ContractClient>(
 
 // Utility function: 批量更新所有 client 的签名器
 export const updateAllClientsSignTransaction = async (
-  walletAdapter: any,
-  connectedWallet: any
+  walletAdapter: StellarWalletsKitAdapter,
+  connectedWallet: ConnectedWallet
 ): Promise<void> => {
   const { clients } = useContractStore.getState();
 
-  console.log('🔧 Updating signTransaction for all clients...', {
-    clientCount: clients.size,
-    clientNames: Array.from(clients.keys()),
-    walletId: connectedWallet?.id,
-    walletPublicKey: connectedWallet?.publicKey,
-    hasWalletAdapter: !!walletAdapter,
-  });
-
   // 检查是否有 clients
   if (clients.size === 0) {
-    console.warn('⚠️ No clients found in store! Attempting to initialize...');
     try {
       await useContractStore.getState().initializeContracts();
-      const updatedClients = useContractStore.getState().clients;
-      console.log('🔄 After initialization:', {
-        clientCount: updatedClients.size,
-        clientNames: Array.from(updatedClients.keys()),
-      });
     } catch (initError) {
       console.error('❌ Failed to initialize contracts:', initError);
       return;
@@ -420,48 +410,25 @@ export const updateAllClientsSignTransaction = async (
   currentClients.forEach((client, clientName) => {
     try {
       if ((client as any)?.options) {
-        console.log(`🔧 Setting signTransaction for ${clientName}...`);
-
         // 设置统一的签名器函数
         (client as any).options.signTransaction = async (txXdr: string) => {
-          console.log(`🔥 ${clientName} signTransaction called!`, {
-            txXdr: txXdr.substring(0, 100),
-            walletId: connectedWallet?.id,
-          });
-
           try {
-            // 检查钱包适配器当前状态
-            console.log(`🔍 ${clientName} checking wallet adapter state:`, {
-              hasWalletAdapter: !!walletAdapter,
-              walletAdapterType: walletAdapter?.constructor?.name,
-              isConnected: walletAdapter?.isConnected?.(),
-              hasSignTransactionMethod: typeof walletAdapter?.signTransaction === 'function',
-              connectedWalletId: connectedWallet?.id,
-              connectedWalletPublicKey: connectedWallet?.publicKey,
-            });
-
             // 检查全局钱包状态
             const currentWalletState = useWalletStore.getState();
-            console.log(`🔍 ${clientName} current global wallet state:`, {
-              isConnected: currentWalletState.isConnected,
-              connectedWallet: currentWalletState.connectedWallet?.id,
-              hasWalletAdapter: !!currentWalletState.walletAdapter,
-              walletAdapterIsConnected: currentWalletState.walletAdapter?.isConnected?.(),
-            });
 
             // 如果当前钱包适配器状态不对，尝试使用最新的
             let activeWalletAdapter = walletAdapter;
             let activeConnectedWallet = connectedWallet;
 
-            if (!walletAdapter?.isConnected?.() && currentWalletState.walletAdapter?.isConnected?.()) {
-              console.log(`🔄 ${clientName} using current wallet adapter from store...`);
-              activeWalletAdapter = currentWalletState.walletAdapter;
-              activeConnectedWallet = currentWalletState.connectedWallet;
+            if (
+              !walletAdapter?.isConnected?.() &&
+              currentWalletState.walletAdapter?.isConnected?.()
+            ) {
+              activeWalletAdapter = currentWalletState.walletAdapter!;
+              activeConnectedWallet = currentWalletState.connectedWallet!;
             }
 
             if (!activeWalletAdapter?.isConnected?.()) {
-              console.log(`⚠️ ${clientName} wallet adapter not connected, attempting auto-reconnect...`);
-
               // 尝试自动重连
               try {
                 const { validateAndFixWalletConnection } = currentWalletState;
@@ -470,20 +437,29 @@ export const updateAllClientsSignTransaction = async (
                 if (reconnected) {
                   // 重新获取更新后的状态
                   const updatedState = useWalletStore.getState();
-                  activeWalletAdapter = updatedState.walletAdapter;
-                  activeConnectedWallet = updatedState.connectedWallet;
-                  console.log(`✅ ${clientName} wallet reconnected successfully`);
+                  activeWalletAdapter = updatedState.walletAdapter!;
+                  activeConnectedWallet = updatedState.connectedWallet!;
                 } else {
-                  throw new Error(`Failed to auto-reconnect wallet. Please disconnect and reconnect manually.`);
+                  throw new Error(
+                    `Failed to auto-reconnect wallet. Please disconnect and reconnect manually.`
+                  );
                 }
               } catch (reconnectError) {
-                console.error(`❌ ${clientName} auto-reconnect failed:`, reconnectError);
-                throw new Error(`Wallet adapter is not connected and auto-reconnect failed. Please disconnect and reconnect your wallet manually.`);
+                console.error(
+                  `❌ ${clientName} auto-reconnect failed:`,
+                  reconnectError
+                );
+                throw new Error(
+                  `Wallet adapter is not connected and auto-reconnect failed. Please disconnect and reconnect your wallet manually.`
+                );
               }
             }
 
             // 使用静态导入的 Stellar SDK
-            const parsedTx = TransactionBuilder.fromXDR(txXdr, getCurrentStellarNetwork());
+            const parsedTx = TransactionBuilder.fromXDR(
+              txXdr,
+              getCurrentStellarNetwork()
+            );
 
             let transaction;
             if (parsedTx instanceof FeeBumpTransaction) {
@@ -492,77 +468,56 @@ export const updateAllClientsSignTransaction = async (
               transaction = parsedTx;
             }
 
-            console.log(`📝 ${clientName} calling walletAdapter.signTransaction with:`, {
-              networkPassphrase: getCurrentStellarNetwork(),
-              accountToSign: activeConnectedWallet.publicKey,
-              transactionType: transaction.constructor.name,
-            });
-
-            const signedTxXdr = await activeWalletAdapter.signTransaction(transaction, {
-              networkPassphrase: getCurrentStellarNetwork(),
-              accountToSign: activeConnectedWallet.publicKey,
-            });
-
-            console.log(`✅ ${clientName} transaction signed successfully`);
+            const signedTxXdr = await activeWalletAdapter.signTransaction(
+              transaction,
+              {
+                networkPassphrase: getCurrentStellarNetwork(),
+                accountToSign: activeConnectedWallet.publicKey,
+              }
+            );
 
             return {
               signedTxXdr,
               signerAddress: activeConnectedWallet.publicKey,
             };
           } catch (signError) {
-            console.error(`❌ ${clientName} failed to sign transaction:`, signError);
-            console.error(`❌ ${clientName} error details:`, {
-              errorName: (signError as any)?.name,
-              errorMessage: (signError as any)?.message,
-              errorStack: (signError as any)?.stack?.substring(0, 500),
-            });
+            console.error(
+              `❌ ${clientName} failed to sign transaction:`,
+              signError
+            );
             throw signError;
           }
         };
 
         // 同时设置 publicKey
         (client as any).options.publicKey = connectedWallet.publicKey;
-
-        // 验证设置是否成功
-        const hasSignTransaction = typeof (client as any).options.signTransaction === 'function';
-        const hasPublicKey = !!(client as any).options.publicKey;
-
-        console.log(`✅ ${clientName} signTransaction updated:`, {
-          hasSignTransaction,
-          hasPublicKey,
-          publicKey: (client as any).options.publicKey,
-          signTransactionType: typeof (client as any).options.signTransaction,
-        });
-      } else {
-        console.warn(`⚠️ ${clientName} has no options object`);
       }
     } catch (error) {
-      console.error(`❌ Failed to update signTransaction for ${clientName}:`, error);
+      console.error(
+        `❌ Failed to update signTransaction for ${clientName}:`,
+        error
+      );
     }
   });
-
-  console.log('✅ All clients signTransaction updated');
 };
 
 // Utility function: 清除所有 client 的签名器
 export const clearAllClientsSignTransaction = (): void => {
   const { clients } = useContractStore.getState();
 
-  console.log('🧹 Clearing signTransaction for all clients...');
-
   clients.forEach((client, clientName) => {
     try {
       if ((client as any)?.options) {
         delete (client as any).options.signTransaction;
         delete (client as any).options.publicKey;
-        console.log(`🧹 ${clientName} signTransaction cleared`);
       }
     } catch (error) {
-      console.error(`❌ Failed to clear signTransaction for ${clientName}:`, error);
+      console.error(
+        `❌ Failed to clear signTransaction for ${clientName}:`,
+        error
+      );
     }
   });
-
-  console.log('✅ All clients signTransaction cleared');
 };
 
 // Utility function to set contract client

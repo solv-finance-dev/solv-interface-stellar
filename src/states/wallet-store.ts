@@ -14,6 +14,10 @@ import {
   getCurrentStellarNetwork,
   getCurrentNetworkType,
 } from '@/config/stellar';
+import {
+  updateAllClientsSignTransaction,
+  clearAllClientsSignTransaction,
+} from '@/states/contract-store';
 import { Horizon } from '@stellar/stellar-sdk';
 
 export interface WalletState {
@@ -106,18 +110,14 @@ export const useWalletStore = create<WalletStore>()(
             walletAdapter: adapter,
           });
 
-          console.log('✅ Wallet connected:', {
-            walletType: connectedWallet.id,
-            publicKey: connectedWallet.publicKey,
-          });
-
           // 批量更新所有 contract client 的签名器
           try {
-            const { updateAllClientsSignTransaction } = await import('@/states/contract-store');
             await updateAllClientsSignTransaction(adapter, connectedWallet);
-            console.log('✅ All clients signTransaction updated for connected wallet');
           } catch (updateError) {
-            console.warn('Failed to update clients signTransaction:', updateError);
+            console.warn(
+              'Failed to update clients signTransaction:',
+              updateError
+            );
           }
 
           // 立即加载账户信息
@@ -143,11 +143,12 @@ export const useWalletStore = create<WalletStore>()(
         } finally {
           // 清除所有 contract client 的签名器
           try {
-            const { clearAllClientsSignTransaction } = await import('@/states/contract-store');
             clearAllClientsSignTransaction();
-            console.log('✅ All clients signTransaction cleared');
           } catch (clearError) {
-            console.warn('Failed to clear clients signTransaction:', clearError);
+            console.warn(
+              'Failed to clear clients signTransaction:',
+              clearError
+            );
           }
 
           set({
@@ -162,8 +163,6 @@ export const useWalletStore = create<WalletStore>()(
             isLoadingAccount: false,
             isLoadingBalances: false,
           });
-
-          console.log('🔌 Wallet disconnected');
         }
       },
 
@@ -171,26 +170,24 @@ export const useWalletStore = create<WalletStore>()(
       validateAndFixWalletConnection: async () => {
         const { isConnected, connectedWallet, walletAdapter } = get();
 
-        console.log('🔍 Validating wallet connection state...', {
-          globalIsConnected: isConnected,
-          hasConnectedWallet: !!connectedWallet,
-          hasWalletAdapter: !!walletAdapter,
-          walletAdapterIsConnected: walletAdapter?.isConnected?.(),
-        });
-
         // 检测状态不一致：全局状态说已连接，但适配器说未连接
-        if (isConnected && connectedWallet && walletAdapter && !walletAdapter.isConnected?.()) {
-          console.log('⚠️ Detected wallet state inconsistency after page refresh');
-          console.log('🔄 Attempting to re-establish wallet connection...');
-
+        if (
+          isConnected &&
+          connectedWallet &&
+          walletAdapter &&
+          !walletAdapter.isConnected?.()
+        ) {
           try {
             // 尝试重新连接相同的钱包
             const { connectWallet } = get();
             await connectWallet(connectedWallet.id as any);
-            console.log('✅ Wallet connection re-established successfully');
+
             return true;
           } catch (reconnectError) {
-            console.error('❌ Failed to re-establish wallet connection:', reconnectError);
+            console.error(
+              '❌ Failed to re-establish wallet connection:',
+              reconnectError
+            );
             // 清除不一致的状态
             const { disconnectWallet } = get();
             await disconnectWallet();
@@ -200,13 +197,11 @@ export const useWalletStore = create<WalletStore>()(
 
         // 状态一致，无需处理
         if (isConnected && connectedWallet && walletAdapter?.isConnected?.()) {
-          console.log('✅ Wallet connection state is consistent');
           return true;
         }
 
         // 全局状态说未连接，这是正常的
         if (!isConnected) {
-          console.log('ℹ️ Wallet is not connected (normal state)');
           return false;
         }
 
@@ -267,7 +262,7 @@ export const useWalletStore = create<WalletStore>()(
           );
 
           const networkType = getCurrentNetworkType();
-          console.log(`💰 Balances loaded for ${networkType}:`, {
+          console.debug(`💰 Balances loaded for ${networkType}:`, {
             publicKey: connectedWallet.publicKey,
             xlmBalance,
             totalBalances: balances.length,
