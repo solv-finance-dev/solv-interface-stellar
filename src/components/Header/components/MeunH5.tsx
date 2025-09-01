@@ -57,7 +57,9 @@ const Nav = ({ menuList }: { menuList: MenuItem[] }) => {
                 {item.label}
                 {item.new ? item.new : null}
               </div>
-              <div className='w-2/3 text-xs'>{item.description}</div>
+              <div className='w-2/3 font-MatterSQ-Regular text-xs'>
+                {item.description}
+              </div>
             </div>
           </div>
         ))}
