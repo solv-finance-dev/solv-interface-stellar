@@ -434,7 +434,6 @@ export const updateAllClientsSignTransaction = async (
               }
             }
 
-            // 使用静态导入的 Stellar SDK
             const parsedTx = TransactionBuilder.fromXDR(
               txXdr,
               getCurrentStellarNetwork()

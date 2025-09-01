@@ -77,7 +77,7 @@ export type AllowListStorageKey = { tag: 'Allowed'; values: readonly [string] };
  * Storage keys for the data associated with the blocklist extension
  */
 export type BlockListStorageKey = { tag: 'Blocked'; values: readonly [string] };
-
+export const TOKEN_FEE_RATE_DECIMAL = 10000;
 export const Errors2 = {
   /**
    * Indicates an error related to the current balance of account from which
