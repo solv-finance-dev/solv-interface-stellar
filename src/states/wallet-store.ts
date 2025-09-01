@@ -261,15 +261,6 @@ export const useWalletStore = create<WalletStore>()(
             connectedWallet.publicKey
           );
 
-          const networkType = getCurrentNetworkType();
-          console.debug(`💰 Balances loaded for ${networkType}:`, {
-            publicKey: connectedWallet.publicKey,
-            xlmBalance,
-            totalBalances: balances.length,
-            network: stellarAPI.isTestnet() ? 'Testnet' : 'Mainnet',
-            horizonUrl: stellarAPI.getConfig().horizonUrl,
-          });
-
           set({
             balances,
             xlmBalance,

@@ -110,7 +110,6 @@ export const useContractStore = create<ContractStore>()(
           await Promise.all(initPromises);
 
           set({ isInitializing: false });
-          console.log('✅ All contract clients initialized successfully');
         } catch (error) {
           const errorMessage =
             error instanceof Error
@@ -163,31 +162,11 @@ export const useContractStore = create<ContractStore>()(
             // 不注入 signTransaction，让每次调用时自己处理
           };
 
-          console.log('🔧 Creating client with options:', {
-            contractId: clientOptions.contractId,
-            networkPassphrase: clientOptions.networkPassphrase,
-            rpcUrl: clientOptions.rpcUrl,
-            clientName,
-          });
-
           const client = new registeredType.constructor(clientOptions);
-
-          console.log('✅ Client created:', {
-            clientType: client.constructor.name,
-            hasOptions: !!(client as any).options,
-            optionsKeys: (client as any).options
-              ? Object.keys((client as any).options)
-              : [],
-          });
 
           // Set client
           setClient(clientName, client);
 
-          console.log(`✅ ${clientName} initialized successfully:`, {
-            networkPassphrase: clientConfig.networkPassphrase,
-            contractId: clientConfig.contractId,
-            rpcUrl: clientConfig.rpcUrl,
-          });
         } catch (error) {
           const errorMessage =
             error instanceof Error
