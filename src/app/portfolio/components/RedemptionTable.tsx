@@ -6,6 +6,7 @@ import { TokenIcon } from '@/components/TokenIcon';
 import { TooltipComplex } from '@/components/TooltipComplex';
 import { useDialog } from '@/hooks/useDialog';
 import { useLoadingDialog } from '@/hooks/useLoadingDialog';
+import { useSuccessfulDialog } from '@/hooks/useSuccessfulDialog';
 import { Button } from '@solvprotocol/ui-v2';
 import { ColumnDef } from '@tanstack/react-table';
 
@@ -25,6 +26,7 @@ interface RedemptionTableProps {
 export function RedemptionTable({ data }: RedemptionTableProps) {
   const { openDialog } = useDialog();
   const { openLoadingDialog, closeLoadingDialog } = useLoadingDialog();
+  const { openSuccessfulDialog } = useSuccessfulDialog();
 
   const showClaimDialog = () => {
     openDialog({
@@ -57,6 +59,21 @@ export function RedemptionTable({ data }: RedemptionTableProps) {
           chainId: 'xxx',
           scanUrl: 'xxx',
         });
+
+        setTimeout(() => {
+          closeLoadingDialog();
+
+          openSuccessfulDialog({
+            size: 'md',
+            title: 'Deposit',
+            description: 'You successfully deposited 100.00 WBTC.',
+            chainId: 'xxx',
+            scanUrl: 'xxx',
+            onConfirm: async () => {
+              console.log('close successful dialog');
+            },
+          });
+        }, 2000);
       },
     });
   };

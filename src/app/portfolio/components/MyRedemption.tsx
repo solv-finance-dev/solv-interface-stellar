@@ -87,7 +87,7 @@ export default function MyRedemption() {
       </div>
 
       <Card className='mt-8 rounded-3xl border-none p-8'>
-        <RedemptionTable data={mockRedemptions}></RedemptionTable>
+        <RedemptionTable data={mockRedemptions} />
       </Card>
     </div>
   );

@@ -67,7 +67,7 @@ export function GlobalDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && closeDialog()}>
       <DialogContent
-        className={`${sizeClasses[size]} max-h-[90vh] overflow-y-auto`}
+        className={`${sizeClasses[size]} max-h-[90vh] overflow-y-auto border-none outline-none`}
         showCloseButton={showCloseButton}
       >
         <DialogHeader>
