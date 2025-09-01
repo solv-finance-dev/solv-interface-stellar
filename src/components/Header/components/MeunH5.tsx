@@ -35,7 +35,7 @@ const Nav = ({ menuList }: { menuList: MenuItem[] }) => {
           <div
             className={cn(
               'flex w-full cursor-pointer items-center justify-start font-MatterSQ-Medium text-[0.875rem]',
-              'rounded-[6px] px-4 py-2',
+              'cursor-pointer rounded-[6px] px-4 py-2',
 
               item?.activeHref && item?.activeHref.includes(pathname)
                 ? theme === 'dark'
