@@ -166,7 +166,6 @@ export const useContractStore = create<ContractStore>()(
 
           // Set client
           setClient(clientName, client);
-
         } catch (error) {
           const errorMessage =
             error instanceof Error

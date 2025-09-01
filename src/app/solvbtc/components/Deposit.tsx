@@ -127,7 +127,10 @@ export default function Deposit() {
         .refine(
           val => {
             if (!val || val.trim() === '') return true;
-            return getFractionalLength(val) <= (selected?.decimals ?? DECIMAL_PRECISION);
+            return (
+              getFractionalLength(val) <=
+              (selected?.decimals ?? DECIMAL_PRECISION)
+            );
           },
           {
             message: `Exceeds maximum decimals (${selected?.decimals ?? DECIMAL_PRECISION}) for ${selected.name}`,
@@ -167,7 +170,10 @@ export default function Deposit() {
         .refine(
           val => {
             if (!val || val.trim() === '') return true;
-            const receiveDecimals = (supportedTokens.find(t => t.name === 'SolvBTC')?.decimals) ?? (selected?.decimals ?? DECIMAL_PRECISION);
+            const receiveDecimals =
+              supportedTokens.find(t => t.name === 'SolvBTC')?.decimals ??
+              selected?.decimals ??
+              DECIMAL_PRECISION;
             return getFractionalLength(val) <= receiveDecimals;
           },
           {
@@ -199,7 +205,10 @@ export default function Deposit() {
       calculateReceiveAmount(newDeposit);
 
       const currentReceive = form.getValues('receive');
-      const receiveDecimals = (supportedTokens.find(t => t.name === 'SolvBTC')?.decimals) ?? (token?.decimals ?? DECIMAL_PRECISION);
+      const receiveDecimals =
+        supportedTokens.find(t => t.name === 'SolvBTC')?.decimals ??
+        token?.decimals ??
+        DECIMAL_PRECISION;
       const newReceive = sanitizeAmountInput(currentReceive, receiveDecimals);
       form.setValue('receive', newReceive, { shouldValidate: true });
       calculateDepositAmount(newReceive);
@@ -306,7 +315,10 @@ export default function Deposit() {
         tokenBalance.balance,
         tokenBalance.decimals
       );
-      const sanitized = sanitizeAmountInput(formatted, selected?.decimals ?? DECIMAL_PRECISION);
+      const sanitized = sanitizeAmountInput(
+        formatted,
+        selected?.decimals ?? DECIMAL_PRECISION
+      );
       form.setValue('deposit', sanitized);
       calculateReceiveAmount(sanitized);
     }
@@ -333,8 +345,14 @@ export default function Deposit() {
     const ratio = one.minus(feeRateValue.div(PERCENTAGE_DIVISOR));
     const receiveAmount = depositValue.multipliedBy(ratio);
 
-    const receiveDecimals = (supportedTokens.find(t => t.name === 'SolvBTC')?.decimals) ?? (selected?.decimals ?? DECIMAL_PRECISION);
-    const formattedReceiveAmount = bnToTruncatedString(receiveAmount, receiveDecimals);
+    const receiveDecimals =
+      supportedTokens.find(t => t.name === 'SolvBTC')?.decimals ??
+      selected?.decimals ??
+      DECIMAL_PRECISION;
+    const formattedReceiveAmount = bnToTruncatedString(
+      receiveAmount,
+      receiveDecimals
+    );
     form.setValue('receive', formattedReceiveAmount || '');
     form.trigger('receive');
   };
@@ -366,7 +384,10 @@ export default function Deposit() {
     const depositAmount = receiveValue.div(denom);
 
     const depositDecimals = selected?.decimals ?? DECIMAL_PRECISION;
-    const formattedDepositAmount = bnToTruncatedString(depositAmount, depositDecimals);
+    const formattedDepositAmount = bnToTruncatedString(
+      depositAmount,
+      depositDecimals
+    );
     form.setValue('deposit', formattedDepositAmount || '');
     form.trigger('deposit');
   };
@@ -618,7 +639,10 @@ export default function Deposit() {
                       className='h-[2.75rem]'
                       inputValue={field.value}
                       onInputChange={value => {
-                        const sanitized = sanitizeAmountInput(value, selected?.decimals ?? DECIMAL_PRECISION);
+                        const sanitized = sanitizeAmountInput(
+                          value,
+                          selected?.decimals ?? DECIMAL_PRECISION
+                        );
                         field.onChange(sanitized);
                         // Calculate receive amount when deposit amount changes
                         calculateReceiveAmount(sanitized);
@@ -724,8 +748,15 @@ export default function Deposit() {
                     className='h-[2.75rem]'
                     inputValue={field.value}
                     onInputChange={value => {
-                      const receiveDecimals = (supportedTokens.find(t => t.name === 'SolvBTC')?.decimals) ?? (selected?.decimals ?? DECIMAL_PRECISION);
-                      const sanitized = sanitizeAmountInput(value, receiveDecimals);
+                      const receiveDecimals =
+                        supportedTokens.find(t => t.name === 'SolvBTC')
+                          ?.decimals ??
+                        selected?.decimals ??
+                        DECIMAL_PRECISION;
+                      const sanitized = sanitizeAmountInput(
+                        value,
+                        receiveDecimals
+                      );
                       field.onChange(sanitized);
                       // Calculate deposit amount when receive amount changes
                       calculateDepositAmount(sanitized);
