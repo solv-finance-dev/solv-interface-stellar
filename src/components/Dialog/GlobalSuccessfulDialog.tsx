@@ -82,7 +82,7 @@ export function GlobalSuccessfulDialog() {
         showCloseButton={showCloseButton}
       >
         <DialogHeader className='mt-[2.75rem]'>
-          <div className='flex w-full justify-center'>
+          <DialogTitle className='flex w-full justify-center'>
             <div className='flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full bg-gray-50'>
               <svg
                 width='41'
@@ -97,7 +97,7 @@ export function GlobalSuccessfulDialog() {
                 />
               </svg>
             </div>
-          </div>
+          </DialogTitle>
 
           <div className='mb-[.5rem] mt-6 flex items-center justify-center text-[1.125rem] font-[500] leading-none'>
             {title ? (
