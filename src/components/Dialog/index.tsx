@@ -102,7 +102,7 @@ export function GlobalDialog() {
               onClick={handleConfirm}
               disabled={disableConfirm || loading}
               className={cn(
-                'h-12 flex-1 rounded-full text-[1rem]',
+                'h-12 flex-1 rounded-full bg-brand-500 text-[1rem] outline-none hover:bg-brand-600',
                 !showCancel && 'w-full'
               )}
             >

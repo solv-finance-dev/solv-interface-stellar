@@ -793,7 +793,7 @@ export default function Deposit() {
           <Button
             type='submit'
             disabled={!isFormValid()}
-            className='w-full rounded-full bg-brand-500 text-white hover:bg-brand-500/90 disabled:cursor-not-allowed disabled:bg-gray-300 md:w-[25.625rem]'
+            className='w-full rounded-full bg-brand-500 text-white hover:bg-brand-600 disabled:cursor-not-allowed disabled:bg-gray-300 md:w-[25.625rem]'
           >
             {isSubmitting ? (
               <>
