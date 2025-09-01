@@ -15,6 +15,7 @@ import {
 import { TokenIcon } from '../TokenIcon';
 import { CopyHelper } from '../CopyHelper';
 import { DisconnectIcon, MyPortfolioIcon } from '@/assets/svg/svg';
+import { useRouter } from 'next/navigation';
 
 interface WalletConnectorProps {
   className?: string;
@@ -70,6 +71,8 @@ export function WalletConnector({
   } = useWalletStore();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const router = useRouter();
 
   // 断开钱包连接
   const handleDisconnect = async () => {
@@ -163,7 +166,10 @@ export function WalletConnector({
             </div>
 
             <div className='space-y-1'>
-              <div className='border-input leader-5 flex w-full cursor-pointer items-center space-x-2 border-b-[1px] border-solid py-3 text-left text-[.875rem] transition-colors'>
+              <div
+                className='border-input leader-5 flex w-full cursor-pointer items-center space-x-2 border-b-[1px] border-solid py-3 text-left text-[.875rem] transition-colors'
+                onClick={() => router.push('/portfolio')}
+              >
                 <MyPortfolioIcon className='h-4 w-4' />
                 <span>My Portfolio</span>
               </div>

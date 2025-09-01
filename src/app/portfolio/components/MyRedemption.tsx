@@ -17,7 +17,7 @@ export const mockRedemptions: Redemption[] = [
   {
     id: '2',
     pool: 'SolvBTC Yield Pool',
-    network: 'Solana',
+    network: 'stellar',
     withdrawAmount: 10.0,
     value: '0.002',
   },

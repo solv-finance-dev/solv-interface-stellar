@@ -167,15 +167,22 @@ export function RedemptionTable({ data }: RedemptionTableProps) {
         align: 'right',
       },
       cell: ({ row }) => {
+        // console.log('row', row);
         return (
-          <Button
-            variant='default'
-            size='sm'
-            className='w-[6.4375rem] rounded-full bg-brand hover:bg-brand-600'
-            onClick={showClaimDialog}
-          >
-            <ClaimIcon className='h-4 w-4' /> Claim
-          </Button>
+          <div className='flex flex-col items-end'>
+            <Button
+              variant='default'
+              size='sm'
+              className='w-[6.4375rem] rounded-full bg-brand hover:bg-brand-600'
+              onClick={showClaimDialog}
+            >
+              <ClaimIcon className='h-4 w-4' /> Claim
+            </Button>
+            {/* 倒计时 */}
+            {row.id === '2' && (
+              <div className='text-xs text-brand-500'>6d 20h 50m 36s</div>
+            )}
+          </div>
         );
       },
     },

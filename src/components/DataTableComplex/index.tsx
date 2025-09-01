@@ -33,8 +33,14 @@ import {
 } from '@solvprotocol/ui-v2';
 import NoData from '../NoData';
 
+type AlignType = 'left' | 'center' | 'right';
+
+interface ColumnMeta {
+  align?: AlignType;
+}
+
 interface DataTableComplexProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
+  columns: (ColumnDef<TData, TValue> & { meta?: ColumnMeta })[];
   data: TData[];
   onRowClick?: (row: TData) => void;
   gridTemplateColumns?: string;
@@ -68,6 +74,9 @@ export function DataTableComplex<TData, TValue>({
       },
     },
   });
+
+  // console.log('getHeaderGroups', table.getHeaderGroups());
+  // console.log('getRowModel', table.getRowModel().rows);
 
   const handleRowClick = (row: Row<TData>) => {
     if (onRowClick) {
@@ -200,7 +209,7 @@ export function DataTableComplex<TData, TValue>({
             {showSkeleton ? (
               renderSkeletonRows()
             ) : table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map(row => (
+              table.getRowModel().rows.map((row, index) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
