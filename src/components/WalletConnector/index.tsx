@@ -34,7 +34,7 @@ const ImageAvatar = ({
     <TokenIcon
       src={src}
       alt={alt}
-      className={cn('h-5 w-5 lg:h-6 lg:w-6', className)}
+      className={cn('h-5 w-5 md:h-6 md:w-6', className)}
       fallback=' '
     />
   );
@@ -44,7 +44,7 @@ const ChainIcon = ({ className }: { className?: string }) => {
   return (
     <div
       className={cn(
-        'h-8 w-8 lg:h-[2.75rem] lg:w-[2.75rem]',
+        'h-8 w-8 md:h-[2.75rem] md:w-[2.75rem]',
         'flex items-center justify-center rounded-full border-[1px] border-solid border-border bg-gray-400/10 backdrop-blur-[5px]',
         className
       )}
@@ -83,7 +83,7 @@ export function WalletConnector({
   // 如果没有连接钱包，显示连接按钮
   if (!isConnected || !connectedWallet || isLoadingAccount || isConnecting) {
     return (
-      <div className='relative flex items-center space-x-2 lg:space-x-4'>
+      <div className='relative flex items-center space-x-2 md:space-x-4'>
         {showChainIcon && <ChainIcon />}
         <Button
           onClick={() => setIsModalOpen(true)}
@@ -91,7 +91,7 @@ export function WalletConnector({
           size='lg'
           disabled={isConnecting || isLoadingAccount}
           className={cn(
-            'h-8 space-x-1 rounded-full border border-solid border-border bg-gray-400/10 px-3 text-sm font-medium text-textColor backdrop-blur-[5px] transition-all hover:opacity-90 lg:h-[2.75rem] lg:px-4',
+            'h-8 space-x-1 rounded-full border border-solid border-border bg-gray-400/10 px-3 text-sm font-medium text-textColor backdrop-blur-[5px] transition-all hover:opacity-90 md:h-[2.75rem] md:px-4',
             'disabled:cursor-not-allowed disabled:opacity-50',
             className
           )}
@@ -109,19 +109,19 @@ export function WalletConnector({
   return (
     <div
       className={cn(
-        'relative flex items-center space-x-2 lg:space-x-4',
+        'relative flex items-center space-x-2 md:space-x-4',
         className
       )}
     >
       {showChainIcon && <ChainIcon />}
       <Popover>
         <PopoverTrigger asChild>
-          <div className='flex h-8 cursor-pointer items-center space-x-1 rounded-full border border-border bg-gray-400/10 px-1 backdrop-blur-[5px] transition-colors lg:h-[2.75rem] lg:px-4'>
+          <div className='flex h-8 cursor-pointer items-center space-x-1 rounded-full border border-border bg-gray-400/10 px-1 backdrop-blur-[5px] transition-colors md:h-[2.75rem] md:px-4'>
             <ImageAvatar
               src='https://avatar.sft-api.com/avatar/28.png'
               alt='User Avatar'
             />
-            <span className='text-[.75rem] font-medium text-textColor lg:text-sm'>
+            <span className='text-[.75rem] font-medium text-textColor md:text-sm'>
               {otherAddressFormat(connectedWallet.publicKey)}
             </span>
             <ChevronDown className='h-4 w-4 text-textColor transition-transform' />
