@@ -39,7 +39,6 @@ import {
 } from '@/states/contract-store';
 import { Client as ContractClient } from '@stellar/stellar-sdk/contract';
 import {
-  getSolvBTCTokenBalance,
   formatTokenBalance,
   type TokenBalanceResult,
 } from '@/lib/token-balance';
@@ -48,10 +47,6 @@ import {
   SolvBTCTokenClient,
 } from '@/contracts/solvBTCTokenContract/src';
 import { getCurrentStellarNetwork } from '@/config/stellar';
-
-// Constants
-const PERCENTAGE_DIVISOR = 100; // Convert percentage to decimal (e.g., 1% = 0.01)
-const DECIMAL_PRECISION = 6; // Fallback decimal precision if token decimals are unavailable
 
 // Using shared utils for sanitization/formatting and calculations
 
@@ -87,6 +82,7 @@ export default function Deposit() {
   const [shareTokenDecimals, setShareTokenDecimals] = useState<number>(
     TOKEN_DECIMALS_FALLBACK
   );
+  const [shareTokenName, setShareTokenName] = useState<string>('SolvBTC');
 
   // Create form validation schema as a function to access current state
   const createFormSchema = () =>
@@ -150,26 +146,18 @@ export default function Deposit() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vaultEntry]);
 
-  // Load SolvBTC share token decimals for receive side
+  // Load shares token metadata for receive side from vault store (no extra RPC)
   useEffect(() => {
-    const loadShareDecimals = async () => {
-      if (!solvBTCClient) return;
-      try {
-        const shareIdTx = await solvBTCClient.get_shares_token();
-        const shareId = shareIdTx.result;
-        if (!shareId) return;
-        const client = new SolvBTCTokenClient({
-          contractId: shareId,
-          networkPassphrase: getCurrentStellarNetwork(),
-          rpcUrl: process.env.NEXT_PUBLIC_STELLAR_RPC_URL!,
-          allowHttp: true,
-        } as any);
-        const dec = await client.decimals();
-        setShareTokenDecimals(Number(dec.result) || TOKEN_DECIMALS_FALLBACK);
-      } catch {}
-    };
-    loadShareDecimals();
-  }, [solvBTCClient]);
+    const st = vaultEntry?.shareTokenClient;
+    if (st) {
+      setShareTokenDecimals(st.decimal ?? TOKEN_DECIMALS_FALLBACK);
+      setShareTokenName(st.name || 'SolvBTC');
+    }
+  }, [
+    vaultEntry?.shareTokenClient?.id,
+    vaultEntry?.shareTokenClient?.decimal,
+    vaultEntry?.shareTokenClient?.name,
+  ]);
   // Function to fetch token balance for currently selected token using its client
   const fetchTokenBalance = async (tokenAddress?: string) => {
     if (!connectedWallet?.publicKey) {
@@ -751,15 +739,13 @@ export default function Deposit() {
                     }}
                     iSuffix={
                       <div className='flex h-full items-center justify-end'>
-                        {' '}
                         <div className='flex items-center justify-between text-[1rem]'>
                           <TokenIcon
                             src='https://res1.sft-api.com/token/SolvBTC.png'
-                            alt='SolvBTC'
-                            fallback='SolvBTC'
+                            alt={shareTokenName}
+                            fallback={shareTokenName}
                           />
-
-                          {`SolvBTC`}
+                          {shareTokenName}
                         </div>
                       </div>
                     }
