@@ -24,7 +24,14 @@ import { InputComplex } from '@/components/InputComplex';
 import { TooltipComplex } from '@/components/TooltipComplex';
 import { TokenIcon } from '@/components/TokenIcon';
 import { TxResult } from '@/components';
-import BigNumber from 'bignumber.js';
+import {
+  TOKEN_DECIMALS_FALLBACK,
+  sanitizeAmountInput,
+  computeReceiveFromDeposit,
+  computeDepositFromReceive,
+  scaleAmountToBigInt,
+  createLinkedAmountSchema,
+} from '@/app/solvbtc/utils';
 import {
   useSolvBtcStore,
   useSolvBTCVaultClient,
@@ -47,40 +54,7 @@ import { TOKEN_FEE_RATE_DECIMAL } from '@/contracts/solvBTCTokenContract/src';
 const PERCENTAGE_DIVISOR = 100; // Convert percentage to decimal (e.g., 1% = 0.01)
 const DECIMAL_PRECISION = 6; // Fallback decimal precision if token decimals are unavailable
 
-// Helpers for amount sanitization and formatting (truncate, not round)
-const getFractionalLength = (value: string): number => {
-  if (!value || !value.includes('.')) return 0;
-  const [, fractional = ''] = value.split('.');
-  return fractional.length;
-};
-
-const truncateToDecimals = (value: string, decimals: number): string => {
-  if (!value) return '';
-  const normalized = value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
-  if (!normalized) return '';
-  const [i = '', f = ''] = normalized.split('.');
-  if (decimals <= 0) return i || '';
-  // If user has just typed a trailing dot, preserve it so they can continue typing
-  if (normalized.endsWith('.') && f.length === 0) {
-    return `${i || '0'}.`;
-  }
-  const tf = f.slice(0, Math.max(0, decimals));
-  return tf.length > 0 ? `${i || '0'}.${tf}` : i || '';
-};
-
-const sanitizeAmountInput = (value: string, decimals: number): string => {
-  if (!value) return '';
-  let v = value.trim();
-  if (v.startsWith('.')) v = `0${v}`;
-  v = v.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
-  return truncateToDecimals(v, decimals);
-};
-
-const bnToTruncatedString = (value: BigNumber, decimals: number): string => {
-  const d = Math.max(0, decimals);
-  const s = value.toFixed(d, BigNumber.ROUND_DOWN);
-  return s.replace(/\.0+$/, '').replace(/\.$/, '');
-};
+// Using shared utils for sanitization/formatting and calculations
 
 export default function Deposit() {
   const solvBTCClient = useSolvBTCVaultClient();
@@ -104,82 +78,18 @@ export default function Deposit() {
 
   // Create form validation schema as a function to access current state
   const createFormSchema = () =>
-    z.object({
-      deposit: z
-        .string()
-        .refine(
-          val => {
-            // Allow empty values
-            if (!val || val.trim() === '') return true;
-            const num = parseFloat(val);
-            return !isNaN(num) && isFinite(num);
-          },
-          { message: 'Deposit amount must be a valid number' }
-        )
-        .refine(
-          val => {
-            // Allow empty values
-            if (!val || val.trim() === '') return true;
-            return parseFloat(val) > 0;
-          },
-          { message: 'Deposit amount must be greater than 0' }
-        )
-        .refine(
-          val => {
-            if (!val || val.trim() === '') return true;
-            return (
-              getFractionalLength(val) <=
-              (selected?.decimals ?? DECIMAL_PRECISION)
-            );
-          },
-          {
-            message: `Exceeds maximum decimals (${selected?.decimals ?? DECIMAL_PRECISION}) for ${selected.name}`,
-          }
-        )
-        .refine(
-          val => {
-            // Allow empty values
-            if (!val || val.trim() === '') return true;
-            const depositAmount = parseFloat(val);
-            const maxBalance = parseFloat(tokenBalance.balance || '0');
-            return depositAmount <= maxBalance;
-          },
-          {
-            message: `Deposit amount cannot exceed your balance of ${formatTokenBalance(tokenBalance.balance, tokenBalance.decimals)} ${selected.name}`,
-          }
-        ),
-      receive: z
-        .string()
-        .refine(
-          val => {
-            // Allow empty values
-            if (!val || val.trim() === '') return true;
-            const num = parseFloat(val);
-            return !isNaN(num) && isFinite(num);
-          },
-          { message: 'Receive amount must be a valid number' }
-        )
-        .refine(
-          val => {
-            // Allow empty values
-            if (!val || val.trim() === '') return true;
-            return parseFloat(val) > 0;
-          },
-          { message: 'Receive amount must be greater than 0' }
-        )
-        .refine(
-          val => {
-            if (!val || val.trim() === '') return true;
-            const receiveDecimals =
-              supportedTokens.find(t => t.name === 'SolvBTC')?.decimals ??
-              selected?.decimals ??
-              DECIMAL_PRECISION;
-            return getFractionalLength(val) <= receiveDecimals;
-          },
-          {
-            message: `Exceeds maximum decimals for SolvBTC`,
-          }
-        ),
+    createLinkedAmountSchema({
+      depositDecimals: selected?.decimals ?? TOKEN_DECIMALS_FALLBACK,
+      receiveDecimals:
+        supportedTokens.find(t => t.name === 'SolvBTC')?.decimals ??
+        selected?.decimals ??
+        TOKEN_DECIMALS_FALLBACK,
+      maxDeposit: formatTokenBalance(
+        tokenBalance.balance,
+        tokenBalance.decimals
+      ),
+      depositTokenName: selected.name,
+      receiveTokenName: 'SolvBTC',
     });
 
   const form = useForm<z.infer<ReturnType<typeof createFormSchema>>>({
@@ -199,7 +109,7 @@ export default function Deposit() {
       const currentDeposit = form.getValues('deposit');
       const newDeposit = sanitizeAmountInput(
         currentDeposit,
-        token?.decimals ?? DECIMAL_PRECISION
+        token?.decimals ?? TOKEN_DECIMALS_FALLBACK
       );
       form.setValue('deposit', newDeposit, { shouldValidate: true });
       calculateReceiveAmount(newDeposit);
@@ -208,7 +118,7 @@ export default function Deposit() {
       const receiveDecimals =
         supportedTokens.find(t => t.name === 'SolvBTC')?.decimals ??
         token?.decimals ??
-        DECIMAL_PRECISION;
+        TOKEN_DECIMALS_FALLBACK;
       const newReceive = sanitizeAmountInput(currentReceive, receiveDecimals);
       form.setValue('receive', newReceive, { shouldValidate: true });
       calculateDepositAmount(newReceive);
@@ -317,7 +227,7 @@ export default function Deposit() {
       );
       const sanitized = sanitizeAmountInput(
         formatted,
-        selected?.decimals ?? DECIMAL_PRECISION
+        selected?.decimals ?? TOKEN_DECIMALS_FALLBACK
       );
       form.setValue('deposit', sanitized);
       calculateReceiveAmount(sanitized);
@@ -336,21 +246,13 @@ export default function Deposit() {
       return;
     }
 
-    const depositValue = new BigNumber(depositAmount || '0');
-    const feeRateValue = new BigNumber(depositFeeRate || '0');
-
-    // Calculate the amount after fee deduction
-    // receive = deposit * (1 - fee_rate_percentage)
-    const one = new BigNumber(1);
-    const ratio = one.minus(feeRateValue.div(PERCENTAGE_DIVISOR));
-    const receiveAmount = depositValue.multipliedBy(ratio);
-
     const receiveDecimals =
       supportedTokens.find(t => t.name === 'SolvBTC')?.decimals ??
       selected?.decimals ??
-      DECIMAL_PRECISION;
-    const formattedReceiveAmount = bnToTruncatedString(
-      receiveAmount,
+      TOKEN_DECIMALS_FALLBACK;
+    const formattedReceiveAmount = computeReceiveFromDeposit(
+      depositAmount,
+      depositFeeRate,
       receiveDecimals
     );
     form.setValue('receive', formattedReceiveAmount || '');
@@ -369,23 +271,10 @@ export default function Deposit() {
       return;
     }
 
-    const receiveValue = new BigNumber(receiveAmount || '0');
-    const feeRateValue = new BigNumber(depositFeeRate || '0');
-
-    // Calculate the required deposit amount
-    // deposit = receive / (1 - fee_rate_percentage)
-    const one = new BigNumber(1);
-    const denom = one.minus(feeRateValue.div(PERCENTAGE_DIVISOR));
-    if (denom.lte(0)) {
-      form.setValue('deposit', '');
-      form.trigger('deposit');
-      return;
-    }
-    const depositAmount = receiveValue.div(denom);
-
-    const depositDecimals = selected?.decimals ?? DECIMAL_PRECISION;
-    const formattedDepositAmount = bnToTruncatedString(
-      depositAmount,
+    const depositDecimals = selected?.decimals ?? TOKEN_DECIMALS_FALLBACK;
+    const formattedDepositAmount = computeDepositFromReceive(
+      receiveAmount,
+      depositFeeRate,
       depositDecimals
     );
     form.setValue('deposit', formattedDepositAmount || '');
@@ -508,11 +397,11 @@ export default function Deposit() {
       }
 
       // 获取输入金额（以最小单位）
-      const depositDecimals = selected?.decimals ?? DECIMAL_PRECISION;
-      const scaled = new BigNumber(depositAmount)
-        .multipliedBy(new BigNumber(10).pow(depositDecimals))
-        .integerValue(BigNumber.ROUND_DOWN);
-      const depositAmountBigInt = BigInt(scaled.toFixed(0));
+      const depositDecimals = selected?.decimals ?? TOKEN_DECIMALS_FALLBACK;
+      const depositAmountBigInt = scaleAmountToBigInt(
+        depositAmount,
+        depositDecimals
+      );
 
       // 直接使用已经配置好签名器的 client
       const depositTx = await currentClient.deposit({
@@ -641,7 +530,7 @@ export default function Deposit() {
                       onInputChange={value => {
                         const sanitized = sanitizeAmountInput(
                           value,
-                          selected?.decimals ?? DECIMAL_PRECISION
+                          selected?.decimals ?? TOKEN_DECIMALS_FALLBACK
                         );
                         field.onChange(sanitized);
                         // Calculate receive amount when deposit amount changes
@@ -752,7 +641,7 @@ export default function Deposit() {
                         supportedTokens.find(t => t.name === 'SolvBTC')
                           ?.decimals ??
                         selected?.decimals ??
-                        DECIMAL_PRECISION;
+                        TOKEN_DECIMALS_FALLBACK;
                       const sanitized = sanitizeAmountInput(
                         value,
                         receiveDecimals
