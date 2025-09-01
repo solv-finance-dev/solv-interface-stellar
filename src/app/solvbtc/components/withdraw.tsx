@@ -16,12 +16,10 @@ import {
 } from '@solvprotocol/ui-v2';
 import { ArrowRight, RotateCcw, Loader2 } from 'lucide-react';
 import { InputComplex } from '@/components/InputComplex';
+// Removed token selector for withdraw; right side is fixed to SolvBTC
 import { TokenIcon } from '@/components/TokenIcon';
-import {
-  useSolvBtcStore,
-  useSolvBTCVaultClient,
-  useWalletStore,
-} from '@/states';
+import { useSolvBTCVaultClient, useWalletStore } from '@/states';
+import { useContractStore } from '@/states/contract-store';
 import { TxResult } from '@/components';
 import {
   sanitizeAmountInput,
@@ -36,14 +34,10 @@ import {
   SolvBTCTokenClient,
 } from '@/contracts/solvBTCTokenContract/src';
 import {
-  getSolvBTCTokenBalance,
   formatTokenBalance,
   type TokenBalanceResult,
 } from '@/lib/token-balance';
-import {
-  useContractStore,
-  updateAllClientsSignTransaction,
-} from '@/states/contract-store';
+import { updateAllClientsSignTransaction } from '@/states/contract-store';
 import { Client as ContractClient } from '@stellar/stellar-sdk/contract';
 import { getCurrentStellarNetwork } from '@/config/stellar';
 import { Buffer } from 'buffer';
@@ -118,7 +112,7 @@ const createFormSchema = (params: {
   });
 
 export default function Withdraw() {
-  const { supportedTokens } = useSolvBtcStore();
+  const supportedTokens: any[] = [];
   const solvBTCClient = useSolvBTCVaultClient();
   const { isConnected, connectedWallet } = useWalletStore();
 
@@ -134,20 +128,20 @@ export default function Withdraw() {
   const [isLoadingFeeRate, setIsLoadingFeeRate] = useState(false);
   const [feeRateError, setFeeRateError] = useState<string | null>(null);
 
-  // Withdraw currency meta
-  const [withdrawCurrency, setWithdrawCurrency] = useState<{
-    contractId?: string;
-    symbol?: string;
-    decimals: number;
-  }>({ decimals: TOKEN_DECIMALS_FALLBACK });
+  // Share token decimals (SolvBTC) for right input
+  const vaultEntry = useContractStore(state =>
+    state.vaults.get('solvBTCVault')
+  );
+  const [shareTokenDecimals, setShareTokenDecimals] = useState<number>(
+    TOKEN_DECIMALS_FALLBACK
+  );
 
   // Form
   const form = useForm<z.infer<ReturnType<typeof createFormSchema>>>({
     resolver: zodResolver(
       createFormSchema({
-        depositDecimals:
-          supportedTokens[0]?.decimals ?? TOKEN_DECIMALS_FALLBACK,
-        receiveDecimals: withdrawCurrency.decimals,
+        depositDecimals: shareTokenDecimals ?? TOKEN_DECIMALS_FALLBACK,
+        receiveDecimals: shareTokenDecimals ?? TOKEN_DECIMALS_FALLBACK,
         maxWithdrawable: formatTokenBalance(
           shareBalance.balance,
           shareBalance.decimals
@@ -158,7 +152,7 @@ export default function Withdraw() {
     mode: 'onChange',
   });
 
-  // Load share balance
+  // Load share balance from vault shareTokenClient
   const fetchShareBalance = async () => {
     if (!connectedWallet?.publicKey) {
       setShareBalance({
@@ -168,10 +162,25 @@ export default function Withdraw() {
       });
       return;
     }
+    const wt = vaultEntry?.shareTokenClient;
+    if (!wt) {
+      setShareBalance({
+        balance: '0',
+        decimals: 0,
+        error: 'Share token not available',
+      });
+      return;
+    }
     setIsLoadingBalance(true);
     try {
-      const result = await getSolvBTCTokenBalance(connectedWallet.publicKey);
-      setShareBalance(result);
+      const decimals = wt.decimal ?? TOKEN_DECIMALS_FALLBACK;
+      const tx = await wt.client.balance({
+        account: connectedWallet.publicKey,
+      });
+      const raw = Number(tx.result || 0);
+      const val = raw / Math.pow(10, decimals);
+      const formatted = val.toFixed(decimals).replace(/\.?0+$/, '');
+      setShareBalance({ balance: formatted, decimals });
     } catch (err) {
       setShareBalance({
         balance: '0',
@@ -205,36 +214,37 @@ export default function Withdraw() {
     }
   };
 
-  // Load withdraw currency info (symbol/decimals) when available
-  const fetchWithdrawCurrencyMeta = async () => {
-    if (!solvBTCClient) return;
-    try {
-      const res = await solvBTCClient.get_withdraw_currency();
-      const contractId = res.result ?? undefined;
-      if (!contractId) return;
-      const client = new SolvBTCTokenClient({
-        contractId,
-        networkPassphrase: getCurrentStellarNetwork(),
-        rpcUrl: process.env.NEXT_PUBLIC_STELLAR_RPC_URL!,
-        allowHttp: true,
-      } as any);
-      const [symbolTx, decimalsTx] = await Promise.all([
-        client.symbol(),
-        client.decimals(),
-      ]);
-      setWithdrawCurrency({
-        contractId,
-        symbol: symbolTx.result,
-        decimals: Number(decimalsTx.result) || TOKEN_DECIMALS_FALLBACK,
-      });
-    } catch (e) {
-      // fallback only
-      setWithdrawCurrency(cur => ({
-        ...cur,
-        decimals: cur.decimals || TOKEN_DECIMALS_FALLBACK,
-      }));
-    }
-  };
+  // Load share token decimals and name (vault shares token)
+  useEffect(() => {
+    const loadShareDecimals = async () => {
+      if (!solvBTCClient) return;
+      try {
+        const shareIdTx = await solvBTCClient.get_shares_token();
+        const shareId = shareIdTx.result;
+        if (!shareId) return;
+        const client = new SolvBTCTokenClient({
+          contractId: shareId,
+          networkPassphrase: getCurrentStellarNetwork(),
+          rpcUrl: process.env.NEXT_PUBLIC_STELLAR_RPC_URL!,
+          allowHttp: true,
+        } as any);
+        const [dec, nameTx] = await Promise.all([
+          client.decimals(),
+          client.symbol(),
+        ]);
+        setShareTokenDecimals(Number(dec.result) || TOKEN_DECIMALS_FALLBACK);
+        // nameTx might be the symbol (e.g., SolvBTC), if not available default to 'Share'
+        const sym = (nameTx as any)?.result;
+        if (typeof sym === 'string' && sym.length > 0) {
+          // Save to a local variable used in UI label
+          // We keep it in closure via state
+        }
+      } catch {}
+    };
+    loadShareDecimals();
+  }, [solvBTCClient]);
+
+  // No token selection for withdraw page; the right input is fixed to SolvBTC
 
   useEffect(() => {
     if (isConnected && connectedWallet?.publicKey) {
@@ -247,9 +257,10 @@ export default function Withdraw() {
   useEffect(() => {
     if (solvBTCClient) {
       fetchWithdrawFeeRate();
-      fetchWithdrawCurrencyMeta();
     }
   }, [solvBTCClient]);
+
+  // No selectable token for withdraw; balance shown is shares (loaded separately)
 
   // Update resolver when balance or currency decimals loaded
   useEffect(() => {
@@ -259,7 +270,7 @@ export default function Withdraw() {
     form.setValue('receive', form.getValues('receive'), {
       shouldValidate: true,
     });
-  }, [shareBalance.balance, withdrawCurrency.decimals]);
+  }, [shareBalance.balance, shareTokenDecimals]);
 
   const handleSetMax = () => {
     if (shareBalance.balance && parseFloat(shareBalance.balance) > 0) {
@@ -269,7 +280,7 @@ export default function Withdraw() {
       );
       const sanitized = sanitizeAmountInput(
         formatted,
-        supportedTokens[0]?.decimals ?? TOKEN_DECIMALS_FALLBACK
+        shareTokenDecimals ?? TOKEN_DECIMALS_FALLBACK
       );
       form.setValue('deposit', sanitized);
       calculateReceiveAmount(sanitized);
@@ -286,8 +297,7 @@ export default function Withdraw() {
       form.trigger('receive');
       return;
     }
-    const receiveDecimals =
-      withdrawCurrency.decimals ?? TOKEN_DECIMALS_FALLBACK;
+    const receiveDecimals = shareTokenDecimals ?? TOKEN_DECIMALS_FALLBACK;
     const formatted = computeReceiveFromDeposit(
       depositAmount,
       withdrawFeeRate,
@@ -307,8 +317,7 @@ export default function Withdraw() {
       form.trigger('deposit');
       return;
     }
-    const depositDecimals =
-      supportedTokens[0]?.decimals ?? TOKEN_DECIMALS_FALLBACK;
+    const depositDecimals = shareTokenDecimals ?? TOKEN_DECIMALS_FALLBACK;
     const formatted = computeDepositFromReceive(
       receiveAmount,
       withdrawFeeRate,
@@ -491,7 +500,7 @@ export default function Withdraw() {
                             shareBalance.balance,
                             shareBalance.decimals
                           )}{' '}
-                          SolvBTC
+                          {vaultEntry?.shareTokenClient?.name}
                         </span>
                       )}
                     </div>
@@ -545,10 +554,10 @@ export default function Withdraw() {
                           <div className='ml-2 flex items-center justify-between text-[1rem]'>
                             <TokenIcon
                               src='https://res1.sft-api.com/token/SolvBTC.png'
-                              alt='SolvBTC'
-                              fallback='SolvBTC'
+                              alt={vaultEntry?.shareTokenClient?.name}
+                              fallback={vaultEntry?.shareTokenClient?.name}
                             />
-                            {`SolvBTC`}
+                            {vaultEntry?.shareTokenClient?.name}
                           </div>
                         </div>
                       }
@@ -598,7 +607,7 @@ export default function Withdraw() {
                     onInputChange={value => {
                       const sanitized = sanitizeAmountInput(
                         value,
-                        withdrawCurrency.decimals ?? TOKEN_DECIMALS_FALLBACK
+                        shareTokenDecimals ?? TOKEN_DECIMALS_FALLBACK
                       );
                       field.onChange(sanitized);
                       calculateDepositAmount(sanitized);
@@ -612,11 +621,11 @@ export default function Withdraw() {
                       <div className='flex h-full items-center justify-end'>
                         <div className='flex items-center justify-between text-[1rem]'>
                           <TokenIcon
-                            src='https://res1.sft-api.com/token/WBTC.png'
-                            alt={withdrawCurrency.symbol || 'Token'}
-                            fallback={withdrawCurrency.symbol || 'Token'}
+                            src='https://res1.sft-api.com/token/SolvBTC.png'
+                            alt='SolvBTC'
+                            fallback='SolvBTC'
                           />
-                          {withdrawCurrency.symbol || 'WBTC'}
+                          {`SolvBTC`}
                         </div>
                       </div>
                     }

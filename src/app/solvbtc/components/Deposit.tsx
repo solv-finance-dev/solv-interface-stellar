@@ -32,12 +32,7 @@ import {
   scaleAmountToBigInt,
   createLinkedAmountSchema,
 } from '@/app/solvbtc/utils';
-import {
-  useSolvBtcStore,
-  useSolvBTCVaultClient,
-  useWalletStore,
-  Token,
-} from '@/states';
+import { useSolvBTCVaultClient, useWalletStore } from '@/states';
 import {
   useContractStore,
   updateAllClientsSignTransaction,
@@ -48,7 +43,11 @@ import {
   formatTokenBalance,
   type TokenBalanceResult,
 } from '@/lib/token-balance';
-import { TOKEN_FEE_RATE_DECIMAL } from '@/contracts/solvBTCTokenContract/src';
+import {
+  TOKEN_FEE_RATE_DECIMAL,
+  SolvBTCTokenClient,
+} from '@/contracts/solvBTCTokenContract/src';
+import { getCurrentStellarNetwork } from '@/config/stellar';
 
 // Constants
 const PERCENTAGE_DIVISOR = 100; // Convert percentage to decimal (e.g., 1% = 0.01)
@@ -56,10 +55,19 @@ const DECIMAL_PRECISION = 6; // Fallback decimal precision if token decimals are
 
 // Using shared utils for sanitization/formatting and calculations
 
+type SupportedToken = {
+  name: string;
+  address: string;
+  decimals: number;
+  icon?: string;
+};
+
 export default function Deposit() {
   const solvBTCClient = useSolvBTCVaultClient();
   const { isConnected, connectedWallet } = useWalletStore();
-  const { supportedTokens } = useSolvBtcStore();
+  const vaultEntry = useContractStore(state =>
+    state.vaults.get('solvBTCVault')
+  );
 
   // Token balance state
   const [tokenBalance, setTokenBalance] = useState<TokenBalanceResult>({
@@ -74,21 +82,22 @@ export default function Deposit() {
   const [feeRateError, setFeeRateError] = useState<string | null>(null);
 
   // Selected token state
-  const [selected, setSelected] = useState<Token>(supportedTokens[0]);
+  const [supportedTokens, setSupportedTokens] = useState<SupportedToken[]>([]);
+  const [selected, setSelected] = useState<SupportedToken | null>(null);
+  const [shareTokenDecimals, setShareTokenDecimals] = useState<number>(
+    TOKEN_DECIMALS_FALLBACK
+  );
 
   // Create form validation schema as a function to access current state
   const createFormSchema = () =>
     createLinkedAmountSchema({
       depositDecimals: selected?.decimals ?? TOKEN_DECIMALS_FALLBACK,
-      receiveDecimals:
-        supportedTokens.find(t => t.name === 'SolvBTC')?.decimals ??
-        selected?.decimals ??
-        TOKEN_DECIMALS_FALLBACK,
+      receiveDecimals: shareTokenDecimals ?? TOKEN_DECIMALS_FALLBACK,
       maxDeposit: formatTokenBalance(
         tokenBalance.balance,
         tokenBalance.decimals
       ),
-      depositTokenName: selected.name,
+      depositTokenName: selected?.name || 'Token',
       receiveTokenName: 'SolvBTC',
     });
 
@@ -115,17 +124,54 @@ export default function Deposit() {
       calculateReceiveAmount(newDeposit);
 
       const currentReceive = form.getValues('receive');
-      const receiveDecimals =
-        supportedTokens.find(t => t.name === 'SolvBTC')?.decimals ??
-        token?.decimals ??
-        TOKEN_DECIMALS_FALLBACK;
+      const receiveDecimals = shareTokenDecimals ?? TOKEN_DECIMALS_FALLBACK;
       const newReceive = sanitizeAmountInput(currentReceive, receiveDecimals);
       form.setValue('receive', newReceive, { shouldValidate: true });
       calculateDepositAmount(newReceive);
+      // Balance will be refreshed by the selected-address effect
     }
   };
-  // Function to fetch token balance
-  const fetchTokenBalance = async () => {
+  // Load supported tokens from vault contract store
+  useEffect(() => {
+    const load = async () => {
+      const rpcUrl = process.env.NEXT_PUBLIC_STELLAR_RPC_URL!;
+      if (!vaultEntry || !rpcUrl) return;
+      const entries = Array.from(vaultEntry.supportedTokenClients.values());
+      const list: SupportedToken[] = entries.map(e => ({
+        name: e.name || e.id,
+        address: e.id,
+        decimals: e.decimal ?? TOKEN_DECIMALS_FALLBACK,
+        icon: undefined,
+      }));
+      setSupportedTokens(list);
+      if (!selected && list.length > 0) setSelected(list[0]);
+    };
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vaultEntry]);
+
+  // Load SolvBTC share token decimals for receive side
+  useEffect(() => {
+    const loadShareDecimals = async () => {
+      if (!solvBTCClient) return;
+      try {
+        const shareIdTx = await solvBTCClient.get_shares_token();
+        const shareId = shareIdTx.result;
+        if (!shareId) return;
+        const client = new SolvBTCTokenClient({
+          contractId: shareId,
+          networkPassphrase: getCurrentStellarNetwork(),
+          rpcUrl: process.env.NEXT_PUBLIC_STELLAR_RPC_URL!,
+          allowHttp: true,
+        } as any);
+        const dec = await client.decimals();
+        setShareTokenDecimals(Number(dec.result) || TOKEN_DECIMALS_FALLBACK);
+      } catch {}
+    };
+    loadShareDecimals();
+  }, [solvBTCClient]);
+  // Function to fetch token balance for currently selected token using its client
+  const fetchTokenBalance = async (tokenAddress?: string) => {
     if (!connectedWallet?.publicKey) {
       setTokenBalance({
         balance: '0',
@@ -134,11 +180,34 @@ export default function Deposit() {
       });
       return;
     }
+    const currentAddress = tokenAddress || selected?.address;
+    if (!currentAddress || !vaultEntry) {
+      setTokenBalance({ balance: '0', decimals: 0 });
+      return;
+    }
 
     setIsLoadingBalance(true);
     try {
-      const result = await getSolvBTCTokenBalance(connectedWallet.publicKey);
-      setTokenBalance(result);
+      const tokenEntry = vaultEntry.supportedTokenClients.get(currentAddress);
+      if (!tokenEntry) {
+        setTokenBalance({
+          balance: '0',
+          decimals: 0,
+          error: 'Token client not found',
+        });
+        return;
+      }
+      const decimals = tokenEntry.decimal ?? TOKEN_DECIMALS_FALLBACK;
+      const balanceTx = await tokenEntry.client.balance({
+        account: connectedWallet.publicKey,
+      });
+      const raw = Number(balanceTx.result || 0);
+      const value = raw / Math.pow(10, decimals);
+      const formatted = value.toFixed(decimals).replace(/\.?0+$/, '');
+      // Only update if selection hasn't changed during async fetch
+      if (selected?.address === currentAddress) {
+        setTokenBalance({ balance: formatted, decimals });
+      }
     } catch (error) {
       setTokenBalance({
         balance: '0',
@@ -200,6 +269,14 @@ export default function Deposit() {
     }
   }, [isConnected, connectedWallet?.publicKey]);
 
+  // Re-fetch balance when selected token changes
+  useEffect(() => {
+    if (isConnected && connectedWallet?.publicKey && selected?.address) {
+      fetchTokenBalance(selected.address);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected?.address]);
+
   // Fetch deposit fee rate when component mounts or when solvBTCClient is available
   useEffect(() => {
     if (solvBTCClient) {
@@ -216,7 +293,7 @@ export default function Deposit() {
     form.setValue('receive', form.getValues('receive'), {
       shouldValidate: true,
     });
-  }, [tokenBalance.balance, selected.name, form]);
+  }, [tokenBalance.balance, selected?.name, form]);
 
   // Set maximum amount
   const handleSetMax = () => {
@@ -246,10 +323,7 @@ export default function Deposit() {
       return;
     }
 
-    const receiveDecimals =
-      supportedTokens.find(t => t.name === 'SolvBTC')?.decimals ??
-      selected?.decimals ??
-      TOKEN_DECIMALS_FALLBACK;
+    const receiveDecimals = shareTokenDecimals ?? TOKEN_DECIMALS_FALLBACK;
     const formattedReceiveAmount = computeReceiveFromDeposit(
       depositAmount,
       depositFeeRate,
@@ -304,7 +378,16 @@ export default function Deposit() {
     // Must not be currently submitting
     const notSubmitting = !isSubmitting;
 
-    return hasValues && isWalletConnected && hasNoErrors && notSubmitting;
+    // Must have a selected token
+    const hasSelected = !!selected;
+
+    return (
+      hasValues &&
+      isWalletConnected &&
+      hasNoErrors &&
+      notSubmitting &&
+      hasSelected
+    );
   };
 
   async function onSubmit(data: z.infer<ReturnType<typeof createFormSchema>>) {
@@ -339,6 +422,17 @@ export default function Deposit() {
           type='error'
           title='Error'
           message='Please connect your wallet first'
+        />
+      );
+      return;
+    }
+
+    if (!selected) {
+      toast(
+        <TxResult
+          type='error'
+          title='Error'
+          message='No supported token available'
         />
       );
       return;
@@ -405,7 +499,7 @@ export default function Deposit() {
 
       // 直接使用已经配置好签名器的 client
       const depositTx = await currentClient.deposit({
-        currency: supportedTokens[0]?.address,
+        currency: selected?.address || '',
         from: connectedWallet.publicKey,
         amount: depositAmountBigInt,
       });
@@ -504,13 +598,13 @@ export default function Deposit() {
                             tokenBalance.balance,
                             tokenBalance.decimals
                           )}{' '}
-                          {selected.name}
+                          {selected?.name}
                         </span>
                       )}
                     </div>
                     <button
                       type='button'
-                      onClick={fetchTokenBalance}
+                      onClick={() => fetchTokenBalance()}
                       disabled={isLoadingBalance || !isConnected}
                       className='rounded p-1 hover:bg-gray-100 disabled:opacity-50'
                       title='Refresh balance'
@@ -556,18 +650,18 @@ export default function Deposit() {
                           </button>
 
                           <Select
-                            value={selected.name}
+                            value={selected?.name}
                             onValueChange={onTokenSelected}
                           >
                             <SelectTrigger className='border-0 !bg-transparent !pl-2 !pr-0 outline-none focus-visible:ring-0'>
                               <div className='flex items-center justify-between text-[1rem]'>
                                 <TokenIcon
-                                  src={selected.icon}
-                                  alt={selected.name}
-                                  fallback={selected.name}
+                                  src={selected?.icon}
+                                  alt={selected?.name}
+                                  fallback={selected?.name}
                                 />
 
-                                {selected.name}
+                                {selected?.name}
                               </div>
                             </SelectTrigger>
 
