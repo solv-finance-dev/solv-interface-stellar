@@ -432,7 +432,7 @@ export default function Withdraw() {
         ) {
           txHash = (signedTx as { id: string }).id;
         }
-      } catch { }
+      } catch {}
 
       toast(
         <TxResult
@@ -518,7 +518,7 @@ export default function Withdraw() {
                         const sanitized = sanitizeAmountInput(
                           value,
                           supportedTokens[0]?.decimals ??
-                          TOKEN_DECIMALS_FALLBACK
+                            TOKEN_DECIMALS_FALLBACK
                         );
                         field.onChange(sanitized);
                         calculateReceiveAmount(sanitized);
