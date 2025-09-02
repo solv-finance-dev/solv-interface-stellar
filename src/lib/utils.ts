@@ -634,11 +634,15 @@ export function handleChainLabel(chainLabel: string) {
 
 export function getCurItem(list: any[], keyTitle: string, row: any) {
   const itemObj = list.filter(item => {
-    return item.key === keyTitle;
+    return item.accessorKey === keyTitle;
   })[0];
 
-  if (itemObj?.colNode?.(row)) {
-    return itemObj.colNode(row);
+  if (keyTitle == 'status') {
+    console.log('status cell', itemObj);
+  }
+
+  if (itemObj?.cell?.({ row })) {
+    return itemObj?.cell?.({ row });
   } else {
     return ``;
   }

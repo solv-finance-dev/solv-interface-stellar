@@ -13,6 +13,7 @@ export const mockRedemptions: Redemption[] = [
     network: 'Solana',
     withdrawAmount: 10.0,
     value: '0.001 SolvBTC',
+    status: 'Pending',
   },
   {
     id: '2',
@@ -20,6 +21,7 @@ export const mockRedemptions: Redemption[] = [
     network: 'stellar',
     withdrawAmount: 10.0,
     value: '0.002',
+    status: 'Ready to claim',
   },
   {
     id: '3',
@@ -27,6 +29,7 @@ export const mockRedemptions: Redemption[] = [
     network: 'Solana',
     withdrawAmount: 10.0,
     value: '0.003',
+    status: 'Ready to claim',
   },
   {
     id: '4',
@@ -34,6 +37,7 @@ export const mockRedemptions: Redemption[] = [
     network: 'Solana',
     withdrawAmount: 10.0,
     value: '0.004',
+    status: 'Ready to claim',
   },
   {
     id: '5',
@@ -41,6 +45,7 @@ export const mockRedemptions: Redemption[] = [
     network: 'Solana',
     withdrawAmount: 10.0,
     value: '0.005',
+    status: 'Ready to claim',
   },
   {
     id: '6',
@@ -48,6 +53,7 @@ export const mockRedemptions: Redemption[] = [
     network: 'Solana',
     withdrawAmount: 10.0,
     value: '0.006',
+    status: 'Ready to claim',
   },
 ];
 

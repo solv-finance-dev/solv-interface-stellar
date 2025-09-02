@@ -2,13 +2,25 @@
 
 import { ClaimIcon } from '@/assets/svg/svg';
 import { DataTableComplex } from '@/components/DataTableComplex';
+import H5AssetsCard, {
+  AssetsDataItem,
+  AssetsSkeletonCard,
+  NoDataDom,
+} from '@/components/DataTableComplex/H5AssetsCard';
+import TablePagination from '@/components/DataTableComplex/TablePagination';
 import { TokenIcon } from '@/components/TokenIcon';
 import { TooltipComplex } from '@/components/TooltipComplex';
 import { useDialog } from '@/hooks/useDialog';
 import { useLoadingDialog } from '@/hooks/useLoadingDialog';
 import { useSuccessfulDialog } from '@/hooks/useSuccessfulDialog';
+import { getCurItem } from '@/lib/utils';
 import { Button } from '@solvprotocol/ui-v2';
-import { ColumnDef } from '@tanstack/react-table';
+import {
+  ColumnDef,
+  getCoreRowModel,
+  getPaginationRowModel,
+  useReactTable,
+} from '@tanstack/react-table';
 
 export interface Redemption {
   id: string;
@@ -17,6 +29,7 @@ export interface Redemption {
   withdrawAmount: number | string;
   value: number | string;
   action?: string;
+  status?: string;
 }
 
 interface RedemptionTableProps {
@@ -89,18 +102,39 @@ export function RedemptionTable({ data }: RedemptionTableProps) {
       cell: ({ row }) => {
         return (
           <div className=''>
-            <div className='max-w-[calc(90%-1rem)] truncate font-MatterSQ-Medium text-[1rem] leading-[1.125rem]'>
+            <div className='w-full truncate font-MatterSQ-Medium text-[1rem] leading-[1.125rem] md:max-w-[calc(90%-1rem)]'>
               {row.getValue('pool')}
             </div>
 
-            <div className='mt-1 font-MatterSQ-Regular text-[.875rem] leading-4'>
+            <div className='mt-1 hidden font-MatterSQ-Regular text-[.875rem] leading-4 md:flex'>
               {/* <span className='text-yellow-500'>Pending</span> */}
-              <span className='text-green-500'>Ready to claim</span>
+              <span className='text-green-500'> {row.original.status}</span>
             </div>
           </div>
         );
       },
     },
+    {
+      accessorKey: 'status',
+      header: 'Status',
+      enableSorting: false,
+      meta: {
+        align: 'left',
+      },
+      cell: ({ row }) => {
+        return (
+          <div className='mt-1 font-MatterSQ-Regular text-[.875rem] leading-4'>
+            {row.original.status == 'Pending' && (
+              <span className='text-yellow-500'>Pending</span>
+            )}
+            {row.original.status == 'Ready to claim' && (
+              <span className='text-green-500'>Ready to claim</span>
+            )}
+          </div>
+        );
+      },
+    },
+
     {
       accessorKey: 'network',
       header: 'Network',
@@ -152,9 +186,9 @@ export function RedemptionTable({ data }: RedemptionTableProps) {
         }).format(value);
 
         return (
-          <div className='flex flex-col items-end text-[.875rem] leading-4'>
+          <div className='flex flex-row items-end text-[.875rem] leading-4 md:flex-col'>
             <span>{formatted} SolvBTC</span>
-            <span className='mt-1 text-gray-400'>{`$1007.27`}</span>
+            <span className='ml-1 mt-0 text-[10px] text-gray-400 md:ml-0 md:mt-1 md:text-[.875rem]'>{`$1007.27`}</span>
           </div>
         );
       },
@@ -167,13 +201,12 @@ export function RedemptionTable({ data }: RedemptionTableProps) {
         align: 'right',
       },
       cell: ({ row }) => {
-        // console.log('row', row);
         return (
           <div className='flex flex-col items-end'>
             <Button
               variant='default'
               size='sm'
-              className='w-[6.4375rem] rounded-full bg-brand hover:bg-brand-600'
+              className='w-full rounded-full bg-brand hover:bg-brand-600 md:w-[6.4375rem]'
               onClick={showClaimDialog}
             >
               <ClaimIcon className='h-4 w-4' /> Claim
@@ -187,15 +220,91 @@ export function RedemptionTable({ data }: RedemptionTableProps) {
       },
     },
   ];
+
+  const tableH5 = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    initialState: {
+      pagination: {
+        pageSize: 6,
+      },
+    },
+  });
+
+  const filterColumns = [...columns].filter(
+    item => item?.accessorKey !== 'status'
+  );
+
+  console.log('filterColumns', filterColumns);
+  console.log('columns', columns);
+
   return (
     <>
-      <DataTableComplex
-        showSkeleton={false}
-        columns={columns}
-        // data={[]}
-        data={data}
-        gridTemplateColumns='2fr 1fr 1fr 1.5fr 1fr'
-      />
+      <div className='hidden md:block'>
+        <DataTableComplex
+          showSkeleton={false}
+          columns={filterColumns}
+          // data={[]}
+          data={data}
+          gridTemplateColumns='2fr 1fr 1fr 1.5fr 1fr'
+        />
+      </div>
+
+      <div className='block w-full md:hidden'>
+        {/* loadFinished */}
+        {false ? (
+          <AssetsSkeletonCard></AssetsSkeletonCard>
+        ) : (
+          <>
+            {tableH5.getRowModel().rows?.length > 0 ? (
+              <div>
+                {tableH5.getRowModel().rows.map((row, index) => (
+                  <div
+                    key={`H5AssetsCard-${row.id}-${index}`}
+                    onClick={() => {}}
+                  >
+                    <H5AssetsCard
+                      cardTitle={<>{getCurItem(columns, 'pool', row)}</>}
+                      operateBtn={<>{getCurItem(columns, 'action', row)}</>}
+                    >
+                      <AssetsDataItem
+                        keyTitle='Network'
+                        value={<>{getCurItem(columns, 'network', row)}</>}
+                      ></AssetsDataItem>
+
+                      <AssetsDataItem
+                        keyTitle='Status'
+                        value={<>{getCurItem(columns, 'status', row)}</>}
+                      ></AssetsDataItem>
+
+                      <AssetsDataItem
+                        keyTitle='WithdrawAmount'
+                        value={
+                          <>{getCurItem(columns, 'withdrawAmount', row)}</>
+                        }
+                      ></AssetsDataItem>
+
+                      <AssetsDataItem
+                        keyTitle='Value'
+                        value={<>{getCurItem(columns, 'value', row)}</>}
+                      ></AssetsDataItem>
+                    </H5AssetsCard>
+                  </div>
+                ))}
+
+                {/* Pagination */}
+                <div className='flex items-center justify-center'>
+                  <TablePagination table={tableH5} data={data} />
+                </div>
+              </div>
+            ) : (
+              <NoDataDom></NoDataDom>
+            )}
+          </>
+        )}
+      </div>
     </>
   );
 }
