@@ -11,7 +11,6 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
   Select,
   SelectContent,
   SelectGroup,
@@ -44,9 +43,7 @@ import {
 } from '@/lib/token-balance';
 import {
   TOKEN_FEE_RATE_DECIMAL,
-  SolvBTCTokenClient,
 } from '@/contracts/solvBTCTokenContract/src';
-import { getCurrentStellarNetwork } from '@/config/stellar';
 
 // Using shared utils for sanitization/formatting and calculations
 
@@ -369,11 +366,15 @@ export default function Deposit() {
     // Must have a selected token
     const hasSelected = !!selected;
 
+    // Amount must be greater than 0
+    const positiveAmount = parseFloat(depositValue || receiveValue || '0') > 0;
+
     return (
       hasValues &&
       isWalletConnected &&
       hasNoErrors &&
       notSubmitting &&
+      positiveAmount &&
       hasSelected
     );
   };
@@ -572,16 +573,14 @@ export default function Deposit() {
             render={({ field }) => (
               <FormItem className='w-full gap-[10px] md:w-[45.4%]'>
                 <FormLabel className='flex items-end justify-between text-[.75rem] leading-[1rem]'>
-                  <span>Deposit</span>
+                  <span className='text-textColor'>You Will Deposit</span>
                   <div className='flex items-center gap-2 text-[.875rem]'>
                     <span className='text-grayColor'>Balance:</span>
-                    <div className='text-textColor'>
+                    <div className='text-grayColor'>
                       {isLoadingBalance ? (
                         <span className='animate-pulse'>Loading...</span>
                       ) : (
-                        <span
-                          className={tokenBalance.error ? 'text-red-500' : ''}
-                        >
+                        <span>
                           {formatTokenBalance(
                             tokenBalance.balance,
                             tokenBalance.decimals
@@ -598,7 +597,7 @@ export default function Deposit() {
                       title='Refresh balance'
                     >
                       <RotateCcw
-                        className={`h-3 w-3 ${isLoadingBalance ? 'animate-spin' : ''}`}
+                        className={`h-3 w-3 text-grayColor ${isLoadingBalance ? 'animate-spin' : ''}`}
                       />
                     </button>
                   </div>
@@ -608,6 +607,12 @@ export default function Deposit() {
                   <FormControl>
                     <InputComplex
                       className='h-[2.75rem]'
+                      error={
+                        !!isConnected &&
+                        !!field.value &&
+                        parseFloat(field.value || '0') >
+                        parseFloat(tokenBalance.balance || '0')
+                      }
                       inputValue={field.value}
                       onInputChange={value => {
                         const sanitized = sanitizeAmountInput(
@@ -677,8 +682,6 @@ export default function Deposit() {
                     />
                   </FormControl>
                 </div>
-
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -694,7 +697,7 @@ export default function Deposit() {
               <FormItem className='w-full gap-[10px] md:w-[45.4%]'>
                 <FormLabel className='flex items-center justify-between text-[.75rem] leading-[1rem]'>
                   <div className='flex items-center !gap-1'>
-                    You Will Receive
+                    <span className='text-textColor'>You Will Receive</span>
                     <TooltipComplex content={'tips'}></TooltipComplex>
                   </div>
                   <div className='flex items-center gap-2 text-[.875rem]'>
@@ -717,6 +720,12 @@ export default function Deposit() {
                 <FormControl>
                   <InputComplex
                     className='h-[2.75rem]'
+                    error={
+                      !!isConnected &&
+                      !!form.getValues('deposit') &&
+                      parseFloat(form.getValues('deposit') || '0') >
+                      parseFloat(tokenBalance.balance || '0')
+                    }
                     inputValue={field.value}
                     onInputChange={value => {
                       const receiveDecimals =
@@ -751,8 +760,6 @@ export default function Deposit() {
                     }
                   />
                 </FormControl>
-
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -769,6 +776,11 @@ export default function Deposit() {
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
                 Processing...
               </>
+            ) : !!isConnected &&
+              !!form.getValues('deposit') &&
+              parseFloat(form.getValues('deposit') || '0') >
+              parseFloat(tokenBalance.balance || '0') ? (
+              'Insufficient balance'
             ) : (
               'Deposit'
             )}

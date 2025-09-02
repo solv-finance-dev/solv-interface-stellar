@@ -11,7 +11,6 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
   toast,
 } from '@solvprotocol/ui-v2';
 import { ArrowRight, RotateCcw, Loader2 } from 'lucide-react';
@@ -239,7 +238,7 @@ export default function Withdraw() {
           // Save to a local variable used in UI label
           // We keep it in closure via state
         }
-      } catch {}
+      } catch { }
     };
     loadShareDecimals();
   }, [solvBTCClient]);
@@ -339,7 +338,14 @@ export default function Withdraw() {
     const formErrors = form.formState.errors;
     const hasNoErrors = !formErrors.deposit && !formErrors.receive;
     const notSubmitting = !isSubmitting;
-    return hasValues && isWalletConnected && hasNoErrors && notSubmitting;
+    const positiveAmount = parseFloat(depositValue || receiveValue || '0') > 0;
+    return (
+      hasValues &&
+      isWalletConnected &&
+      hasNoErrors &&
+      notSubmitting &&
+      positiveAmount
+    );
   };
 
   async function onSubmit(data: z.infer<ReturnType<typeof createFormSchema>>) {
@@ -441,7 +447,7 @@ export default function Withdraw() {
         ) {
           txHash = (signedTx as { id: string }).id;
         }
-      } catch {}
+      } catch { }
 
       toast(
         <TxResult
@@ -512,7 +518,7 @@ export default function Withdraw() {
                       title='Refresh balance'
                     >
                       <RotateCcw
-                        className={`h-3 w-3 ${isLoadingBalance ? 'animate-spin' : ''}`}
+                        className={`h-3 w-3 text-grayColor ${isLoadingBalance ? 'animate-spin' : ''}`}
                       />
                     </button>
                   </div>
@@ -522,12 +528,18 @@ export default function Withdraw() {
                   <FormControl>
                     <InputComplex
                       className='h-[2.75rem]'
+                      error={
+                        !!isConnected &&
+                        !!field.value &&
+                        parseFloat(field.value || '0') >
+                        parseFloat(shareBalance.balance || '0')
+                      }
                       inputValue={field.value}
                       onInputChange={value => {
                         const sanitized = sanitizeAmountInput(
                           value,
                           supportedTokens[0]?.decimals ??
-                            TOKEN_DECIMALS_FALLBACK
+                          TOKEN_DECIMALS_FALLBACK
                         );
                         field.onChange(sanitized);
                         calculateReceiveAmount(sanitized);
@@ -564,8 +576,6 @@ export default function Withdraw() {
                     />
                   </FormControl>
                 </div>
-
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -581,7 +591,7 @@ export default function Withdraw() {
               <FormItem className='w-full gap-[10px] md:w-[45.4%]'>
                 <FormLabel className='flex items-center justify-between text-[.75rem] leading-[1rem]'>
                   <div className='flex items-center !gap-1'>
-                    You Will Receive
+                    <span className='text-textColor'>You Will Receive</span>
                   </div>
                   <div className='flex items-center gap-2 text-[.875rem]'>
                     <span className='text-grayColor'>Fee Rate:</span>
@@ -603,6 +613,12 @@ export default function Withdraw() {
                 <FormControl>
                   <InputComplex
                     className='h-[2.75rem]'
+                    error={
+                      !!isConnected &&
+                      !!form.getValues('deposit') &&
+                      parseFloat(form.getValues('deposit') || '0') >
+                      parseFloat(shareBalance.balance || '0')
+                    }
                     inputValue={field.value}
                     onInputChange={value => {
                       const sanitized = sanitizeAmountInput(
@@ -631,8 +647,6 @@ export default function Withdraw() {
                     }
                   />
                 </FormControl>
-
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -649,6 +663,11 @@ export default function Withdraw() {
                 <Loader2 className='mr-2 h-4 w-4 animate-spin' />
                 Processing...
               </>
+            ) : !!isConnected &&
+              !!form.getValues('deposit') &&
+              parseFloat(form.getValues('deposit') || '0') >
+              parseFloat(shareBalance.balance || '0') ? (
+              'Insufficient balance'
             ) : (
               'Withdraw'
             )}
