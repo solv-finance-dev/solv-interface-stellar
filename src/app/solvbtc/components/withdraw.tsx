@@ -40,6 +40,9 @@ import { updateAllClientsSignTransaction } from '@/states/contract-store';
 import { Client as ContractClient } from '@stellar/stellar-sdk/contract';
 import { getCurrentStellarNetwork } from '@/config/stellar';
 import { Buffer } from 'buffer';
+import { useLoadingDialog } from '@/hooks/useLoadingDialog';
+import { useSuccessfulDialog } from '@/hooks/useSuccessfulDialog';
+import { buildExplorerTxUrl, getTxHashFromSent } from '@/lib/stellar-tx';
 
 const createFormSchema = (params: {
   depositDecimals: number;
@@ -114,6 +117,8 @@ export default function Withdraw() {
   const supportedTokens: any[] = [];
   const solvBTCClient = useSolvBTCVaultClient();
   const { isConnected, connectedWallet } = useWalletStore();
+  const { openLoadingDialog, closeLoadingDialog } = useLoadingDialog();
+  const { openSuccessfulDialog } = useSuccessfulDialog();
 
   // SolvBTC balance (withdrawable shares)
   const [shareBalance, setShareBalance] = useState<TokenBalanceResult>({
@@ -238,7 +243,7 @@ export default function Withdraw() {
           // Save to a local variable used in UI label
           // We keep it in closure via state
         }
-      } catch { }
+      } catch {}
     };
     loadShareDecimals();
   }, [solvBTCClient]);
@@ -434,35 +439,35 @@ export default function Withdraw() {
         shares: sharesBigInt,
         request_hash,
       });
+
+      // 打开 Loading 弹窗
+      openLoadingDialog({
+        title: 'Withdraw',
+        description: `Submitting withdraw request: ${withdrawAmount} SolvBTC...`,
+        showCloseButton: false,
+      });
+
       const signedTx = await tx.signAndSend();
 
-      let txHash: string | undefined;
-      try {
-        if (typeof signedTx === 'object' && signedTx && 'hash' in signedTx) {
-          txHash = (signedTx as { hash: string }).hash;
-        } else if (
-          typeof signedTx === 'object' &&
-          signedTx &&
-          'id' in signedTx
-        ) {
-          txHash = (signedTx as { id: string }).id;
-        }
-      } catch { }
+      const txHash = getTxHashFromSent(signedTx);
+      closeLoadingDialog();
 
-      toast(
-        <TxResult
-          type='success'
-          title='Transaction Successful!'
-          message={`Withdraw request submitted: ${withdrawAmount} SolvBTC`}
-          txHash={txHash}
-        />
-      );
+      const scanUrl = buildExplorerTxUrl(txHash);
+      openSuccessfulDialog({
+        title: 'Withdraw',
+        description: `Withdraw request submitted: ${withdrawAmount} SolvBTC`,
+        confirmText: 'OK',
+        showConfirm: true,
+        showCancel: false,
+        scanUrl,
+      });
 
       form.reset();
       if (isConnected && connectedWallet?.publicKey) {
         fetchShareBalance();
       }
     } catch (error) {
+      closeLoadingDialog();
       toast(
         <TxResult
           type='error'
@@ -532,14 +537,14 @@ export default function Withdraw() {
                         !!isConnected &&
                         !!field.value &&
                         parseFloat(field.value || '0') >
-                        parseFloat(shareBalance.balance || '0')
+                          parseFloat(shareBalance.balance || '0')
                       }
                       inputValue={field.value}
                       onInputChange={value => {
                         const sanitized = sanitizeAmountInput(
                           value,
                           supportedTokens[0]?.decimals ??
-                          TOKEN_DECIMALS_FALLBACK
+                            TOKEN_DECIMALS_FALLBACK
                         );
                         field.onChange(sanitized);
                         calculateReceiveAmount(sanitized);
@@ -617,7 +622,7 @@ export default function Withdraw() {
                       !!isConnected &&
                       !!form.getValues('deposit') &&
                       parseFloat(form.getValues('deposit') || '0') >
-                      parseFloat(shareBalance.balance || '0')
+                        parseFloat(shareBalance.balance || '0')
                     }
                     inputValue={field.value}
                     onInputChange={value => {
@@ -666,7 +671,7 @@ export default function Withdraw() {
             ) : !!isConnected &&
               !!form.getValues('deposit') &&
               parseFloat(form.getValues('deposit') || '0') >
-              parseFloat(shareBalance.balance || '0') ? (
+                parseFloat(shareBalance.balance || '0') ? (
               'Insufficient balance'
             ) : (
               'Withdraw'

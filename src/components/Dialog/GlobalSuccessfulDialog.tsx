@@ -39,7 +39,6 @@ export function GlobalSuccessfulDialog() {
     loading = false,
     size = 'md',
     showCloseButton = true,
-    chainId,
     scanUrl,
   } = options;
 
@@ -144,19 +143,16 @@ export function GlobalSuccessfulDialog() {
           )}
         </DialogFooter>
 
-        <a
-          className='flex cursor-pointer items-center justify-center px-5 text-[.8125rem] font-[500] text-brand hover:underline'
-          href={scanUrl || ''}
-          target='_blank'
-          rel='noreferrer'
-        >
-          {chainId && scanUrl && (
-            <>
-              <span>View on</span>&nbsp; {`CHAIN_SCAN_NAME(预留)`}
-              {/* {CHAIN_SCAN_NAME[chainId]} */}
-            </>
-          )}
-        </a>
+        {scanUrl && (
+          <a
+            className='flex cursor-pointer items-center justify-center px-5 text-[.8125rem] font-[500] text-brand hover:underline'
+            href={scanUrl || ''}
+            target='_blank'
+            rel='noreferrer'
+          >
+            <span>View on explorer</span>
+          </a>
+        )}
       </DialogContent>
     </Dialog>
   );

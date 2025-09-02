@@ -41,9 +41,10 @@ import {
   formatTokenBalance,
   type TokenBalanceResult,
 } from '@/lib/token-balance';
-import {
-  TOKEN_FEE_RATE_DECIMAL,
-} from '@/contracts/solvBTCTokenContract/src';
+import { TOKEN_FEE_RATE_DECIMAL } from '@/contracts/solvBTCTokenContract/src';
+import { buildExplorerTxUrl, getTxHashFromSent } from '@/lib/stellar-tx';
+import { useLoadingDialog } from '@/hooks/useLoadingDialog';
+import { useSuccessfulDialog } from '@/hooks/useSuccessfulDialog';
 
 // Using shared utils for sanitization/formatting and calculations
 
@@ -60,6 +61,8 @@ export default function Deposit() {
   const vaultEntry = useContractStore(state =>
     state.vaults.get('solvBTCVault')
   );
+  const { openLoadingDialog, closeLoadingDialog } = useLoadingDialog();
+  const { openSuccessfulDialog } = useSuccessfulDialog();
 
   // Token balance state
   const [tokenBalance, setTokenBalance] = useState<TokenBalanceResult>({
@@ -493,34 +496,30 @@ export default function Deposit() {
         amount: depositAmountBigInt,
       });
 
+      // 打开 Loading 弹窗
+      openLoadingDialog({
+        title: 'Deposit',
+        description: `Depositing ${depositAmount} ${selected?.name}...`,
+        showCloseButton: false,
+      });
+
       // 直接调用 signAndSend，签名器已经在钱包连接时配置好了
       const signedTx = await depositTx.signAndSend();
 
-      // Extract transaction hash if available (safely handle different response structures)
-      let txHash: string | undefined;
-      try {
-        // Try to extract transaction hash from the response
-        if (typeof signedTx === 'object' && signedTx && 'hash' in signedTx) {
-          txHash = (signedTx as { hash: string }).hash;
-        } else if (
-          typeof signedTx === 'object' &&
-          signedTx &&
-          'id' in signedTx
-        ) {
-          txHash = (signedTx as { id: string }).id;
-        }
-      } catch (e) {
-        console.warn('Could not extract transaction hash:', e);
-      }
+      // Extract transaction hash from SentTransaction
+      const txHash = getTxHashFromSent(signedTx);
+      closeLoadingDialog();
 
-      toast(
-        <TxResult
-          type='success'
-          title='Transaction Successful!'
-          message={`Successfully deposited ${depositAmount} ${selected.name}`}
-          txHash={txHash}
-        />
-      );
+      // 成功弹窗
+      const scanUrl = buildExplorerTxUrl(txHash);
+      openSuccessfulDialog({
+        title: 'Deposit',
+        description: `Successfully deposited ${depositAmount} ${selected.name}.`,
+        confirmText: 'OK',
+        showConfirm: true,
+        showCancel: false,
+        scanUrl,
+      });
 
       // Reset form after successful submission
       form.reset();
@@ -530,6 +529,8 @@ export default function Deposit() {
         fetchTokenBalance();
       }
     } catch (error) {
+      // 关闭 Loading 弹窗
+      closeLoadingDialog();
       console.error('Deposit transaction failed:', error);
 
       let errorTitle = 'Transaction Failed';
@@ -611,7 +612,7 @@ export default function Deposit() {
                         !!isConnected &&
                         !!field.value &&
                         parseFloat(field.value || '0') >
-                        parseFloat(tokenBalance.balance || '0')
+                          parseFloat(tokenBalance.balance || '0')
                       }
                       inputValue={field.value}
                       onInputChange={value => {
@@ -724,7 +725,7 @@ export default function Deposit() {
                       !!isConnected &&
                       !!form.getValues('deposit') &&
                       parseFloat(form.getValues('deposit') || '0') >
-                      parseFloat(tokenBalance.balance || '0')
+                        parseFloat(tokenBalance.balance || '0')
                     }
                     inputValue={field.value}
                     onInputChange={value => {
@@ -779,7 +780,7 @@ export default function Deposit() {
             ) : !!isConnected &&
               !!form.getValues('deposit') &&
               parseFloat(form.getValues('deposit') || '0') >
-              parseFloat(tokenBalance.balance || '0') ? (
+                parseFloat(tokenBalance.balance || '0') ? (
               'Insufficient balance'
             ) : (
               'Deposit'
