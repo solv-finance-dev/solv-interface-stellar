@@ -12,17 +12,10 @@ import {
   Row,
 } from '@tanstack/react-table';
 
-import {
-  ChevronDown,
-  ChevronUp,
-  ChevronsUpDown,
-  ChevronLeft,
-  ChevronRight,
-} from 'lucide-react';
+import { ChevronDown, ChevronUp, ChevronsUpDown } from 'lucide-react';
 
 import cn from 'classnames';
 import {
-  Button,
   Skeleton,
   Table,
   TableBody,

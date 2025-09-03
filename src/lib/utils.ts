@@ -637,10 +637,6 @@ export function getCurItem(list: any[], keyTitle: string, row: any) {
     return item.accessorKey === keyTitle;
   })[0];
 
-  if (keyTitle == 'status') {
-    console.log('status cell', itemObj);
-  }
-
   if (itemObj?.cell?.({ row })) {
     return itemObj?.cell?.({ row });
   } else {

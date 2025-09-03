@@ -1,9 +1,15 @@
 import { Button } from '@solvprotocol/ui-v2';
-import { table } from 'console';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+import { ChevronLeft } from 'lucide-react';
 import React from 'react';
 
-export default function TablePagination({ table, data }) {
+export default function TablePagination({
+  table,
+  data,
+}: {
+  table: any;
+  data: any[];
+}) {
   // Generate page number button array
   const getPageNumbers = () => {
     const currentPage = table.getState().pagination.pageIndex + 1;
