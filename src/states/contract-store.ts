@@ -138,7 +138,7 @@ export const useContractStore = create<ContractStore>()(
                       ]);
                       tokenName = nameTx.result || address;
                       decimal = Number(decimalsTx.result) || 0;
-                    } catch { }
+                    } catch {}
 
                     supportedTokenClients.set(address, {
                       name: tokenName,
@@ -175,7 +175,7 @@ export const useContractStore = create<ContractStore>()(
                     ]);
                     name = symbolTx.result || sharesTokenId;
                     decimal = Number(decimalsTx.result) || 0;
-                  } catch { }
+                  } catch {}
                   shareTokenClient = {
                     name,
                     id: sharesTokenId,
@@ -422,9 +422,9 @@ export interface ContractClientConfig {
 export type ContractClientConstructor = new (
   config: ContractClientConfig
 ) => ContractClient;
-export const setContractClient = (_name: string, _client: ContractClient) => { };
+export const setContractClient = (_name: string, _client: ContractClient) => {};
 export const registerContractClientType = (
   _clientName: string,
   _constructor: ContractClientConstructor,
   _defaultConfig?: Partial<ContractClientConfig>
-) => { };
+) => {};

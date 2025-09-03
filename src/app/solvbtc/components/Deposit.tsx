@@ -249,7 +249,9 @@ export default function Deposit() {
       }
     } catch (error) {
       setAllowance(BigInt(0));
-      setAllowanceError(error instanceof Error ? error.message : 'Unknown error');
+      setAllowanceError(
+        error instanceof Error ? error.message : 'Unknown error'
+      );
     } finally {
       setIsLoadingAllowance(false);
     }
@@ -421,7 +423,9 @@ export default function Deposit() {
     if (anyClient?.options?.signTransaction) return;
     const { walletAdapter } = useWalletStore.getState();
     if (!walletAdapter || !connectedWallet) {
-      throw new Error('Wallet not properly connected - no signTransaction available');
+      throw new Error(
+        'Wallet not properly connected - no signTransaction available'
+      );
     }
     anyClient.options = anyClient.options || {};
     anyClient.options.signTransaction = async (txXdr: string) => {
@@ -430,7 +434,10 @@ export default function Deposit() {
         txXdr,
         getCurrentStellarNetwork()
       );
-      const inner = parsed instanceof sdk.FeeBumpTransaction ? parsed.innerTransaction : parsed;
+      const inner =
+        parsed instanceof sdk.FeeBumpTransaction
+          ? parsed.innerTransaction
+          : parsed;
       const signedTxXdr = await walletAdapter.signTransaction(inner, {
         networkPassphrase: getCurrentStellarNetwork(),
         accountToSign: connectedWallet.publicKey,
@@ -778,7 +785,7 @@ export default function Deposit() {
                         !!isConnected &&
                         !!field.value &&
                         parseFloat(field.value || '0') >
-                        parseFloat(tokenBalance.balance || '0')
+                          parseFloat(tokenBalance.balance || '0')
                       }
                       inputValue={field.value}
                       onInputChange={value => {
@@ -891,7 +898,7 @@ export default function Deposit() {
                       !!isConnected &&
                       !!form.getValues('deposit') &&
                       parseFloat(form.getValues('deposit') || '0') >
-                      parseFloat(tokenBalance.balance || '0')
+                        parseFloat(tokenBalance.balance || '0')
                     }
                     inputValue={field.value}
                     onInputChange={value => {
@@ -946,7 +953,7 @@ export default function Deposit() {
             ) : !!isConnected &&
               !!form.getValues('deposit') &&
               parseFloat(form.getValues('deposit') || '0') >
-              parseFloat(tokenBalance.balance || '0') ? (
+                parseFloat(tokenBalance.balance || '0') ? (
               'Insufficient balance'
             ) : requiresApproval() ? (
               'Approve'
