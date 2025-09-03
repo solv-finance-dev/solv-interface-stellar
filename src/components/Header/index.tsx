@@ -12,10 +12,10 @@ import AppLogoDark from '@/assets/images/app-logo-dark.svg';
 import solvLogoDark from '@/assets/images/solv-logo-dark.svg';
 import solvLogoLight from '@/assets/images/solv-logo-light.svg';
 
-import MeunPc from './components/MeunPc';
-import useMeunStore from '@/states/meun';
-import MeunH5 from './components/MeunH5';
+import MeunPc from './components/MenuPc';
 import { useLockBodyScroll } from '@/hooks/useLockBodyScroll';
+import { useMenuStore } from '@/states/menu';
+import MenuH5 from './components/MenuH5';
 
 export interface MenuItem {
   label: string;
@@ -53,9 +53,9 @@ export const menuList: MenuItem[] = [
 ];
 
 const Header = ({ className }: { className?: string }) => {
-  const { meunH5Open, setMeunH5Open } = useMeunStore();
+  const { menuH5Open, setMenuH5Open } = useMenuStore();
   const { theme, setTheme } = useTheme();
-  useLockBodyScroll(meunH5Open);
+  useLockBodyScroll(menuH5Open);
 
   return (
     <>
@@ -96,9 +96,9 @@ const Header = ({ className }: { className?: string }) => {
 
             <div
               className='cursor-pointer'
-              onClick={() => setMeunH5Open(!meunH5Open)}
+              onClick={() => setMenuH5Open(!menuH5Open)}
             >
-              {meunH5Open ? (
+              {menuH5Open ? (
                 <X className='h-5 w-5' />
               ) : (
                 <AlignJustify className='h-5 w-5' />
@@ -127,7 +127,7 @@ const Header = ({ className }: { className?: string }) => {
         </header>
       </div>
 
-      {meunH5Open && <MeunH5 menuList={menuList} />}
+      {menuH5Open && <MenuH5 menuList={menuList} />}
     </>
   );
 };

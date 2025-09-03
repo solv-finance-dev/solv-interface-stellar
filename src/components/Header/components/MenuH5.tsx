@@ -1,20 +1,20 @@
-import useMeunStore from '@/states/meun';
 import { useTheme } from 'next-themes';
 import { usePathname, useRouter } from 'next/navigation';
 import { MenuItem } from '..';
 import cn from 'classnames';
+import { useMenuStore } from '@/states/menu';
 
-const Nav = ({ menuList }: { menuList: MenuItem[] }) => {
+const MenuH5 = ({ menuList }: { menuList: MenuItem[] }) => {
   const router = useRouter();
 
-  const { setMeunH5Open } = useMeunStore();
+  const { setMenuH5Open } = useMenuStore();
   const { theme } = useTheme();
   const pathname = usePathname();
 
   const handleNavClick = async (href: string) => {
     router.push(href);
     setTimeout(() => {
-      setMeunH5Open(false);
+      setMenuH5Open(false);
     }, 300);
   };
 
@@ -68,4 +68,4 @@ const Nav = ({ menuList }: { menuList: MenuItem[] }) => {
   );
 };
 
-export default Nav;
+export default MenuH5;

@@ -248,9 +248,6 @@ export function RedemptionTable({ data }: RedemptionTableProps) {
     item => item?.accessorKey !== 'status'
   );
 
-  console.log('filterColumns', filterColumns);
-  console.log('columns', columns);
-
   return (
     <>
       <div className='hidden md:block'>
