@@ -229,6 +229,22 @@ export class StellarAPI {
       throw new Error(`Failed to get strict receive paths: ${error}`);
     }
   }
+
+  /**
+   * 获取当前最新的 Ledger 序号
+   */
+  async getLatestLedgerSequence(): Promise<number> {
+    try {
+      const ledgers = await this.server.ledgers().order('desc').limit(1).call();
+      const latest = ledgers.records?.[0];
+      if (!latest) throw new Error('No ledger records returned');
+      const seq = Number(latest.sequence);
+      if (!Number.isFinite(seq)) throw new Error('Invalid ledger sequence');
+      return seq;
+    } catch (error) {
+      throw new Error(`Failed to get latest ledger sequence: ${error}`);
+    }
+  }
 }
 
 // 创建单例实例

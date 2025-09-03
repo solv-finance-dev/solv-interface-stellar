@@ -58,7 +58,7 @@ const DEFAULT_VAULT_CONTRACTS: VaultContractMeta[] = [
   {
     id:
       process.env.NEXT_PUBLIC_VAULT_CONTRACT ||
-      'CC7QI7A5SAWKRUBWVDXGI545WSQI5V3JF25TRMI2JC2H3HOW3QVEUDHU',
+      'CAW4Y6AD3BPHUYTTPE4DZPERC4KTMJM7TTMYM6AJNYAAWJMU2TH2ZCJ2',
     name: 'solvBTCVault',
   },
 ];
@@ -138,7 +138,7 @@ export const useContractStore = create<ContractStore>()(
                       ]);
                       tokenName = nameTx.result || address;
                       decimal = Number(decimalsTx.result) || 0;
-                    } catch {}
+                    } catch { }
 
                     supportedTokenClients.set(address, {
                       name: tokenName,
@@ -175,7 +175,7 @@ export const useContractStore = create<ContractStore>()(
                     ]);
                     name = symbolTx.result || sharesTokenId;
                     decimal = Number(decimalsTx.result) || 0;
-                  } catch {}
+                  } catch { }
                   shareTokenClient = {
                     name,
                     id: sharesTokenId,
@@ -422,9 +422,9 @@ export interface ContractClientConfig {
 export type ContractClientConstructor = new (
   config: ContractClientConfig
 ) => ContractClient;
-export const setContractClient = (_name: string, _client: ContractClient) => {};
+export const setContractClient = (_name: string, _client: ContractClient) => { };
 export const registerContractClientType = (
   _clientName: string,
   _constructor: ContractClientConstructor,
   _defaultConfig?: Partial<ContractClientConfig>
-) => {};
+) => { };

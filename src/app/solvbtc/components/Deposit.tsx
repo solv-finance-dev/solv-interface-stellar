@@ -45,6 +45,9 @@ import { TOKEN_FEE_RATE_DECIMAL } from '@/contracts/solvBTCTokenContract/src';
 import { buildExplorerTxUrl, getTxHashFromSent } from '@/lib/stellar-tx';
 import { useLoadingDialog } from '@/hooks/useLoadingDialog';
 import { useSuccessfulDialog } from '@/hooks/useSuccessfulDialog';
+import { getCurrentStellarNetwork } from '@/config/stellar';
+import { SolvBTCTokenClient } from '@/contracts/solvBTCTokenContract/src';
+import { getStellarAPI } from '@/stellar';
 
 // Using shared utils for sanitization/formatting and calculations
 
@@ -84,6 +87,10 @@ export default function Deposit() {
   );
   const [shareTokenName, setShareTokenName] = useState<string>('SolvBTC');
 
+  // Allowance state
+  const [allowance, setAllowance] = useState<bigint>(BigInt(0));
+  const [isLoadingAllowance, setIsLoadingAllowance] = useState(false);
+  const [allowanceError, setAllowanceError] = useState<string | null>(null);
   // Create form validation schema as a function to access current state
   const createFormSchema = () =>
     createLinkedAmountSchema({
@@ -207,6 +214,64 @@ export default function Deposit() {
     }
   };
 
+  // Parse i128-like value into bigint safely
+  const parseI128ToBigInt = (v: any): bigint => {
+    try {
+      if (typeof v === 'bigint') return v;
+      if (typeof v === 'number') return BigInt(Math.trunc(v));
+      if (typeof v === 'string') return BigInt(v);
+      if (v && typeof v.toString === 'function') return BigInt(v.toString());
+    } catch (_) {
+      // ignore
+    }
+    return BigInt(0);
+  };
+
+  // Fetch allowance for the selected token against the vault
+  const fetchAllowance = async (tokenAddress?: string) => {
+    if (!connectedWallet?.publicKey) return;
+    const currentToken = tokenAddress || selected?.address;
+    if (!currentToken || !vaultEntry) return;
+
+    setIsLoadingAllowance(true);
+    setAllowanceError(null);
+    try {
+      const tokenEntry = vaultEntry.supportedTokenClients.get(currentToken);
+      if (!tokenEntry) throw new Error('Token client not found');
+
+      const allowanceTx = await tokenEntry.client.allowance({
+        owner: connectedWallet.publicKey,
+        spender: vaultEntry.id,
+      });
+      const result = parseI128ToBigInt(allowanceTx.result);
+      if (selected?.address === currentToken) {
+        setAllowance(result);
+      }
+    } catch (error) {
+      setAllowance(BigInt(0));
+      setAllowanceError(error instanceof Error ? error.message : 'Unknown error');
+    } finally {
+      setIsLoadingAllowance(false);
+    }
+  };
+
+  // Determine if current allowance covers the input deposit amount
+  const requiresApproval = (): boolean => {
+    const depositStr = form.getValues('deposit');
+    if (!isConnected || !selected || !depositStr) return false;
+    const amt = parseFloat(depositStr);
+    if (isNaN(amt) || amt <= 0) return false;
+    try {
+      const needed = scaleAmountToBigInt(
+        depositStr,
+        selected?.decimals ?? TOKEN_DECIMALS_FALLBACK
+      );
+      return allowance < needed;
+    } catch {
+      return true;
+    }
+  };
+
   // Function to fetch deposit fee rate
   const fetchDepositFeeRate = async () => {
     if (!solvBTCClient) {
@@ -240,6 +305,7 @@ export default function Deposit() {
   useEffect(() => {
     if (isConnected && connectedWallet?.publicKey) {
       fetchTokenBalance();
+      fetchAllowance();
 
       // 验证钱包连接状态，修复页面刷新后的状态不一致问题
       const validateConnection = async () => {
@@ -261,6 +327,7 @@ export default function Deposit() {
   useEffect(() => {
     if (isConnected && connectedWallet?.publicKey && selected?.address) {
       fetchTokenBalance(selected.address);
+      fetchAllowance(selected.address);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected?.address]);
@@ -345,6 +412,93 @@ export default function Deposit() {
 
   // Add transaction loading state
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Ensure a contract client has a signer attached (for token approve)
+  const ensureClientSigner = async (client: SolvBTCTokenClient) => {
+    const anyClient = client as unknown as {
+      options?: { signTransaction?: any; publicKey?: string };
+    };
+    if (anyClient?.options?.signTransaction) return;
+    const { walletAdapter } = useWalletStore.getState();
+    if (!walletAdapter || !connectedWallet) {
+      throw new Error('Wallet not properly connected - no signTransaction available');
+    }
+    anyClient.options = anyClient.options || {};
+    anyClient.options.signTransaction = async (txXdr: string) => {
+      const sdk = await import('@stellar/stellar-sdk');
+      const parsed = sdk.TransactionBuilder.fromXDR(
+        txXdr,
+        getCurrentStellarNetwork()
+      );
+      const inner = parsed instanceof sdk.FeeBumpTransaction ? parsed.innerTransaction : parsed;
+      const signedTxXdr = await walletAdapter.signTransaction(inner, {
+        networkPassphrase: getCurrentStellarNetwork(),
+        accountToSign: connectedWallet.publicKey,
+      });
+      return { signedTxXdr, signerAddress: connectedWallet.publicKey };
+    };
+    anyClient.options.publicKey = connectedWallet.publicKey;
+  };
+
+  // Approve flow
+  const handleApprove = async () => {
+    if (!selected || !vaultEntry || !connectedWallet?.publicKey) return;
+    try {
+      const tokenEntry = vaultEntry.supportedTokenClients.get(selected.address);
+      if (!tokenEntry) throw new Error('Token client not found');
+
+      const tokenClient = tokenEntry.client;
+
+      await ensureClientSigner(tokenClient);
+
+      const I128_MAX = (BigInt(1) << BigInt(127)) - BigInt(1);
+
+      // compute live_until_ledger based on current network ledger
+      const stellarAPI = getStellarAPI();
+      const currentLedger = await stellarAPI.getLatestLedgerSequence();
+      const liveUntil = currentLedger + 100000;
+
+      const approveTx = await tokenClient.approve({
+        owner: connectedWallet.publicKey,
+        spender: vaultEntry.id,
+        amount: I128_MAX,
+        live_until_ledger: liveUntil,
+      });
+
+      openLoadingDialog({
+        title: 'Approve',
+        description: `Approving ${selected.name} for Vault...`,
+        showCloseButton: false,
+      });
+
+      const signed = await approveTx.signAndSend();
+      const txHash = getTxHashFromSent(signed);
+      closeLoadingDialog();
+
+      const scanUrl = buildExplorerTxUrl(txHash);
+      openSuccessfulDialog({
+        title: 'Approve',
+        description: `Approve successful for ${selected.name}.`,
+        confirmText: 'OK',
+        showConfirm: true,
+        showCancel: false,
+        scanUrl,
+      });
+
+      // Refresh allowance after approval
+      await fetchAllowance(selected.address);
+    } catch (error) {
+      closeLoadingDialog();
+      console.error('Approve transaction failed:', error);
+      toast(
+        <TxResult
+          type='error'
+          title='Approve Failed'
+          message={error instanceof Error ? error.message : 'Please try again.'}
+        />
+      );
+    }
+  };
 
   // Check if form is valid for submission
   const isFormValid = () => {
@@ -442,6 +596,17 @@ export default function Deposit() {
       return;
     }
 
+    // If allowance is not enough, do Approve instead of Deposit
+    if (requiresApproval()) {
+      setIsSubmitting(true);
+      try {
+        await handleApprove();
+      } finally {
+        setIsSubmitting(false);
+      }
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -524,9 +689,10 @@ export default function Deposit() {
       // Reset form after successful submission
       form.reset();
 
-      // Refresh balance after successful deposit
+      // Refresh balance and allowance after successful deposit
       if (isConnected && connectedWallet?.publicKey) {
         fetchTokenBalance();
+        fetchAllowance();
       }
     } catch (error) {
       // 关闭 Loading 弹窗
@@ -612,7 +778,7 @@ export default function Deposit() {
                         !!isConnected &&
                         !!field.value &&
                         parseFloat(field.value || '0') >
-                          parseFloat(tokenBalance.balance || '0')
+                        parseFloat(tokenBalance.balance || '0')
                       }
                       inputValue={field.value}
                       onInputChange={value => {
@@ -725,7 +891,7 @@ export default function Deposit() {
                       !!isConnected &&
                       !!form.getValues('deposit') &&
                       parseFloat(form.getValues('deposit') || '0') >
-                        parseFloat(tokenBalance.balance || '0')
+                      parseFloat(tokenBalance.balance || '0')
                     }
                     inputValue={field.value}
                     onInputChange={value => {
@@ -780,8 +946,10 @@ export default function Deposit() {
             ) : !!isConnected &&
               !!form.getValues('deposit') &&
               parseFloat(form.getValues('deposit') || '0') >
-                parseFloat(tokenBalance.balance || '0') ? (
+              parseFloat(tokenBalance.balance || '0') ? (
               'Insufficient balance'
+            ) : requiresApproval() ? (
+              'Approve'
             ) : (
               'Deposit'
             )}
