@@ -1,46 +1,52 @@
 import { ReactNode } from 'react';
 import { create } from 'zustand';
 
-type LoadingDialogState = {
-  isOpen: boolean;
+type DialogSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+
+interface LoadingDialogOptions {
   title?: string;
   description?: string | ReactNode;
-  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+  size?: DialogSize;
   showCloseButton?: boolean;
   className?: string;
   chainId?: string;
   scanUrl?: string;
-  openLoadingDialog: (options?: {
-    title?: string;
-    description?: string;
-    size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
-    showCloseButton?: boolean;
-    className?: string;
-    chainId?: string;
-    scanUrl?: string;
-  }) => void;
-  closeLoadingDialog: () => void;
-};
+}
 
-export const useLoadingDialogStore = create<LoadingDialogState>(set => ({
-  isOpen: false,
+interface LoadingDialogState extends LoadingDialogOptions {
+  isOpen: boolean;
+  openLoadingDialog: (options?: LoadingDialogOptions) => void;
+  closeLoadingDialog: () => void;
+}
+
+const DEFAULT_OPTIONS: Required<Omit<LoadingDialogOptions, 'description'>> = {
   title: 'Loading',
-  description: 'Please wait, in progress...',
   size: 'md',
   showCloseButton: false,
   className: '',
   chainId: '',
   scanUrl: '',
+};
+
+const DEFAULT_DESCRIPTION = 'Please wait, in progress...';
+
+export const useLoadingDialogStore = create<LoadingDialogState>(set => ({
+  isOpen: false,
+  ...DEFAULT_OPTIONS,
+  description: DEFAULT_DESCRIPTION,
+
   openLoadingDialog: options =>
     set({
       isOpen: true,
-      title: options?.title || 'Loading',
-      description: options?.description || 'Please wait, in progress...',
-      size: options?.size,
-      showCloseButton: options?.showCloseButton,
-      className: options?.className || '',
-      chainId: options?.chainId || '',
-      scanUrl: options?.scanUrl || '',
+      title: options?.title ?? DEFAULT_OPTIONS.title,
+      description: options?.description ?? DEFAULT_DESCRIPTION,
+      size: options?.size ?? DEFAULT_OPTIONS.size,
+      showCloseButton:
+        options?.showCloseButton ?? DEFAULT_OPTIONS.showCloseButton,
+      className: options?.className ?? DEFAULT_OPTIONS.className,
+      chainId: options?.chainId ?? DEFAULT_OPTIONS.chainId,
+      scanUrl: options?.scanUrl ?? DEFAULT_OPTIONS.scanUrl,
     }),
+
   closeLoadingDialog: () => set({ isOpen: false }),
 }));

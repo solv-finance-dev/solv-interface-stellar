@@ -1,10 +1,13 @@
 import { create } from 'zustand';
+import type { ReactNode } from 'react';
 
-type DialogOptions = {
+type DialogSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'full';
+
+interface DialogOptions {
   title?: string;
   description?: string;
-  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'full';
-  content?: React.ReactNode;
+  size?: DialogSize;
+  content?: ReactNode;
   confirmText?: string;
   cancelText?: string;
   onConfirm?: () => void | Promise<void>;
@@ -14,24 +17,51 @@ type DialogOptions = {
   disableConfirm?: boolean;
   loading?: boolean;
   showCloseButton?: boolean;
-};
+}
 
-type DialogStore = {
+interface DialogStore {
   isOpen: boolean;
   options: DialogOptions;
   openDialog: (options: DialogOptions) => void;
   closeDialog: () => void;
   setDialogLoading: (loading: boolean) => void;
   setDialogDisabled: (disabled: boolean) => void;
+  updateDialogOptions: (options: Partial<DialogOptions>) => void;
+}
+
+const DEFAULT_OPTIONS: DialogOptions = {
+  showCancel: false,
+  showConfirm: true,
+  disableConfirm: false,
+  loading: false,
+  showCloseButton: true,
+  size: 'md',
 };
 
 export const useDialogStore = create<DialogStore>(set => ({
   isOpen: false,
-  options: {},
-  openDialog: options => set({ isOpen: true, options }),
+  options: DEFAULT_OPTIONS,
+
+  openDialog: options =>
+    set({
+      isOpen: true,
+      options: { ...DEFAULT_OPTIONS, ...options },
+    }),
+
   closeDialog: () => set({ isOpen: false }),
+
   setDialogLoading: loading =>
-    set(state => ({ options: { ...state.options, loading } })),
+    set(state => ({
+      options: { ...state.options, loading },
+    })),
+
   setDialogDisabled: disableConfirm =>
-    set(state => ({ options: { ...state.options, disableConfirm } })),
+    set(state => ({
+      options: { ...state.options, disableConfirm },
+    })),
+
+  updateDialogOptions: options =>
+    set(state => ({
+      options: { ...state.options, ...options },
+    })),
 }));

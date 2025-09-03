@@ -1,10 +1,13 @@
 import { create } from 'zustand';
+import { ReactNode } from 'react';
 
-type DialogOptions = {
+type DialogSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'full';
+
+interface DialogOptions {
   title?: string;
   description?: string;
-  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'full';
-  content?: React.ReactNode;
+  size?: DialogSize;
+  content?: ReactNode;
   confirmText?: string;
   cancelText?: string;
   onConfirm?: () => void | Promise<void>;
@@ -16,24 +19,44 @@ type DialogOptions = {
   showCloseButton?: boolean;
   chainId?: string;
   scanUrl?: string;
-};
+}
 
-type SuccessfulDialogStore = {
+interface SuccessfulDialogStore {
   isOpen: boolean;
   options: DialogOptions;
   openSuccessfulDialog: (options: DialogOptions) => void;
   closeSuccessfulDialog: () => void;
   setSuccessfulDialogLoading: (loading: boolean) => void;
   setSuccessfulDialogDisabled: (disabled: boolean) => void;
+}
+
+const DEFAULT_OPTIONS: DialogOptions = {
+  showCancel: false,
+  showConfirm: true,
+  disableConfirm: false,
+  loading: false,
+  showCloseButton: true,
 };
 
 export const useSuccessfulDialogStore = create<SuccessfulDialogStore>(set => ({
   isOpen: false,
-  options: {},
-  openSuccessfulDialog: options => set({ isOpen: true, options }),
+  options: DEFAULT_OPTIONS,
+
+  openSuccessfulDialog: options =>
+    set({
+      isOpen: true,
+      options: { ...DEFAULT_OPTIONS, ...options },
+    }),
+
   closeSuccessfulDialog: () => set({ isOpen: false }),
+
   setSuccessfulDialogLoading: loading =>
-    set(state => ({ options: { ...state.options, loading } })),
+    set(state => ({
+      options: { ...state.options, loading },
+    })),
+
   setSuccessfulDialogDisabled: disableConfirm =>
-    set(state => ({ options: { ...state.options, disableConfirm } })),
+    set(state => ({
+      options: { ...state.options, disableConfirm },
+    })),
 }));
