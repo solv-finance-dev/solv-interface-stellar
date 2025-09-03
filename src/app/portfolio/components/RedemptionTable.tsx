@@ -21,6 +21,7 @@ import {
   getPaginationRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import cn from 'classnames';
 
 export interface Redemption {
   id: string;
@@ -107,8 +108,15 @@ export function RedemptionTable({ data }: RedemptionTableProps) {
             </div>
 
             <div className='mt-1 hidden font-MatterSQ-Regular text-[.875rem] leading-4 md:flex'>
-              {/* <span className='text-yellow-500'>Pending</span> */}
-              <span className='text-green-500'> {row.original.status}</span>
+              <span
+                className={cn(
+                  row.original.status == 'Pending'
+                    ? 'text-yellow-500'
+                    : 'text-green-500'
+                )}
+              >
+                {row.original.status}
+              </span>
             </div>
           </div>
         );
@@ -124,12 +132,15 @@ export function RedemptionTable({ data }: RedemptionTableProps) {
       cell: ({ row }) => {
         return (
           <div className='mt-1 font-MatterSQ-Regular text-[.875rem] leading-4'>
-            {row.original.status == 'Pending' && (
-              <span className='text-yellow-500'>Pending</span>
-            )}
-            {row.original.status == 'Ready to claim' && (
-              <span className='text-green-500'>Ready to claim</span>
-            )}
+            <span
+              className={cn(
+                row.original.status == 'Pending'
+                  ? 'text-yellow-500'
+                  : 'text-green-500'
+              )}
+            >
+              {row.original.status}
+            </span>
           </div>
         );
       },
