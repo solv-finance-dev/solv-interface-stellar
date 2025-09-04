@@ -40,6 +40,30 @@
 :root {
   --fontfamily: 'MatterSQ-Regular';
 
+  /* text colors */
+  --solv-text-primary: var(--solv-neutral-900);
+  --solv-text-secondary: var(--solv-neutral-600);
+  --solv-text-tertiary: var(--solv-neutral-400);
+  --solv-text-purple-primary: var(--solv-primary-500);
+  --solv-text-heading: var(--solv-neutral-900);
+  --solv-text-placeholder: var(--solv-neutral-400);
+  --solv-text-disabled: var(--solv-neutral-300);
+  --solv-text-gain: var(--solv-success-500);
+  --solv-text-loss: var(--solv-alert-500);
+
+  /* border colors */
+  --solv-border-default: var(--solv-neutral-300);
+  --solv-border-default-hover: var(--solv-neutral-500);
+  --solv-borders-dividers: var(--solv-neutral-200);
+  --solv-borders-dividers-blank: var(--solv-neutral-000);
+
+  /* background colors */
+  --solv-background-default: var(--solv-neutral-50);
+  --solv-background-color1: var(--solv-neutral-000);
+  --solv-background-color2: var(--solv-neutral-50);
+  --solv-background-color3: var(--solv-neutral-100);
+  --solv-background-color4: var(--solv-neutral-200);
+
   --surfaces: #fafafa;
   --background: #fafafa;
   --solv-border: 0, 0%, 84%;
