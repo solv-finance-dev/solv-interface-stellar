@@ -23,7 +23,7 @@ A modern web interface for interacting with SolvBTC on the Stellar network. This
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/solv-finance-dev/solv-interface-stellar.git
 cd solv-interface-stellar
 ```
 
@@ -41,7 +41,7 @@ Edit `.env.local` with your configuration:
 ```env
 NEXT_PUBLIC_STELLAR_NETWORK=testnet
 NEXT_PUBLIC_STELLAR_RPC_URL=https://soroban-testnet.stellar.org
-NEXT_PUBLIC_VAULT_CONTRACT=CAW4Y6AD3BPHUYTTPE4DZPERC4KTMJM7TTMYM6AJNYAAWJMU2TH2ZCJ2
+NEXT_PUBLIC_VAULT_CONTRACT=xxx
 NEXT_PUBLIC_EXPLORER_TX_URL=https://stellar.expert/explorer/testnet/tx/
 ```
 
