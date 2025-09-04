@@ -81,7 +81,6 @@ const config = {
         },
         textActiveColor: 'hsl(var(--solv-active-text))',
         errorColor: 'hsl(var(--solv-alert-500))',
-
         brand: {
           DEFAULT: '#7667EB', // main
           50: '#D8E0FD',
