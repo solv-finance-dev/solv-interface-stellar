@@ -40,8 +40,8 @@ cp env.example .env.local
 Edit `.env.local` with your configuration:
 ```env
 NEXT_PUBLIC_STELLAR_NETWORK=testnet
-NEXT_PUBLIC_STELLAR_RPC_URL=https://soroban-testnet.stellar.org
-NEXT_PUBLIC_VAULT_CONTRACT=xxx
+NEXT_PUBLIC_STELLAR_RPC_URL= xxx
+NEXT_PUBLIC_VAULT_CONTRACT= xxx
 NEXT_PUBLIC_EXPLORER_TX_URL=https://stellar.expert/explorer/testnet/tx/
 ```
 
