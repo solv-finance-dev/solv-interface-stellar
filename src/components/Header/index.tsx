@@ -113,7 +113,7 @@ const Header = ({ className }: { className?: string }) => {
 
             <div className='flex items-center justify-center'>
               <div
-                className='bg-base-neutral-600/10 border-base-neutral-300 dark:border-base-neutral-800 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-solid md:h-[2.75rem] md:w-[2.75rem] md:p-[.375rem]'
+                className='bg-base-neutral-600/10 border-base-neutral-300 dark:border-base-neutral-800 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-solid backdrop-blur-[5px] md:h-[2.75rem] md:w-[2.75rem] md:p-[.375rem]'
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
               >
                 {theme == 'dark' ? (
