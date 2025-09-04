@@ -29,16 +29,26 @@ export interface Redemption {
   pool: string;
   network: string;
   withdrawAmount: number | string;
-  value: number | string;
-  action?: string;
-  status?: string;
+  valueUsd: number;
+  availableTime?: string;
+  state?: string;
 }
 
 interface RedemptionTableProps {
   data: Redemption[];
+  loading?: boolean;
+  pagination: { pageIndex: number; pageSize: number };
+  onPaginationChange: (updater: any) => void;
+  pageCount: number;
 }
 
-export function RedemptionTable({ data }: RedemptionTableProps) {
+export function RedemptionTable({
+  data,
+  loading = false,
+  pagination,
+  onPaginationChange,
+  pageCount,
+}: RedemptionTableProps) {
   const { openDialog } = useDialog();
   const { openLoadingDialog, closeLoadingDialog } = useLoadingDialog();
   const { openSuccessfulDialog } = useSuccessfulDialog();
@@ -111,12 +121,12 @@ export function RedemptionTable({ data }: RedemptionTableProps) {
             <div className='mt-1 hidden font-MatterSQ-Regular text-[.875rem] leading-4 md:flex'>
               <span
                 className={cn(
-                  row.original.status == 'Pending'
+                  row.original.state == 'pending'
                     ? 'text-yellow-500'
                     : 'text-green-500'
                 )}
               >
-                {row.original.status}
+                {row.original.state}
               </span>
             </div>
           </div>
@@ -124,7 +134,7 @@ export function RedemptionTable({ data }: RedemptionTableProps) {
       },
     },
     {
-      accessorKey: 'status',
+      accessorKey: 'state',
       header: 'Status',
       enableSorting: false,
       meta: {
@@ -135,12 +145,12 @@ export function RedemptionTable({ data }: RedemptionTableProps) {
           <div className='mt-1 font-MatterSQ-Regular text-[.875rem] leading-4'>
             <span
               className={cn(
-                row.original.status == 'Pending'
+                row.original.state == 'pending'
                   ? 'text-yellow-500'
                   : 'text-green-500'
               )}
             >
-              {row.original.status}
+              {row.original.state}
             </span>
           </div>
         );
@@ -184,14 +194,14 @@ export function RedemptionTable({ data }: RedemptionTableProps) {
       },
     },
     {
-      accessorKey: 'value',
+      accessorKey: 'valueUsd',
       header: 'Value',
       enableSorting: true,
       meta: {
         align: 'right',
       },
       cell: ({ row }) => {
-        const value = parseFloat(row.getValue('value'));
+        const value = Number(row.getValue('valueUsd')) || 0;
         const formatted = new Intl.NumberFormat('en-US', {
           style: 'currency',
           currency: 'USD',
@@ -200,7 +210,9 @@ export function RedemptionTable({ data }: RedemptionTableProps) {
         return (
           <div className='flex flex-row items-end text-[.875rem] leading-4 md:flex-col'>
             <span>{formatted} SolvBTC</span>
-            <span className='ml-1 mt-0 text-[10px] text-gray-400 md:ml-0 md:mt-1 md:text-[.875rem]'>{`$1007.27`}</span>
+            <span className='ml-1 mt-0 text-[10px] text-gray-400 md:ml-0 md:mt-1 md:text-[.875rem]'>
+              {formatted}
+            </span>
           </div>
         );
       },
@@ -223,9 +235,10 @@ export function RedemptionTable({ data }: RedemptionTableProps) {
             >
               <ClaimIcon className='h-4 w-4' /> Claim
             </Button>
-            {/* 倒计时 */}
-            {row.id === '2' && (
-              <div className='text-xs text-brand-500'>6d 20h 50m 36s</div>
+            {row.original.availableTime && (
+              <div className='text-xs text-brand-500'>
+                {new Date(row.original.availableTime).toLocaleString()}
+              </div>
             )}
           </div>
         );
@@ -238,32 +251,36 @@ export function RedemptionTable({ data }: RedemptionTableProps) {
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    initialState: {
-      pagination: {
-        pageSize: 6,
-      },
+    manualPagination: true,
+    pageCount,
+    onPaginationChange,
+    state: {
+      pagination,
     },
   });
 
   const filterColumns = [...columns].filter(
-    item => 'accessorKey' in item && item.accessorKey !== 'status'
+    item => 'accessorKey' in item && item.accessorKey !== 'state'
   );
 
   return (
     <>
       <div className='hidden md:block'>
         <DataTableComplex
-          showSkeleton={false}
+          showSkeleton={loading}
           columns={filterColumns}
-          // data={[]}
           data={data}
           gridTemplateColumns='2fr 1fr 1fr 1.5fr 1fr'
+          manualPagination
+          pageCount={pageCount}
+          pagination={pagination}
+          onPaginationChange={onPaginationChange}
         />
       </div>
 
       <div className='block w-full md:hidden'>
         {/* loadFinished */}
-        {false ? (
+        {loading ? (
           <AssetsSkeletonCard></AssetsSkeletonCard>
         ) : (
           <>
@@ -272,7 +289,7 @@ export function RedemptionTable({ data }: RedemptionTableProps) {
                 {tableH5.getRowModel().rows.map((row, index) => (
                   <div
                     key={`H5AssetsCard-${row.id}-${index}`}
-                    onClick={() => {}}
+                    onClick={() => { }}
                   >
                     <H5AssetsCard
                       cardTitle={<>{getCurItem(columns, 'pool', row)}</>}
@@ -285,7 +302,7 @@ export function RedemptionTable({ data }: RedemptionTableProps) {
 
                       <AssetsDataItem
                         keyTitle='Status'
-                        value={<>{getCurItem(columns, 'status', row)}</>}
+                        value={<>{getCurItem(columns, 'state', row)}</>}
                       ></AssetsDataItem>
 
                       <AssetsDataItem
@@ -297,7 +314,7 @@ export function RedemptionTable({ data }: RedemptionTableProps) {
 
                       <AssetsDataItem
                         keyTitle='Value'
-                        value={<>{getCurItem(columns, 'value', row)}</>}
+                        value={<>{getCurItem(columns, 'valueUsd', row)}</>}
                       ></AssetsDataItem>
                     </H5AssetsCard>
                   </div>
