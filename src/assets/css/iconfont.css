@@ -1,0 +1,34 @@
+/* MatterSQ */
+@font-face {
+  font-family: 'MatterSQ-Bold';
+  src: url('../font/MatterSQ/MatterSQ-Bold.ttf');
+}
+
+@font-face {
+  font-family: 'MatterSQ-Light';
+  src: url('../font/MatterSQ/MatterSQ-Light.ttf');
+}
+@font-face {
+  font-family: 'MatterSQ-Medium';
+  src: url('../font/MatterSQ/MatterSQ-Medium.ttf');
+}
+
+@font-face {
+  font-family: 'MatterSQ-Regular';
+  src: url('../font/MatterSQ/MatterSQ-Regular.ttf');
+}
+
+@font-face {
+  font-family: 'MatterSQ-SemiBold';
+  src: url('../font/MatterSQ/MatterSQ-SemiBold.ttf');
+}
+
+@font-face {
+  font-family: 'Faculty-Glyphic';
+  src: url('../font/facultyglyphic/facultyglyphic-regular.otf');
+}
+
+@font-face {
+  font-family: 'Fusion-Pixel';
+  src: url('../font/fusion-pixel/fusion-pixel.ttf');
+}
