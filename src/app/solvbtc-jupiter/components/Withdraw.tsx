@@ -165,7 +165,7 @@ export default function Withdraw() {
         <div className='flex items-end justify-center'>
           <Button
             type='submit'
-            className='w-full rounded-full bg-brand-500 text-white hover:bg-brand-500/90 md:w-[25.625rem]'
+            className='w-full rounded-full bg-brand-500 text-white hover:bg-brand-600 md:w-[25.625rem]'
           >
             Withdraw
           </Button>

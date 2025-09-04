@@ -1,99 +1,70 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Client as ContractClient } from '@stellar/stellar-sdk/contract';
-import { SolvBTCVaultClient } from '@/contracts/solvBTCVaultContract/src';
-import { getCurrentStellarNetwork } from '@/config/stellar';
+import { TransactionBuilder, FeeBumpTransaction } from '@stellar/stellar-sdk';
 
-// 合约客户端配置类型定义
-export interface ContractClientConfig {
-  networkPassphrase: string;
-  rpcUrl: string;
-  contractId: string;
+import { SolvBTCVaultClient } from '@/contracts/solvBTCVaultContract/src';
+import { SolvBTCTokenClient } from '@/contracts/solvBTCTokenContract/src';
+import { getCurrentStellarNetwork } from '@/config/stellar';
+import { useWalletStore } from '@/states/wallet-store';
+import { StellarWalletsKitAdapter, ConnectedWallet } from '@/wallet-connector';
+
+// -------------------------
+// Types & Interfaces
+// -------------------------
+
+export interface VaultToken {
+  name: string;
+  id: string;
+  client: SolvBTCTokenClient;
+  decimal: number;
 }
 
-// 合约客户端构造函数类型
-export type ContractClientConstructor = new (
-  config: ContractClientConfig
-) => ContractClient;
+export interface StoredContract {
+  name: string;
+  id: string;
+  client: SolvBTCVaultClient;
+  supportedTokenClients: Map<string, VaultToken>;
+  shareTokenClient?: VaultToken;
+}
 
-// 合约客户端状态
-export interface ContractState {
-  // 所有合约客户端的Map - key是类名，value是实例
-  clients: Map<string, ContractClient>;
+export interface VaultContractMeta {
+  name: string;
+  id: string;
+}
 
-  // 合约初始化状态Map - key是类名，value是初始化状态
-  initializedClients: Map<string, boolean>;
-
-  // 加载状态
+interface ContractState {
+  vaults: Map<string, StoredContract>;
   isInitializing: boolean;
-
-  // 错误状态
   initError: string | null;
 }
 
-// 合约客户端操作
-export interface ContractActions {
-  // 初始化所有合约客户端
-  initializeContracts: () => Promise<void>;
-
-  // 初始化特定合约客户端 - 通过类名
-  initializeClient: (
-    clientName: string,
-    config?: ContractClientConfig
-  ) => Promise<void>;
-
-  // 通用的获取合约客户端方法
+interface ContractActions {
+  initializeContracts: () => Promise<void>; // compatibility wrapper
+  initializeVaults: (contracts: VaultContractMeta[]) => Promise<void>;
+  getVault: (name: string) => StoredContract | null;
+  // Compatibility API: map legacy client names to vault clients
   getClient: <T extends ContractClient = ContractClient>(
     clientName: string
   ) => T | null;
-
-  // 通用的设置合约客户端方法
-  setClient: (clientName: string, client: ContractClient) => void;
-
-  // 检查合约是否已初始化
-  isClientInitialized: (clientName: string) => boolean;
-
-  // 重置所有合约客户端
   resetContracts: () => void;
-
-  // 重置特定合约客户端
-  resetClient: (clientName: string) => void;
-
-  // 错误处理
   setInitError: (error: string | null) => void;
   clearInitError: () => void;
-
-  // 获取所有客户端名称
-  getClientNames: () => string[];
-
-  // 注册合约客户端类型（用于自动初始化）
-  registerClientType: (
-    clientName: string,
-    constructor: ContractClientConstructor,
-    defaultConfig?: Partial<ContractClientConfig>
-  ) => void;
-
-  // 便利方法 - 向后兼容
-  getSolvBTCVaultClient: () => SolvBTCVaultClient | null;
-  initializeSolvBTCVaultClient: (
-    config?: ContractClientConfig
-  ) => Promise<void>;
 }
 
 type ContractStore = ContractState & ContractActions;
 
-// 注册的合约客户端类型
-const registeredClientTypes: Map<
-  string,
+const DEFAULT_VAULT_CONTRACTS: VaultContractMeta[] = [
   {
-    constructor: ContractClientConstructor;
-    defaultConfig?: Partial<ContractClientConfig>;
-  }
-> = new Map();
+    id:
+      process.env.NEXT_PUBLIC_VAULT_CONTRACT ||
+      'CAW4Y6AD3BPHUYTTPE4DZPERC4KTMJM7TTMYM6AJNYAAWJMU2TH2ZCJ2',
+    name: 'solvBTCVault',
+  },
+];
 
 const initialState: ContractState = {
-  clients: new Map(),
-  initializedClients: new Map(),
+  vaults: new Map(),
   isInitializing: false,
   initError: null,
 };
@@ -103,282 +74,357 @@ export const useContractStore = create<ContractStore>()(
     (set, get) => ({
       ...initialState,
 
+      // Backward compatible entry point
       initializeContracts: async () => {
-        const { setInitError } = get();
+        await get().initializeVaults(DEFAULT_VAULT_CONTRACTS);
+      },
 
+      initializeVaults: async (contracts: VaultContractMeta[]) => {
         try {
           set({ isInitializing: true, initError: null });
 
-          // 初始化所有注册的合约客户端
-          const initPromises = Array.from(registeredClientTypes.keys()).map(
-            clientName => get().initializeClient(clientName)
+          const networkPassphrase = getCurrentStellarNetwork();
+          const rpcUrl = process.env.NEXT_PUBLIC_STELLAR_RPC_URL!;
+          if (!rpcUrl)
+            throw new Error('NEXT_PUBLIC_STELLAR_RPC_URL is missing');
+
+          const vaultEntries = await Promise.all(
+            contracts.map(async meta => {
+              // Create vault client
+              const vaultClient = new SolvBTCVaultClient({
+                contractId: meta.id,
+                networkPassphrase,
+                rpcUrl,
+                allowHttp: true,
+              } as any);
+
+              // Query supported currencies and shares token in parallel
+              const [supportedCurrenciesTx, sharesTokenTx] = await Promise.all([
+                vaultClient.get_supported_currencies(),
+                vaultClient.get_shares_token(),
+              ]);
+
+              const supportedCurrencies = supportedCurrenciesTx.result || [];
+              const sharesTokenId = sharesTokenTx.result || undefined;
+
+              // Build supported token clients
+              const supportedTokenClients = new Map<
+                string,
+                {
+                  name: string;
+                  id: string;
+                  client: SolvBTCTokenClient;
+                  decimal: number;
+                }
+              >();
+
+              await Promise.all(
+                supportedCurrencies.map(async address => {
+                  try {
+                    const tokenClient = new SolvBTCTokenClient({
+                      contractId: address,
+                      networkPassphrase,
+                      rpcUrl,
+                      allowHttp: true,
+                    } as any);
+
+                    // Try to resolve token symbol and decimals
+                    let tokenName = address;
+                    let decimal = 0;
+                    try {
+                      const [nameTx, decimalsTx] = await Promise.all([
+                        tokenClient.symbol(),
+                        tokenClient.decimals(),
+                      ]);
+                      tokenName = nameTx.result || address;
+                      decimal = Number(decimalsTx.result) || 0;
+                    } catch {}
+
+                    supportedTokenClients.set(address, {
+                      name: tokenName,
+                      id: address,
+                      client: tokenClient,
+                      decimal,
+                    });
+                  } catch (e) {
+                    console.warn(
+                      'Failed creating token client for',
+                      address,
+                      e
+                    );
+                  }
+                })
+              );
+
+              // Build share token client (optional)
+              let shareTokenClient: StoredContract['shareTokenClient'];
+              if (sharesTokenId) {
+                try {
+                  const client = new SolvBTCTokenClient({
+                    contractId: sharesTokenId,
+                    networkPassphrase,
+                    rpcUrl,
+                    allowHttp: true,
+                  } as any);
+                  let name = sharesTokenId;
+                  let decimal = 0;
+                  try {
+                    const [symbolTx, decimalsTx] = await Promise.all([
+                      client.symbol(),
+                      client.decimals(),
+                    ]);
+                    name = symbolTx.result || sharesTokenId;
+                    decimal = Number(decimalsTx.result) || 0;
+                  } catch {}
+                  shareTokenClient = {
+                    name,
+                    id: sharesTokenId,
+                    client,
+                    decimal,
+                  };
+                } catch (e) {
+                  console.warn(
+                    'Failed creating share token client for',
+                    sharesTokenId,
+                    e
+                  );
+                }
+              }
+
+              const entry: StoredContract = {
+                name: meta.name,
+                id: meta.id,
+                client: vaultClient,
+                supportedTokenClients,
+                shareTokenClient,
+              };
+              return entry;
+            })
           );
 
-          await Promise.all(initPromises);
-
-          set({ isInitializing: false });
+          // Commit state
+          set(() => {
+            const newVaults = new Map<string, StoredContract>();
+            vaultEntries.forEach(entry => newVaults.set(entry.name, entry));
+            return { vaults: newVaults, isInitializing: false };
+          });
         } catch (error) {
-          const errorMessage =
+          const msg =
             error instanceof Error
               ? error.message
-              : 'Failed to initialize contracts';
-          console.error('❌ Failed to initialize contracts:', errorMessage);
-          setInitError(errorMessage);
-          set({ isInitializing: false });
+              : 'Failed to initialize vaults';
+          console.error('❌ initializeVaults error:', msg);
+          set({ isInitializing: false, initError: msg });
         }
       },
 
-      initializeClient: async (
-        clientName: string,
-        config?: ContractClientConfig
-      ) => {
-        const { setInitError, setClient } = get();
-
-        try {
-          // 获取注册的客户端类型
-          const registeredType = registeredClientTypes.get(clientName);
-          if (!registeredType) {
-            throw new Error(`Client type '${clientName}' is not registered`);
-          }
-
-          // 使用传入的配置或默认配置
-          const clientConfig: ContractClientConfig = {
-            networkPassphrase: getCurrentStellarNetwork(),
-            rpcUrl: process.env.NEXT_PUBLIC_STELLAR_RPC_URL!,
-            contractId: getDefaultContractId(clientName),
-            ...registeredType.defaultConfig,
-            ...config,
-          };
-
-          // 验证必要的配置
-          if (!clientConfig.rpcUrl) {
-            throw new Error(
-              'NEXT_PUBLIC_STELLAR_RPC_URL environment variable is required'
-            );
-          }
-          if (!clientConfig.contractId) {
-            throw new Error(`Contract ID for ${clientName} is required`);
-          }
-
-          // 创建客户端实例
-          const client = new registeredType.constructor(clientConfig);
-
-          // 设置客户端
-          setClient(clientName, client);
-
-          console.log(`✅ ${clientName} initialized successfully:`, {
-            networkPassphrase: clientConfig.networkPassphrase,
-            contractId: clientConfig.contractId,
-            rpcUrl: clientConfig.rpcUrl,
-          });
-        } catch (error) {
-          const errorMessage =
-            error instanceof Error
-              ? error.message
-              : `Failed to initialize ${clientName}`;
-          console.error(`❌ Failed to initialize ${clientName}:`, errorMessage);
-          setInitError(errorMessage);
-
-          // 重置该客户端
-          get().resetClient(clientName);
-          throw error;
-        }
+      getVault: (name: string) => {
+        const { vaults } = get();
+        return vaults.get(name) || null;
       },
 
       getClient: <T extends ContractClient = ContractClient>(
         clientName: string
       ): T | null => {
-        const { clients } = get();
-        return (clients.get(clientName) as T) || null;
-      },
-
-      setClient: (clientName: string, client: ContractClient) => {
-        set(state => {
-          const newClients = new Map(state.clients);
-          const newInitialized = new Map(state.initializedClients);
-
-          newClients.set(clientName, client);
-          newInitialized.set(clientName, true);
-
-          return {
-            clients: newClients,
-            initializedClients: newInitialized,
-            initError: null,
-          };
-        });
-      },
-
-      isClientInitialized: (clientName: string): boolean => {
-        const { initializedClients } = get();
-        return initializedClients.get(clientName) || false;
+        // Currently only SolvBTCVaultClient is supported as a legacy name
+        if (clientName === 'SolvBTCVaultClient') {
+          const entry = get().getVault('solvBTCVault');
+          return (entry?.client as unknown as T) || null;
+        }
+        return null;
       },
 
       resetContracts: () => {
-        set({
-          ...initialState,
-          clients: new Map(),
-          initializedClients: new Map(),
-        });
-        console.log('🔄 All contract clients reset');
+        set({ ...initialState, vaults: new Map() });
+        console.log('🔄 All vault contract clients reset');
       },
 
-      resetClient: (clientName: string) => {
-        set(state => {
-          const newClients = new Map(state.clients);
-          const newInitialized = new Map(state.initializedClients);
-
-          newClients.delete(clientName);
-          newInitialized.set(clientName, false);
-
-          return {
-            clients: newClients,
-            initializedClients: newInitialized,
-          };
-        });
-        console.log(`🔄 ${clientName} client reset`);
-      },
-
-      setInitError: (error: string | null) => {
-        set({ initError: error });
-      },
-
-      clearInitError: () => {
-        set({ initError: null });
-      },
-
-      getClientNames: (): string[] => {
-        const { clients } = get();
-        return Array.from(clients.keys());
-      },
-
-      registerClientType: (
-        clientName: string,
-        constructor: ContractClientConstructor,
-        defaultConfig?: Partial<ContractClientConfig>
-      ) => {
-        registeredClientTypes.set(clientName, { constructor, defaultConfig });
-        console.log(`📝 Registered client type: ${clientName}`);
-      },
-
-      // 便利方法 - 向后兼容
-      getSolvBTCVaultClient: (): SolvBTCVaultClient | null => {
-        return get().getClient<SolvBTCVaultClient>('SolvBTCVaultClient');
-      },
-
-      initializeSolvBTCVaultClient: async (config?: ContractClientConfig) => {
-        return get().initializeClient('SolvBTCVaultClient', config);
-      },
+      setInitError: (error: string | null) => set({ initError: error }),
+      clearInitError: () => set({ initError: null }),
     }),
     {
       name: 'stellar-contract-storage',
       partialize: state => ({
-        // 只持久化初始化状态，不持久化客户端实例
-        initializedClients: Array.from(state.initializedClients.entries()),
+        // persist nothing heavy; only a flag is useful
+        isInitializing: state.isInitializing,
       }),
       onRehydrateStorage: () => state => {
         if (state) {
-          // 重建Map对象
-          state.clients = new Map();
-          state.initializedClients = new Map(state.initializedClients || []);
+          state.vaults = new Map();
         }
       },
     }
   )
 );
 
-// 获取默认的合约 ID
-const getDefaultContractId = (clientName: string): string => {
-  switch (clientName) {
-    case 'SolvBTCVaultClient':
-      return process.env.NEXT_PUBLIC_VAULT_CONTRACT || '';
-    // 后续添加其他合约的环境变量
-    default:
-      return '';
-  }
-};
+// -------------------------
+// Hooks & Utilities (compat)
+// -------------------------
 
-// 注册默认的合约客户端类型
-useContractStore
-  .getState()
-  .registerClientType('SolvBTCVaultClient', SolvBTCVaultClient);
-
-// 通用合约客户端 Hook
 export const useContractClient = <T extends ContractClient = ContractClient>(
   clientName: string
 ): T | null => {
-  const { getClient, isClientInitialized, initializeClient } =
-    useContractStore();
-
-  // 如果还未初始化，自动初始化
-  if (!isClientInitialized(clientName)) {
-    initializeClient(clientName).catch(console.error);
+  // Compatibility: return the solvBTCVault client when asking for SolvBTCVaultClient
+  if (clientName === 'SolvBTCVaultClient') {
+    const entry = useContractStore.getState().getVault('solvBTCVault');
+    return (entry?.client as unknown as T) || null;
   }
-
-  return getClient<T>(clientName);
+  return null;
 };
 
-// 便利 Hook - 向后兼容
 export const useSolvBTCVaultClient = (): SolvBTCVaultClient | null => {
-  return useContractClient<SolvBTCVaultClient>('SolvBTCVaultClient');
+  const entry = useContractStore(state => state.getVault('solvBTCVault'));
+  return entry?.client || null;
 };
 
-// 保持向后兼容的别名
-export const useVaultClient = useSolvBTCVaultClient;
-
-// 工具函数：确保所有合约客户端已初始化
 export const ensureContractInitialized = async (): Promise<void> => {
-  const { isInitializing, initializeContracts } = useContractStore.getState();
-
-  if (!isInitializing) {
-    await initializeContracts();
-  }
+  await useContractStore.getState().initializeContracts();
 };
 
-// 工具函数：确保特定合约客户端已初始化
 export const ensureClientInitialized = async (
-  clientName: string
+  _clientName: string
 ): Promise<void> => {
-  const { isClientInitialized, initializeClient } = useContractStore.getState();
-
-  if (!isClientInitialized(clientName)) {
-    await initializeClient(clientName);
-  }
+  // No-op in the new model; just ensure all vaults are initialized
+  await ensureContractInitialized();
 };
 
-// 获取所有合约客户端的工具函数
+export const initializeContracts = async (): Promise<void> => {
+  await useContractStore.getState().initializeContracts();
+};
+
+export const resetContracts = (): void => {
+  useContractStore.getState().resetContracts();
+};
+
 export const getContractClients = (): Record<string, ContractClient> => {
-  const { clients } = useContractStore.getState();
+  const { vaults } = useContractStore.getState();
   const result: Record<string, ContractClient> = {};
-
-  clients.forEach((client, name) => {
-    result[name] = client;
+  vaults.forEach((entry, name) => {
+    result[name] = entry.client;
   });
-
   return result;
 };
 
-// 获取特定合约客户端的工具函数
 export const getContractClient = <T extends ContractClient = ContractClient>(
   clientName: string
 ): T | null => {
-  return useContractStore.getState().getClient<T>(clientName);
+  // Compatibility mapping
+  if (clientName === 'SolvBTCVaultClient') {
+    const entry = useContractStore.getState().getVault('solvBTCVault');
+    return (entry?.client as unknown as T) || null;
+  }
+  return null;
 };
 
-// 设置合约客户端的工具函数
-export const setContractClient = (
-  clientName: string,
-  client: ContractClient
-): void => {
-  useContractStore.getState().setClient(clientName, client);
+// Batch update signers for all vault clients (token clients stay unsigned)
+export const updateAllClientsSignTransaction = async (
+  walletAdapter: StellarWalletsKitAdapter,
+  connectedWallet: ConnectedWallet
+): Promise<void> => {
+  // Ensure vaults exist
+  if (useContractStore.getState().vaults.size === 0) {
+    try {
+      await useContractStore.getState().initializeContracts();
+    } catch (initError) {
+      console.error('❌ Failed to initialize vaults:', initError);
+      return;
+    }
+  }
+
+  const { vaults } = useContractStore.getState();
+  vaults.forEach((entry, name) => {
+    const client = entry.client as unknown as ContractClient & {
+      options?: { signTransaction?: any; publicKey?: string };
+    };
+    try {
+      if (client?.options) {
+        client.options.signTransaction = async (txXdr: string) => {
+          try {
+            const currentWalletState = useWalletStore.getState();
+            let activeWalletAdapter = walletAdapter;
+            let activeConnectedWallet = connectedWallet;
+            if (
+              !walletAdapter?.isConnected?.() &&
+              currentWalletState.walletAdapter?.isConnected?.()
+            ) {
+              activeWalletAdapter = currentWalletState.walletAdapter!;
+              activeConnectedWallet = currentWalletState.connectedWallet!;
+            }
+            if (!activeWalletAdapter?.isConnected?.()) {
+              const { validateAndFixWalletConnection } = currentWalletState;
+              const reconnected = await validateAndFixWalletConnection();
+              if (reconnected) {
+                const updated = useWalletStore.getState();
+                activeWalletAdapter = updated.walletAdapter!;
+                activeConnectedWallet = updated.connectedWallet!;
+              } else {
+                throw new Error(
+                  'Wallet adapter not connected and auto-reconnect failed.'
+                );
+              }
+            }
+
+            const parsedTx = TransactionBuilder.fromXDR(
+              txXdr,
+              getCurrentStellarNetwork()
+            );
+            const inner =
+              parsedTx instanceof FeeBumpTransaction
+                ? parsedTx.innerTransaction
+                : parsedTx;
+            const signedTxXdr = await activeWalletAdapter.signTransaction(
+              inner,
+              {
+                networkPassphrase: getCurrentStellarNetwork(),
+                accountToSign: activeConnectedWallet.publicKey,
+              }
+            );
+            return {
+              signedTxXdr,
+              signerAddress: activeConnectedWallet.publicKey,
+            };
+          } catch (e) {
+            console.error(`❌ ${name} failed to sign transaction:`, e);
+            throw e;
+          }
+        };
+        client.options.publicKey = connectedWallet.publicKey;
+      }
+    } catch (error) {
+      console.error(`❌ Failed updating signer for ${name}:`, error);
+    }
+  });
 };
 
-// 注册新的合约客户端类型
+export const clearAllClientsSignTransaction = (): void => {
+  const { vaults } = useContractStore.getState();
+  vaults.forEach((entry, name) => {
+    const client = entry.client as unknown as ContractClient & {
+      options?: { signTransaction?: any; publicKey?: string };
+    };
+    try {
+      if (client?.options) {
+        delete client.options.signTransaction;
+        delete client.options.publicKey;
+      }
+    } catch (error) {
+      console.error(`❌ Failed to clear signer for ${name}:`, error);
+    }
+  });
+};
+
+// Compatibility shims (no-ops in the new model)
+export interface ContractClientConfig {
+  networkPassphrase: string;
+  rpcUrl: string;
+  contractId: string;
+}
+export type ContractClientConstructor = new (
+  config: ContractClientConfig
+) => ContractClient;
+export const setContractClient = (_name: string, _client: ContractClient) => {};
 export const registerContractClientType = (
-  clientName: string,
-  constructor: ContractClientConstructor,
-  defaultConfig?: Partial<ContractClientConfig>
-): void => {
-  useContractStore
-    .getState()
-    .registerClientType(clientName, constructor, defaultConfig);
-};
+  _clientName: string,
+  _constructor: ContractClientConstructor,
+  _defaultConfig?: Partial<ContractClientConfig>
+) => {};

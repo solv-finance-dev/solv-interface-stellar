@@ -8,11 +8,16 @@ import {
   WalletInfo,
   StellarWalletsKitAdapter,
 } from '@/wallet-connector';
+// 移除 WalletSignerProxy 导入，不再使用复杂的代理模式
 import { getStellarAPI } from '@/stellar';
 import {
   getCurrentStellarNetwork,
   getCurrentNetworkType,
 } from '@/config/stellar';
+import {
+  updateAllClientsSignTransaction,
+  clearAllClientsSignTransaction,
+} from '@/states/contract-store';
 import { Horizon } from '@stellar/stellar-sdk';
 
 export interface WalletState {
@@ -42,6 +47,7 @@ export interface WalletActions {
   // 钱包连接
   connectWallet: (walletType: WalletType) => Promise<void>;
   disconnectWallet: () => Promise<void>;
+  validateAndFixWalletConnection: () => Promise<boolean>;
 
   // 数据刷新
   refreshAccountInfo: () => Promise<void>;
@@ -104,6 +110,16 @@ export const useWalletStore = create<WalletStore>()(
             walletAdapter: adapter,
           });
 
+          // 批量更新所有 contract client 的签名器
+          try {
+            await updateAllClientsSignTransaction(adapter, connectedWallet);
+          } catch (updateError) {
+            console.warn(
+              'Failed to update clients signTransaction:',
+              updateError
+            );
+          }
+
           // 立即加载账户信息
           await get().refreshAccountInfo();
         } catch (error) {
@@ -125,6 +141,16 @@ export const useWalletStore = create<WalletStore>()(
         } catch (error) {
           console.warn('Error during wallet disconnect:', error);
         } finally {
+          // 清除所有 contract client 的签名器
+          try {
+            clearAllClientsSignTransaction();
+          } catch (clearError) {
+            console.warn(
+              'Failed to clear clients signTransaction:',
+              clearError
+            );
+          }
+
           set({
             isConnected: false,
             isConnecting: false,
@@ -138,6 +164,48 @@ export const useWalletStore = create<WalletStore>()(
             isLoadingBalances: false,
           });
         }
+      },
+
+      // 检测并修复钱包连接状态不一致问题
+      validateAndFixWalletConnection: async () => {
+        const { isConnected, connectedWallet, walletAdapter } = get();
+
+        // 检测状态不一致：全局状态说已连接，但适配器说未连接
+        if (
+          isConnected &&
+          connectedWallet &&
+          walletAdapter &&
+          !walletAdapter.isConnected?.()
+        ) {
+          try {
+            // 尝试重新连接相同的钱包
+            const { connectWallet } = get();
+            await connectWallet(connectedWallet.id as any);
+
+            return true;
+          } catch (reconnectError) {
+            console.error(
+              '❌ Failed to re-establish wallet connection:',
+              reconnectError
+            );
+            // 清除不一致的状态
+            const { disconnectWallet } = get();
+            await disconnectWallet();
+            return false;
+          }
+        }
+
+        // 状态一致，无需处理
+        if (isConnected && connectedWallet && walletAdapter?.isConnected?.()) {
+          return true;
+        }
+
+        // 全局状态说未连接，这是正常的
+        if (!isConnected) {
+          return false;
+        }
+
+        return false;
       },
 
       refreshAccountInfo: async () => {
@@ -192,15 +260,6 @@ export const useWalletStore = create<WalletStore>()(
           const xlmBalance = await stellarAPI.getXLMBalance(
             connectedWallet.publicKey
           );
-
-          const networkType = getCurrentNetworkType();
-          console.log(`💰 Balances loaded for ${networkType}:`, {
-            publicKey: connectedWallet.publicKey,
-            xlmBalance,
-            totalBalances: balances.length,
-            network: stellarAPI.isTestnet() ? 'Testnet' : 'Mainnet',
-            horizonUrl: stellarAPI.getConfig().horizonUrl,
-          });
 
           set({
             balances,

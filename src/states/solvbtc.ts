@@ -3,6 +3,9 @@ import { persist } from 'zustand/middleware';
 
 import { persistConfig } from './config';
 
+// data from https://lab.stellar.org/smart-contracts/contract-explorer
+// read get_supported_currencies from solvbtc contract
+
 interface useSolvBtcStore {
   navOpen: boolean;
   setNavOpen: (navOpen: boolean) => void;

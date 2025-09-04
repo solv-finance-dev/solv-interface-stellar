@@ -65,7 +65,7 @@ export function addressFormat(value: string, digits = 4): string {
   return data;
 }
 
-export function otherAddressFormat(value: string, digits = 6): string {
+export function otherAddressFormat(value: string, digits = 5): string {
   if (isEmpty(value)) {
     return '';
   }
@@ -634,11 +634,11 @@ export function handleChainLabel(chainLabel: string) {
 
 export function getCurItem(list: any[], keyTitle: string, row: any) {
   const itemObj = list.filter(item => {
-    return item.key === keyTitle;
+    return item.accessorKey === keyTitle;
   })[0];
 
-  if (itemObj?.colNode?.(row)) {
-    return itemObj.colNode(row);
+  if (itemObj?.cell?.({ row })) {
+    return itemObj?.cell?.({ row });
   } else {
     return ``;
   }

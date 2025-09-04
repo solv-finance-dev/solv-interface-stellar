@@ -6,7 +6,10 @@ import { Input } from '@solvprotocol/ui-v2';
 import { ChangeEvent, ReactNode, useCallback, useState } from 'react';
 
 export interface InputComplexProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
+  extends Omit<
+    React.HTMLAttributes<HTMLDivElement>,
+    'onChange' | 'onFocus' | 'onBlur'
+  > {
   /* input */
   inputValue?: string;
   onInputChange?: (val: string) => void;

@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 
 import { Provider } from '@/providers';
 
-import '@solvprotocol/ui-v2/dist/assets/style.css';
 import '@/assets/css/globals.css';
+import '@/assets/css/theme.css';
 
 export const metadata: Metadata = {
   title: 'Solv App',
