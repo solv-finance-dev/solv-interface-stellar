@@ -6,7 +6,7 @@ import DynamicAccordion, { SolvInfo } from '../Accordion';
 
 const FAQ = ({ hash, faqData }: { hash?: string; faqData: SolvInfo[] }) => {
   return (
-    <Card className='mb-4 rounded-3xl !p-4 md:mb-8 md:!p-8' id='faqs'>
+    <Card className='mb-4 !p-4 md:mb-8 md:!p-8' id='faqs'>
       <div className='font-MatterSQ-Medium text-3xl font-medium'>FAQs</div>
       <DynamicAccordion
         data={faqData}

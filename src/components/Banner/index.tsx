@@ -24,7 +24,7 @@ const Banner = ({
   return (
     <Card
       className={cn(
-        'mb-4 box-border rounded-3xl !p-4 md:mb-8 md:!p-8',
+        'mb-4 box-border !p-4 md:mb-8 md:!p-8',
         showBg
           ? "bg-[url('../../assets/images/solvbtc-banner-bg-h5.svg')] bg-contain bg-right-top bg-no-repeat lg:bg-[url('../../assets/images/solvbtc-banner-bg.svg')]"
           : '',
@@ -36,7 +36,7 @@ const Banner = ({
           {title}
 
           {subTitle && (
-            <span className='text-[2.5rem] leading-[3rem] text-grayColor md:ml-4'>
+            <span className='text-grayColor text-[2.5rem] leading-[3rem] md:ml-4'>
               {subTitle}
             </span>
           )}
