@@ -738,7 +738,7 @@ export default function Deposit() {
   return (
     <Form {...form}>
       {/* Top-right exchange rate pill */}
-      <div className='mb-3 flex w-full justify-end absolute top-6 right-4'>
+      <div className='absolute right-4 top-6 mb-3 flex w-full justify-end'>
         <div className='flex items-center gap-2 rounded-md px-3 py-1 text-[.875rem]'>
           <span className='text-grayColor'>Exchange Rate</span>
           <span className='text-textColor'>
@@ -753,7 +753,7 @@ export default function Deposit() {
                   depositFeeRate,
                   shareTokenDecimals ?? TOKEN_DECIMALS_FALLBACK
                 );
-                return `1.00 ${selected?.name} = ${receive || '—'} ${shareTokenName}`;
+                return `1.00 ${selected?.name} = ${receive ? parseFloat(receive).toFixed(4) : '—'} ${shareTokenName}`;
               })()
             )}
           </span>
@@ -807,7 +807,7 @@ export default function Deposit() {
                         !!isConnected &&
                         !!field.value &&
                         parseFloat(field.value || '0') >
-                        parseFloat(tokenBalance.balance || '0')
+                          parseFloat(tokenBalance.balance || '0')
                       }
                       inputValue={field.value}
                       onInputChange={value => {
@@ -904,7 +904,7 @@ export default function Deposit() {
                       !!isConnected &&
                       !!form.getValues('deposit') &&
                       parseFloat(form.getValues('deposit') || '0') >
-                      parseFloat(tokenBalance.balance || '0')
+                        parseFloat(tokenBalance.balance || '0')
                     }
                     inputValue={field.value}
                     onInputChange={value => {
@@ -959,7 +959,7 @@ export default function Deposit() {
             ) : !!isConnected &&
               !!form.getValues('deposit') &&
               parseFloat(form.getValues('deposit') || '0') >
-              parseFloat(tokenBalance.balance || '0') ? (
+                parseFloat(tokenBalance.balance || '0') ? (
               'Insufficient balance'
             ) : requiresApproval() ? (
               'Approve'

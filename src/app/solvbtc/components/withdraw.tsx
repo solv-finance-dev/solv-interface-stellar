@@ -244,7 +244,7 @@ export default function Withdraw() {
           // Save to a local variable used in UI label
           // We keep it in closure via state
         }
-      } catch { }
+      } catch {}
     };
     loadShareDecimals();
   }, [solvBTCClient]);
@@ -488,7 +488,7 @@ export default function Withdraw() {
   return (
     <Form {...form}>
       {/* Top-right exchange rate pill */}
-      <div className='mb-3 flex w-full justify-end absolute top-6 right-4'>
+      <div className='absolute right-4 top-6 mb-3 flex w-full justify-end'>
         <div className='flex items-center gap-2 rounded-md px-3 py-1 text-[.875rem]'>
           <span className='text-grayColor'>Exchange Rate</span>
           <span className='text-textColor'>
@@ -503,7 +503,7 @@ export default function Withdraw() {
                   withdrawFeeRate,
                   shareTokenDecimals ?? TOKEN_DECIMALS_FALLBACK
                 );
-                return `1.00 ${vaultEntry?.shareTokenClient?.name || 'Share'} = ${receive || '—'} SolvBTC`;
+                return `1.00 ${vaultEntry?.shareTokenClient?.name || 'Share'} = ${receive ? parseFloat(receive).toFixed(4) : '—'} SolvBTC`;
               })()
             )}
           </span>
@@ -559,14 +559,14 @@ export default function Withdraw() {
                         !!isConnected &&
                         !!field.value &&
                         parseFloat(field.value || '0') >
-                        parseFloat(shareBalance.balance || '0')
+                          parseFloat(shareBalance.balance || '0')
                       }
                       inputValue={field.value}
                       onInputChange={value => {
                         const sanitized = sanitizeAmountInput(
                           value,
                           supportedTokens[0]?.decimals ??
-                          TOKEN_DECIMALS_FALLBACK
+                            TOKEN_DECIMALS_FALLBACK
                         );
                         field.onChange(sanitized);
                         calculateReceiveAmount(sanitized);
@@ -628,7 +628,7 @@ export default function Withdraw() {
                       !!isConnected &&
                       !!form.getValues('deposit') &&
                       parseFloat(form.getValues('deposit') || '0') >
-                      parseFloat(shareBalance.balance || '0')
+                        parseFloat(shareBalance.balance || '0')
                     }
                     inputValue={field.value}
                     onInputChange={value => {
@@ -677,7 +677,7 @@ export default function Withdraw() {
             ) : !!isConnected &&
               !!form.getValues('deposit') &&
               parseFloat(form.getValues('deposit') || '0') >
-              parseFloat(shareBalance.balance || '0') ? (
+                parseFloat(shareBalance.balance || '0') ? (
               'Insufficient balance'
             ) : (
               'Withdraw'
