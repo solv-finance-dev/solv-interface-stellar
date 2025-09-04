@@ -42,7 +42,6 @@ const config = {
         secondaryColor: '#bdc4fd',
         surfaces: 'var(--surfaces)',
         border: 'hsl(var(--solv-border))',
-        // textColor: 'hsl(var(--solv-text))',
         textActiveColor: 'hsl(var(--solv-active-text))',
         errorColor: 'hsl(var(--solv-alert-500))',
         brand: {
