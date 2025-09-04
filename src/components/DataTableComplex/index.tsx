@@ -1,6 +1,4 @@
 'use client';
-import { useState } from 'react';
-
 import {
   ColumnDef,
   flexRender,
@@ -11,10 +9,6 @@ import {
   getPaginationRowModel,
   Row,
 } from '@tanstack/react-table';
-
-import { ChevronDown, ChevronUp, ChevronsUpDown } from 'lucide-react';
-
-import cn from 'classnames';
 import {
   Skeleton,
   Table,
@@ -24,6 +18,10 @@ import {
   TableHeader,
   TableRow,
 } from '@solvprotocol/ui-v2';
+import cn from 'classnames';
+import { ChevronDown, ChevronUp, ChevronsUpDown } from 'lucide-react';
+import { useState } from 'react';
+
 import NoData from '../NoData';
 import TablePagination from './TablePagination';
 
@@ -107,7 +105,8 @@ export function DataTableComplex<TData, TValue>({
               >
                 {headerGroup.headers.map(header => {
                   const canSort = header.column.getCanSort();
-                  const align = header.column.columnDef.meta?.align || 'left';
+                  const align =
+                    (header.column.columnDef.meta as any)?.align || 'left';
 
                   return (
                     <TableHead
@@ -173,7 +172,8 @@ export function DataTableComplex<TData, TValue>({
                   style={{ gridTemplateColumns }}
                 >
                   {row.getVisibleCells().map(cell => {
-                    const align = cell.column.columnDef.meta?.align || 'left';
+                    const align =
+                      (cell.column.columnDef.meta as any)?.align || 'left';
 
                     return (
                       <TableCell
