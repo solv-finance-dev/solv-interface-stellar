@@ -12,6 +12,7 @@ import {
   FormItem,
   FormLabel,
   toast,
+  Skeleton,
 } from '@solvprotocol/ui-v2';
 import { ArrowRight, RotateCcw, Loader2 } from 'lucide-react';
 import { InputComplex } from '@/components/InputComplex';
@@ -243,7 +244,7 @@ export default function Withdraw() {
           // Save to a local variable used in UI label
           // We keep it in closure via state
         }
-      } catch {}
+      } catch { }
     };
     loadShareDecimals();
   }, [solvBTCClient]);
@@ -486,6 +487,28 @@ export default function Withdraw() {
 
   return (
     <Form {...form}>
+      {/* Top-right exchange rate pill */}
+      <div className='mb-3 flex w-full justify-end absolute top-6 right-4'>
+        <div className='flex items-center gap-2 rounded-md px-3 py-1 text-[.875rem]'>
+          <span className='text-grayColor'>Exchange Rate</span>
+          <span className='text-textColor'>
+            {isLoadingFeeRate ? (
+              <Skeleton className='h-4 w-[200px]' />
+            ) : feeRateError ? (
+              '—'
+            ) : (
+              (() => {
+                const receive = computeReceiveFromDeposit(
+                  '1',
+                  withdrawFeeRate,
+                  shareTokenDecimals ?? TOKEN_DECIMALS_FALLBACK
+                );
+                return `1.00 ${vaultEntry?.shareTokenClient?.name || 'Share'} = ${receive || '—'} SolvBTC`;
+              })()
+            )}
+          </span>
+        </div>
+      </div>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className='flex w-full flex-col space-y-6'
@@ -510,8 +533,7 @@ export default function Withdraw() {
                           {formatTokenBalance(
                             shareBalance.balance,
                             shareBalance.decimals
-                          )}{' '}
-                          {vaultEntry?.shareTokenClient?.name}
+                          )}
                         </span>
                       )}
                     </div>
@@ -537,14 +559,14 @@ export default function Withdraw() {
                         !!isConnected &&
                         !!field.value &&
                         parseFloat(field.value || '0') >
-                          parseFloat(shareBalance.balance || '0')
+                        parseFloat(shareBalance.balance || '0')
                       }
                       inputValue={field.value}
                       onInputChange={value => {
                         const sanitized = sanitizeAmountInput(
                           value,
                           supportedTokens[0]?.decimals ??
-                            TOKEN_DECIMALS_FALLBACK
+                          TOKEN_DECIMALS_FALLBACK
                         );
                         field.onChange(sanitized);
                         calculateReceiveAmount(sanitized);
@@ -598,22 +620,6 @@ export default function Withdraw() {
                   <div className='flex items-center !gap-1'>
                     <span className='text-textColor'>You Will Receive</span>
                   </div>
-                  <div className='flex items-center gap-2 text-[.875rem]'>
-                    <span className='text-grayColor'>Fee Rate:</span>
-                    <div className='text-textColor'>
-                      {isLoadingFeeRate ? (
-                        <span className='animate-pulse'>Loading...</span>
-                      ) : feeRateError ? (
-                        <span className='text-red-500' title={feeRateError}>
-                          Error
-                        </span>
-                      ) : (
-                        <span className='font-medium text-brand-500'>
-                          {withdrawFeeRate}%
-                        </span>
-                      )}
-                    </div>
-                  </div>
                 </FormLabel>
                 <FormControl>
                   <InputComplex
@@ -622,7 +628,7 @@ export default function Withdraw() {
                       !!isConnected &&
                       !!form.getValues('deposit') &&
                       parseFloat(form.getValues('deposit') || '0') >
-                        parseFloat(shareBalance.balance || '0')
+                      parseFloat(shareBalance.balance || '0')
                     }
                     inputValue={field.value}
                     onInputChange={value => {
@@ -671,7 +677,7 @@ export default function Withdraw() {
             ) : !!isConnected &&
               !!form.getValues('deposit') &&
               parseFloat(form.getValues('deposit') || '0') >
-                parseFloat(shareBalance.balance || '0') ? (
+              parseFloat(shareBalance.balance || '0') ? (
               'Insufficient balance'
             ) : (
               'Withdraw'

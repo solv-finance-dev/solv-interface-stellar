@@ -52,7 +52,7 @@ export const computeReceiveFromDeposit = (
   const depositValue = new BigNumber(depositAmount || '0');
   const feeRateValue = new BigNumber(feeRatePercentage || '0');
   const one = new BigNumber(1);
-  const ratio = one.minus(feeRateValue.div(100));
+  const ratio = one.minus(feeRateValue);
   const receiveAmount = depositValue.multipliedBy(ratio);
   return bnToTruncatedString(receiveAmount, receiveDecimals);
 };

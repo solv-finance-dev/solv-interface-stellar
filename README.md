@@ -43,6 +43,9 @@ NEXT_PUBLIC_STELLAR_NETWORK=testnet
 NEXT_PUBLIC_STELLAR_RPC_URL= xxx
 NEXT_PUBLIC_VAULT_CONTRACT= xxx
 NEXT_PUBLIC_EXPLORER_TX_URL=https://stellar.expert/explorer/testnet/tx/
+
+NEXT_PUBLIC_GRAPHQL_URL=https://dev.sft-api.com/graphql
+NEXT_PUBLIC_GRAPHQL_AUTH=solv-app-dev
 ```
 
 4. Start the development server:

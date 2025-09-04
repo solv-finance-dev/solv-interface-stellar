@@ -17,6 +17,7 @@ import {
   SelectItem,
   SelectTrigger,
   toast,
+  Skeleton,
 } from '@solvprotocol/ui-v2';
 import { ArrowRight, RotateCcw, Loader2 } from 'lucide-react';
 import { InputComplex } from '@/components/InputComplex';
@@ -736,6 +737,28 @@ export default function Deposit() {
 
   return (
     <Form {...form}>
+      {/* Top-right exchange rate pill */}
+      <div className='mb-3 flex w-full justify-end absolute top-6 right-4'>
+        <div className='flex items-center gap-2 rounded-md px-3 py-1 text-[.875rem]'>
+          <span className='text-grayColor'>Exchange Rate</span>
+          <span className='text-textColor'>
+            {isLoadingFeeRate ? (
+              <Skeleton className='h-4 w-[200px]' />
+            ) : !selected || feeRateError ? (
+              '—'
+            ) : (
+              (() => {
+                const receive = computeReceiveFromDeposit(
+                  '1',
+                  depositFeeRate,
+                  shareTokenDecimals ?? TOKEN_DECIMALS_FALLBACK
+                );
+                return `1.00 ${selected?.name} = ${receive || '—'} ${shareTokenName}`;
+              })()
+            )}
+          </span>
+        </div>
+      </div>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className='flex w-full flex-col space-y-6'
@@ -758,8 +781,7 @@ export default function Deposit() {
                           {formatTokenBalance(
                             tokenBalance.balance,
                             tokenBalance.decimals
-                          )}{' '}
-                          {selected?.name}
+                          )}
                         </span>
                       )}
                     </div>
@@ -785,7 +807,7 @@ export default function Deposit() {
                         !!isConnected &&
                         !!field.value &&
                         parseFloat(field.value || '0') >
-                          parseFloat(tokenBalance.balance || '0')
+                        parseFloat(tokenBalance.balance || '0')
                       }
                       inputValue={field.value}
                       onInputChange={value => {
@@ -874,22 +896,6 @@ export default function Deposit() {
                     <span className='text-textColor'>You Will Receive</span>
                     <TooltipComplex content={'tips'}></TooltipComplex>
                   </div>
-                  <div className='flex items-center gap-2 text-[.875rem]'>
-                    <span className='text-grayColor'>Fee Rate:</span>
-                    <div className='text-textColor'>
-                      {isLoadingFeeRate ? (
-                        <span className='animate-pulse'>Loading...</span>
-                      ) : feeRateError ? (
-                        <span className='text-red-500' title={feeRateError}>
-                          Error
-                        </span>
-                      ) : (
-                        <span className='font-medium text-brand-500'>
-                          {depositFeeRate}%
-                        </span>
-                      )}
-                    </div>
-                  </div>
                 </FormLabel>
                 <FormControl>
                   <InputComplex
@@ -898,7 +904,7 @@ export default function Deposit() {
                       !!isConnected &&
                       !!form.getValues('deposit') &&
                       parseFloat(form.getValues('deposit') || '0') >
-                        parseFloat(tokenBalance.balance || '0')
+                      parseFloat(tokenBalance.balance || '0')
                     }
                     inputValue={field.value}
                     onInputChange={value => {
@@ -953,7 +959,7 @@ export default function Deposit() {
             ) : !!isConnected &&
               !!form.getValues('deposit') &&
               parseFloat(form.getValues('deposit') || '0') >
-                parseFloat(tokenBalance.balance || '0') ? (
+              parseFloat(tokenBalance.balance || '0') ? (
               'Insufficient balance'
             ) : requiresApproval() ? (
               'Approve'
