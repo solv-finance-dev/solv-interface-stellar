@@ -10,38 +10,6 @@ const config = {
   theme: {
     extend: {
       colors: {
-        background: {
-          DEFAULT: 'hsl(var(--solv-background-default))',
-          elevation1: 'hsl(var(--solv-background-color1))',
-          elevation2: 'hsl(var(--solv-background-color2))',
-          elevation3: 'hsl(var(--solv-background-color3))',
-          elevation4: 'hsl(var(--solv-background-color4))',
-        },
-
-        borderColor: {
-          DEFAULT: 'hsl(var(--solv-border-default))',
-          defaultHover: 'hsl(var(--solv-border-default-hover))',
-          dividers: 'hsl(var(--solv-borders-dividers))',
-          dividersBlank: 'hsl(var(--solv-borders-dividers-blank))',
-          grayColor: 'hsl(var(--solv-gray-color))',
-        },
-        textColor: {
-          DEFAULT: 'hsl(var(--solv-text-primary))',
-          secondary: 'hsl(var(--solv-text-secondary))',
-          tertiary: 'hsl(var(--solv-text-tertiary))',
-          purplePrimary: 'hsl(var(--solv-text-purple-primary))',
-          heading: 'hsl(var(--solv-text-heading))',
-          placeholder: 'hsl(var(--solv-text-placeholder))',
-          disabled: 'hsl(var(--solv-text-disabled))',
-          gain: 'hsl(var(--solv-text-gain))',
-          loss: 'hsl(var(--solv-text-loss))',
-        },
-        mainColor: '#7667EB',
-        grayColor: '#a5a5a5',
-        primaryColor: '#BDC4FB',
-        secondaryColor: '#bdc4fd',
-        surfaces: 'var(--surfaces)',
-        border: 'hsl(var(--solv-border))',
         // textColor: 'hsl(var(--solv-text))',
         textActiveColor: 'hsl(var(--solv-active-text))',
         errorColor: 'hsl(var(--solv-alert-500))',

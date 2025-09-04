@@ -2135,7 +2135,7 @@
     rpc-websockets "^9.0.2"
     superstruct "^2.0.2"
 
-"@solvprotocol/ui-v2@^2.1.13":
+"@solvprotocol/ui-v2@2.1.13":
   version "2.1.13"
   resolved "https://registry.yarnpkg.com/@solvprotocol/ui-v2/-/ui-v2-2.1.13.tgz#22eae1418a1ce4be3147ed6f47ef32d3f4b3f29c"
   integrity sha512-u280nRyU9o+amV65HAac/LCwGZJuuMWExjf5YAplh99zi/rpph/GbPIUTWQiqvRlkSJy/dV2w9Xq0hFjUDzizA==
