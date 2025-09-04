@@ -1,4 +1,4 @@
-# Solv Interface template
+# Solv Interface Stellar
 
 ## Getting Started
 
