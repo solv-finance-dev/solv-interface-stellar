@@ -25,19 +25,19 @@ import { useState } from 'react';
 import NoData from '../NoData';
 import TablePagination from './TablePagination';
 
-type AlignType = 'left' | 'center' | 'right';
-
-interface ColumnMeta {
-  align?: AlignType;
-}
+export type AlignType = 'left' | 'center' | 'right';
 
 interface DataTableComplexProps<TData, TValue> {
-  columns: (ColumnDef<TData, TValue> & { meta?: ColumnMeta })[];
+  columns: ColumnDef<TData, TValue>[];
   data: TData[];
   onRowClick?: (row: TData) => void;
   gridTemplateColumns?: string;
   showSkeleton?: boolean;
   skeletonCount?: number;
+  manualPagination?: boolean;
+  pageCount?: number;
+  pagination?: { pageIndex: number; pageSize: number };
+  onPaginationChange?: (updater: any) => void;
 }
 
 export function DataTableComplex<TData, TValue>({
@@ -47,6 +47,10 @@ export function DataTableComplex<TData, TValue>({
   gridTemplateColumns = 'repeat(auto-fit, minmax(120px, 1fr))',
   showSkeleton = false,
   skeletonCount = 6,
+  manualPagination = false,
+  pageCount,
+  pagination,
+  onPaginationChange,
 }: DataTableComplexProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -57,18 +61,14 @@ export function DataTableComplex<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
+    manualPagination,
+    pageCount,
+    onPaginationChange,
     state: {
       sorting,
-    },
-    initialState: {
-      pagination: {
-        pageSize: 6,
-      },
+      pagination,
     },
   });
-
-  // console.log('getHeaderGroups', table.getHeaderGroups());
-  // console.log('getRowModel', table.getRowModel().rows);
 
   const handleRowClick = (row: Row<TData>) => {
     if (onRowClick) {
