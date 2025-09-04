@@ -2,12 +2,18 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
 import { MenuItem } from '..';
+import cn from 'classnames';
 
 export default function MenuPc({ menuList }: { menuList: MenuItem[] }) {
   const pathname = usePathname();
 
   return (
-    <section className='m-auto hidden h-[44px] cursor-pointer items-center rounded-full border border-solid border-border bg-gray-400/10 p-1 font-[500] text-textColor backdrop-blur-[5px] hover:border-[#767676] md:flex'>
+    <section
+      className={cn(
+        'bg-base-neutral-600/10 border-base-neutral-300 dark:border-base-neutral-800',
+        'm-auto hidden h-[44px] cursor-pointer items-center rounded-full border border-solid p-1 font-[500] backdrop-blur-[5px] md:flex'
+      )}
+    >
       {menuList.map(item => (
         <div
           className='flex cursor-pointer items-center justify-center font-MatterSQ-Medium text-[0.875rem] md:px-[.8rem] lg:px-[2rem]'
@@ -15,11 +21,12 @@ export default function MenuPc({ menuList }: { menuList: MenuItem[] }) {
         >
           <Link
             href={item.href}
-            className={
+            className={cn(
+              'hover:text-textColor',
               item?.activeHref && item?.activeHref.includes(pathname)
-                ? '!text-textActiveColor'
-                : 'text-textColor'
-            }
+                ? '!text-textColor'
+                : 'text-textColor-secondary'
+            )}
           >
             {item.label}
           </Link>
