@@ -67,7 +67,6 @@ export default function TablePagination({
         )}{' '}
         of {data.length} entries
       </div>
-      <div></div>
 
       <div className='flex items-center space-x-2'>
         {/* Previous */}

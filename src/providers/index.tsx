@@ -1,6 +1,8 @@
 'use client';
 
 import { ReactNode, useEffect } from 'react';
+import { ApolloProvider } from '@apollo/client/react';
+import { getApolloClient } from '@/graphql/clientsFactory';
 
 import Header from '@/components/Header';
 
@@ -52,10 +54,12 @@ const Provider = ({ children }: { children: ReactNode }) => {
     initialize();
   }, [initializeWallets, initializeContracts]);
   return (
-    <ThemeProvider attribute='class' defaultTheme='dark'>
-      <Header />
-      <BodyProvider>{children}</BodyProvider>
-    </ThemeProvider>
+    <ApolloProvider client={getApolloClient()}>
+      <ThemeProvider attribute='class' defaultTheme='dark'>
+        <Header />
+        <BodyProvider>{children}</BodyProvider>
+      </ThemeProvider>
+    </ApolloProvider>
   );
 };
 
