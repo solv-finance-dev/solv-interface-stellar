@@ -114,9 +114,9 @@ export function WalletModal({ open, onOpenChange }: WalletModalProps) {
               return (
                 <div
                   key={wallet.id}
-                  className={`flex items-center space-x-3 rounded-lg bg-grayColor/5 py-2 transition-all duration-200 ${
+                  className={`bg-grayColor/5 flex items-center space-x-3 rounded-lg py-2 transition-all duration-200 ${
                     canClick
-                      ? 'cursor-pointer hover:bg-mainColor hover:text-white'
+                      ? 'hover:bg-mainColor cursor-pointer hover:text-white'
                       : 'cursor-not-allowed opacity-50'
                   }`}
                   onClick={() =>

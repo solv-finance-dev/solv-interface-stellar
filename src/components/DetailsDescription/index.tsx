@@ -61,7 +61,7 @@ export default function DetailsDescription({
       </div>
       {showBtn && (
         <div
-          className='cursor-pointer pt-4 text-sm font-bold text-mainColor'
+          className='text-mainColor cursor-pointer pt-4 text-sm font-bold'
           onClick={() => setShowMore(!showMore)}
         >
           {showMore ? 'See less' : 'See more'}

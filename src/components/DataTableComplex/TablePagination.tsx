@@ -96,7 +96,7 @@ export default function TablePagination({
               }
             }}
             disabled={pageNumber === '...'}
-            className='h-8 w-8 rounded-full bg-transparent p-0 text-textColor hover:bg-gray-100'
+            className='text-textColor h-8 w-8 rounded-full bg-transparent p-0 hover:bg-gray-100'
           >
             {pageNumber}
           </Button>

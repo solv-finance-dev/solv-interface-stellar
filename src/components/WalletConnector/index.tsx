@@ -46,7 +46,7 @@ const ChainIcon = ({ className }: { className?: string }) => {
     <div
       className={cn(
         'h-8 w-8 md:h-[2.75rem] md:w-[2.75rem]',
-        'flex items-center justify-center rounded-full border-[1px] border-solid border-border bg-gray-400/10 backdrop-blur-[5px]',
+        'border-border flex items-center justify-center rounded-full border-[1px] border-solid bg-gray-400/10 backdrop-blur-[5px]',
         className
       )}
     >
@@ -94,7 +94,7 @@ export function WalletConnector({
           size='lg'
           disabled={isConnecting || isLoadingAccount}
           className={cn(
-            'h-8 space-x-1 rounded-full border border-solid border-border bg-gray-400/10 px-3 text-sm font-medium text-textColor backdrop-blur-[5px] transition-all hover:opacity-90 md:h-[2.75rem] md:px-4',
+            'border-border text-textColor h-8 space-x-1 rounded-full border border-solid bg-gray-400/10 px-3 text-sm font-medium backdrop-blur-[5px] transition-all hover:opacity-90 md:h-[2.75rem] md:px-4',
             'disabled:cursor-not-allowed disabled:opacity-50',
             className
           )}
@@ -119,15 +119,15 @@ export function WalletConnector({
       {showChainIcon && <ChainIcon />}
       <Popover>
         <PopoverTrigger asChild>
-          <div className='flex h-8 cursor-pointer items-center space-x-1 rounded-full border border-border bg-gray-400/10 px-1 backdrop-blur-[5px] transition-colors md:h-[2.75rem] md:px-4'>
+          <div className='border-border flex h-8 cursor-pointer items-center space-x-1 rounded-full border bg-gray-400/10 px-1 backdrop-blur-[5px] transition-colors md:h-[2.75rem] md:px-4'>
             <ImageAvatar
               src='https://avatar.sft-api.com/avatar/28.png'
               alt='User Avatar'
             />
-            <span className='text-[.75rem] font-medium text-textColor md:text-sm'>
+            <span className='text-textColor text-[.75rem] font-medium md:text-sm'>
               {otherAddressFormat(connectedWallet.publicKey)}
             </span>
-            <ChevronDown className='h-4 w-4 text-textColor transition-transform' />
+            <ChevronDown className='text-textColor h-4 w-4 transition-transform' />
           </div>
         </PopoverTrigger>
 
@@ -149,7 +149,7 @@ export function WalletConnector({
 
                 <div className='flex items-center space-x-2'>
                   <CopyHelper size='14' data={connectedWallet.publicKey}>
-                    <p className='truncate text-[.875rem] leading-5 text-textColor'>
+                    <p className='text-textColor truncate text-[.875rem] leading-5'>
                       {otherAddressFormat(connectedWallet.publicKey)}
                     </p>
                   </CopyHelper>

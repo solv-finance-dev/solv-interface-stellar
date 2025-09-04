@@ -65,7 +65,7 @@ export default function Withdraw() {
                   <span>You Will Withdraw</span>
                   <div className='flex items-end text-[.875rem]'>
                     {/*  Sample code error : !text-errorColor */}
-                    <span className='mr-2 !text-errorColor text-grayColor'>
+                    <span className='text-grayColor mr-2 !text-errorColor'>
                       Balance:
                     </span>
                     <div className='text-textColor'> 128.34 SolvBTC</div>

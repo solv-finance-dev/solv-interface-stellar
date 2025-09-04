@@ -36,7 +36,7 @@ const Banner = ({
           {title}
 
           {subTitle && (
-            <span className='text-[2.5rem] leading-[3rem] text-grayColor md:ml-4'>
+            <span className='text-grayColor text-[2.5rem] leading-[3rem] md:ml-4'>
               {subTitle}
             </span>
           )}

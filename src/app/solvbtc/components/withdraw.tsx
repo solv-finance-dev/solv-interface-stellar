@@ -523,7 +523,7 @@ export default function Withdraw() {
                       title='Refresh balance'
                     >
                       <RotateCcw
-                        className={`h-3 w-3 text-grayColor ${isLoadingBalance ? 'animate-spin' : ''}`}
+                        className={`text-grayColor h-3 w-3 ${isLoadingBalance ? 'animate-spin' : ''}`}
                       />
                     </button>
                   </div>

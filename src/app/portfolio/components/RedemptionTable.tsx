@@ -1,6 +1,7 @@
 'use client';
 
 import { ClaimIcon } from '@/assets/svg/svg';
+import ClaimAction from './ClaimAction';
 import { DataTableComplex } from '@/components/DataTableComplex';
 
 import H5AssetsCard, {
@@ -14,8 +15,7 @@ import { TooltipComplex } from '@/components/TooltipComplex';
 import { useDialog } from '@/hooks/useDialog';
 import { useLoadingDialog } from '@/hooks/useLoadingDialog';
 import { useSuccessfulDialog } from '@/hooks/useSuccessfulDialog';
-import { getCurItem } from '@/lib/utils';
-import { Button } from '@solvprotocol/ui-v2';
+import { getCurItem, upperCaseFirst } from '@/lib/utils';
 import {
   ColumnDef,
   getCoreRowModel,
@@ -24,6 +24,12 @@ import {
 } from '@tanstack/react-table';
 import cn from 'classnames';
 
+export enum RedemptionState {
+  Pending = 'pending',
+  Signed = 'signed',
+  Claimed = 'claimed',
+}
+
 export interface Redemption {
   id: string;
   pool: string;
@@ -31,7 +37,7 @@ export interface Redemption {
   withdrawAmount: number | string;
   valueUsd: number;
   availableTime?: string;
-  state?: string;
+  state?: RedemptionState;
 }
 
 interface RedemptionTableProps {
@@ -121,12 +127,14 @@ export function RedemptionTable({
             <div className='mt-1 hidden font-MatterSQ-Regular text-[.875rem] leading-4 md:flex'>
               <span
                 className={cn(
-                  row.original.state == 'pending'
+                  row.original.state == RedemptionState.Pending
                     ? 'text-yellow-500'
                     : 'text-green-500'
                 )}
               >
-                {row.original.state}
+                {row.original.state === RedemptionState.Signed
+                  ? 'Ready to claim'
+                  : upperCaseFirst(row.original.state || '')}
               </span>
             </div>
           </div>
@@ -145,12 +153,14 @@ export function RedemptionTable({
           <div className='mt-1 font-MatterSQ-Regular text-[.875rem] leading-4'>
             <span
               className={cn(
-                row.original.state == 'pending'
+                row.original.state == RedemptionState.Pending
                   ? 'text-yellow-500'
                   : 'text-green-500'
               )}
             >
-              {row.original.state}
+              {row.original.state === RedemptionState.Signed
+                ? 'Ready to claim'
+                : upperCaseFirst(row.original.state || '')}
             </span>
           </div>
         );
@@ -226,21 +236,11 @@ export function RedemptionTable({
       },
       cell: ({ row }) => {
         return (
-          <div className='flex flex-col items-end'>
-            <Button
-              variant='default'
-              size='sm'
-              className='w-full rounded-full bg-brand hover:bg-brand-600 md:w-[6.4375rem]'
-              onClick={showClaimDialog}
-            >
-              <ClaimIcon className='h-4 w-4' /> Claim
-            </Button>
-            {row.original.availableTime && (
-              <div className='text-xs text-brand-500'>
-                {new Date(row.original.availableTime).toLocaleString()}
-              </div>
-            )}
-          </div>
+          <ClaimAction
+            availableTime={row.original.availableTime}
+            redemptionState={row.original.state}
+            onClaim={showClaimDialog}
+          />
         );
       },
     },
@@ -289,7 +289,7 @@ export function RedemptionTable({
                 {tableH5.getRowModel().rows.map((row, index) => (
                   <div
                     key={`H5AssetsCard-${row.id}-${index}`}
-                    onClick={() => { }}
+                    onClick={() => {}}
                   >
                     <H5AssetsCard
                       cardTitle={<>{getCurItem(columns, 'pool', row)}</>}

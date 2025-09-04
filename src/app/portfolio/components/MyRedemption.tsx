@@ -4,7 +4,11 @@ import { otherAddressFormat } from '@/lib/utils';
 import { useWalletStore } from '@/states';
 import { Card } from '@solvprotocol/ui-v2';
 import React from 'react';
-import { Redemption, RedemptionTable } from './RedemptionTable';
+import {
+  Redemption,
+  RedemptionState,
+  RedemptionTable,
+} from './RedemptionTable';
 import { useEffect, useState } from 'react';
 import { getApolloClient } from '@/graphql/clientsFactory';
 import {
@@ -54,7 +58,7 @@ export default function MyRedemption() {
             withdrawAmount: Number(r.withdrawAmount) / 1e8,
             valueUsd: Number(r.valueUsd) || 0,
             availableTime: r.availableTime,
-            state: r.state,
+            state: r.state as RedemptionState,
           })
         );
         setRows(mapped);
@@ -82,7 +86,7 @@ export default function MyRedemption() {
           isConnecting ? (
             <></>
           ) : (
-            <div className='flex h-[3rem] w-[12.8125rem] items-center justify-between rounded-[1.875rem] border-[1px] border-solid border-border py-1 pl-2 pr-3'>
+            <div className='border-border flex h-[3rem] w-[12.8125rem] items-center justify-between rounded-[1.875rem] border-[1px] border-solid py-1 pl-2 pr-3'>
               <div className='box-border flex h-10 w-10 items-center justify-center rounded-full border-[1px] border-solid border-gray-300 p-2'>
                 <TokenIcon
                   src='https://avatar.sft-api.com/avatar/28.png'
@@ -91,7 +95,7 @@ export default function MyRedemption() {
               </div>
 
               <CopyHelper size='18' data={connectedWallet.publicKey}>
-                <div className='w-[7.0625rem] truncate text-right text-[.875rem] leading-5 text-textColor'>
+                <div className='text-textColor w-[7.0625rem] truncate text-right text-[.875rem] leading-5'>
                   {otherAddressFormat(connectedWallet.publicKey)}
                 </div>
               </CopyHelper>

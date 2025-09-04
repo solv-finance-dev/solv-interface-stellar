@@ -7,7 +7,7 @@ export default function MenuPc({ menuList }: { menuList: MenuItem[] }) {
   const pathname = usePathname();
 
   return (
-    <section className='m-auto hidden h-[44px] cursor-pointer items-center rounded-full border border-solid border-border bg-gray-400/10 p-1 font-[500] text-textColor backdrop-blur-[5px] hover:border-[#767676] md:flex'>
+    <section className='border-border text-textColor m-auto hidden h-[44px] cursor-pointer items-center rounded-full border border-solid bg-gray-400/10 p-1 font-[500] backdrop-blur-[5px] hover:border-[#767676] md:flex'>
       {menuList.map(item => (
         <div
           className='flex cursor-pointer items-center justify-center font-MatterSQ-Medium text-[0.875rem] md:px-[.8rem] lg:px-[2rem]'
