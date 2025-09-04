@@ -1,0 +1,16 @@
+/* @tailwind base; */
+@import url('tailwindcss/base');
+@import url('@solvprotocol/ui-v2/dist/assets/style.css');
+
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --fontfamily: 'MatterSQ-Regular';
+}
+
+.light {
+}
+
+.dark {
+}
