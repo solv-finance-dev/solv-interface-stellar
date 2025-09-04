@@ -2,6 +2,7 @@
 
 import { ClaimIcon } from '@/assets/svg/svg';
 import { DataTableComplex } from '@/components/DataTableComplex';
+
 import H5AssetsCard, {
   AssetsDataItem,
   AssetsSkeletonCard,
@@ -245,7 +246,7 @@ export function RedemptionTable({ data }: RedemptionTableProps) {
   });
 
   const filterColumns = [...columns].filter(
-    item => item?.accessorKey !== 'status'
+    item => 'accessorKey' in item && item.accessorKey !== 'status'
   );
 
   return (
