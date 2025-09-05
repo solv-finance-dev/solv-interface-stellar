@@ -51,3 +51,20 @@ export interface NonEvmRedemptionsResponse {
     records: NonEvmRedemptionRecord[];
   };
 }
+
+// Signature for redemption claim (non-EVM chains)
+export const QUERY_NON_EVM_REDEMPTION_SIG = gql`
+  query NonEvmRedemptionSig($redemptionId: String) {
+    nonEvmRedemptionSig(redemptionId: $redemptionId) {
+      id
+      signature
+    }
+  }
+`;
+
+export interface NonEvmRedemptionSigResponse {
+  nonEvmRedemptionSig?: {
+    id: string;
+    signature: string;
+  } | null;
+}

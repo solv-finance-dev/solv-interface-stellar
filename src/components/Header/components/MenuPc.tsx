@@ -10,7 +10,7 @@ export default function MenuPc({ menuList }: { menuList: MenuItem[] }) {
   return (
     <section
       className={cn(
-        'bg-base-neutral-600/10 border-base-neutral-300 dark:border-base-neutral-800',
+        'border-base-neutral-300 bg-base-neutral-600/10 dark:border-base-neutral-800',
         'm-auto hidden h-[44px] cursor-pointer items-center rounded-full border border-solid p-1 font-[500] backdrop-blur-[5px] md:flex'
       )}
     >

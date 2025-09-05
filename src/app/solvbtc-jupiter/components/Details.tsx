@@ -6,7 +6,7 @@ import React from 'react';
 export default function Details() {
   return (
     <div>
-      <div className='text-textColor mb-4 font-MatterSQ-Medium text-xl'>
+      <div className='mb-4 font-MatterSQ-Medium text-xl text-textColor'>
         Contract Info
       </div>
 
@@ -16,7 +16,7 @@ export default function Details() {
         <InfoItem label='Token Address' value={`0x9537...d185`} url={''} />
       </div>
 
-      <div className='text-textColor mb-4 font-MatterSQ-Medium text-xl'>
+      <div className='mb-4 font-MatterSQ-Medium text-xl text-textColor'>
         Description
       </div>
 

@@ -1,6 +1,5 @@
 'use client';
 
-import { ClaimIcon } from '@/assets/svg/svg';
 import ClaimAction from './ClaimAction';
 import { DataTableComplex } from '@/components/DataTableComplex';
 
@@ -11,10 +10,7 @@ import H5AssetsCard, {
 } from '@/components/DataTableComplex/H5AssetsCard';
 import TablePagination from '@/components/DataTableComplex/TablePagination';
 import { TokenIcon } from '@/components/TokenIcon';
-import { TooltipComplex } from '@/components/TooltipComplex';
 import { useDialog } from '@/hooks/useDialog';
-import { useLoadingDialog } from '@/hooks/useLoadingDialog';
-import { useSuccessfulDialog } from '@/hooks/useSuccessfulDialog';
 import { getCurItem, upperCaseFirst } from '@/lib/utils';
 import {
   ColumnDef,
@@ -38,6 +34,9 @@ export interface Redemption {
   valueUsd: number;
   availableTime?: string;
   state?: RedemptionState;
+  // raw fields for claim
+  withdrawRequestHash?: string;
+  share?: string;
 }
 
 interface RedemptionTableProps {
@@ -56,62 +55,6 @@ export function RedemptionTable({
   pageCount,
 }: RedemptionTableProps) {
   const { openDialog } = useDialog();
-  const { openLoadingDialog, closeLoadingDialog } = useLoadingDialog();
-  const { openSuccessfulDialog } = useSuccessfulDialog();
-
-  const showClaimDialog = () => {
-    openDialog({
-      size: 'md',
-      title: 'Claim',
-      description: 'Sorry. You have no claimable amount at the moment.',
-      content: (
-        <section className=''>
-          <div className='text-textColor-secondary text-[.875rem] leading-5'>
-            Claimable
-          </div>
-          <div className='text-textColor mb-4 mt-2 text-2xl'>0.00 WBTC</div>
-
-          <div className='bg-background-elevation3 box-border flex h-[2.25rem] w-full items-center justify-between rounded-md p-2'>
-            <div className='flex items-center justify-start text-[.875rem] leading-[1.25rem]'>
-              <span className='text-textColor-secondary mr-1'>
-                Pending repayment
-              </span>{' '}
-              <TooltipComplex content={'tips'} />
-            </div>
-
-            <div className='text-textColor flex items-center justify-end text-[.875rem] leading-[1.25rem]'>
-              0.00 WBTC
-            </div>
-          </div>
-        </section>
-      ),
-      loading: false,
-      onConfirm: async () => {
-        console.log('Confirm Claim');
-
-        openLoadingDialog({
-          description: '当前操作的描述',
-          chainId: 'xxx',
-          scanUrl: 'xxx',
-        });
-
-        setTimeout(() => {
-          closeLoadingDialog();
-
-          openSuccessfulDialog({
-            size: 'md',
-            title: 'Deposit',
-            description: 'You successfully deposited 100.00 WBTC.',
-            chainId: 'xxx',
-            scanUrl: 'xxx',
-            onConfirm: async () => {
-              console.log('close successful dialog');
-            },
-          });
-        }, 2000);
-      },
-    });
-  };
 
   const columns: ColumnDef<Redemption>[] = [
     {
@@ -124,7 +67,7 @@ export function RedemptionTable({
       cell: ({ row }) => {
         return (
           <div className=''>
-            <div className='text-textColor w-full truncate font-MatterSQ-Medium text-[1rem] leading-[1.125rem] md:max-w-[calc(90%-1rem)]'>
+            <div className='w-full truncate font-MatterSQ-Medium text-[1rem] leading-[1.125rem] text-textColor md:max-w-[calc(90%-1rem)]'>
               {row.getValue('pool')}
             </div>
 
@@ -205,7 +148,7 @@ export function RedemptionTable({
         }).format(amount);
 
         return (
-          <div className='text-textColor text-[.875rem] leading-4'>
+          <div className='text-[.875rem] leading-4 text-textColor'>
             {formatted}
           </div>
         );
@@ -228,7 +171,7 @@ export function RedemptionTable({
         return (
           <div className='flex flex-row items-end text-[.875rem] leading-4 md:flex-col'>
             <span className='text-textColor'>{formatted} SolvBTC</span>
-            <span className='text-textColor-secondary ml-1 mt-0 text-[10px] md:ml-0 md:mt-1 md:text-[.875rem]'>
+            <span className='ml-1 mt-0 text-[10px] text-textColor-secondary md:ml-0 md:mt-1 md:text-[.875rem]'>
               {formatted}
             </span>
           </div>
@@ -247,7 +190,9 @@ export function RedemptionTable({
           <ClaimAction
             availableTime={row.original.availableTime}
             redemptionState={row.original.state}
-            onClaim={showClaimDialog}
+            redemptionId={row.original.id}
+            withdrawRequestHash={row.original.withdrawRequestHash}
+            share={row.original.share}
           />
         );
       },
@@ -295,10 +240,7 @@ export function RedemptionTable({
             {tableH5.getRowModel().rows?.length > 0 ? (
               <div>
                 {tableH5.getRowModel().rows.map((row, index) => (
-                  <div
-                    key={`H5AssetsCard-${row.id}-${index}`}
-                    onClick={() => {}}
-                  >
+                  <div key={`H5AssetsCard-${row.id}-${index}`}>
                     <H5AssetsCard
                       cardTitle={<>{getCurItem(columns, 'pool', row)}</>}
                       operateBtn={<>{getCurItem(columns, 'action', row)}</>}
