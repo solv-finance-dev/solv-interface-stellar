@@ -515,12 +515,12 @@ export default function Withdraw() {
   return (
     <Form {...form}>
       {/* Top-right exchange rate pill */}
-      <div className='absolute right-8 top-[2.3rem] hidden w-full justify-end md:flex pointer-events-none'>
+      <div className='pointer-events-none absolute right-8 top-[2.3rem] hidden w-full justify-end md:flex'>
         <ExchangeRateValue />
       </div>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className='flex w-full flex-col space-y-6'
+        className='flex w-full flex-col space-y-4 md:space-y-6'
       >
         <div className='flex flex-col justify-between md:flex-row'>
           <FormField
