@@ -132,7 +132,7 @@ export function GlobalSuccessfulDialog() {
               onClick={handleConfirm}
               disabled={disableConfirm || loading}
               className={cn(
-                'h-12 flex-1 rounded-full bg-brand-500 text-[1rem] outline-none hover:bg-brand-600',
+                'h-12 flex-1 rounded-full bg-brand-500 text-[1rem] text-white outline-none hover:bg-brand-600',
                 !showCancel && 'w-full'
               )}
             >
