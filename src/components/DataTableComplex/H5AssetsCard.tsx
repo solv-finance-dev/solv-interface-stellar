@@ -21,7 +21,7 @@ export function AssetsDataItem({
       className={classNames('flex min-h-[2.875rem] items-center', className)}
     >
       <div className='flex flex-col justify-between'>
-        <div className='mb-[4px] text-[.75rem] leading-4 text-gray-600'>
+        <div className='mb-[4px] text-[.75rem] leading-4 text-textColor-secondary'>
           {keyTitle}
         </div>
 
@@ -91,7 +91,7 @@ export default function H5AssetsCard({
 }) {
   return (
     <>
-      <div className='flex items-center justify-between rounded-[.25rem] py-[.375rem] md:px-[.25rem]'>
+      <div className='flex items-center justify-between rounded-[.25rem] py-[.375rem] text-textColor md:px-[.25rem]'>
         {cardTitle}
       </div>
 
