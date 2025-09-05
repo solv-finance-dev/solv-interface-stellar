@@ -39,7 +39,7 @@ export default function SolvBtc() {
       id='transaction'
     >
       <Tabs defaultValue='deposit' className='w-full'>
-        <TabsList className='mb-[2.25rem] h-[2.75rem] w-[17.6875rem] !space-x-1 !bg-transparent !p-0'>
+        <TabsList className='mb-2 h-[2.75rem] w-[17.6875rem] !space-x-1 !bg-transparent !p-0 md:mb-[2.25rem]'>
           {tabs.map(({ value, label }) => (
             <TabsTrigger
               key={value}

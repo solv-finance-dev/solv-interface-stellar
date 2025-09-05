@@ -68,9 +68,10 @@ export function WalletModal({ open, onOpenChange }: WalletModalProps) {
           <DialogTitle className='text-left text-lg font-bold'>
             Connect your wallet
           </DialogTitle>
-          <DialogDescription className='mt-4'>
-            <Label className='text-muted-foreground flex items-start space-x-2 text-left text-xs'>
+          <DialogDescription className='mt-3'>
+            <Label className='flex items-start space-x-1 text-left text-xs text-textColor'>
               <Checkbox
+                className='mt-[2px]'
                 id='terms'
                 checked={isCheckedTerms}
                 onCheckedChange={checked => {
@@ -79,13 +80,13 @@ export function WalletModal({ open, onOpenChange }: WalletModalProps) {
                   );
                 }}
               />
-              <span>
+              <span className='text-xs'>
                 By connecting my wallet and using Solv's services, I confirm
                 that I have read, understood, and agree to be bound by Solv's{' '}
                 <a
                   href='https://storage-1.solv.finance/solv-term-of-use-reps-and-warranties.pdf'
                   target='_blank'
-                  className='text-mainColor'
+                  className='text-brand'
                 >
                   Terms of Use and Privacy Policy
                 </a>
@@ -93,7 +94,7 @@ export function WalletModal({ open, onOpenChange }: WalletModalProps) {
                 <a
                   href='https://docs.solv.finance/legal/disclaimer'
                   target='_blank'
-                  className='text-mainColor'
+                  className='text-brand'
                 >
                   Disclaimer
                 </a>
@@ -102,7 +103,7 @@ export function WalletModal({ open, onOpenChange }: WalletModalProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <div className='space-y-4'>
+        <div className=''>
           {/* Wallet List */}
           <div className='h-[19.5rem] space-y-2 overflow-y-auto'>
             {availableWallets.map(wallet => {
@@ -114,16 +115,16 @@ export function WalletModal({ open, onOpenChange }: WalletModalProps) {
               return (
                 <div
                   key={wallet.id}
-                  className={`bg-grayColor/5 flex items-center space-x-3 rounded-lg py-2 transition-all duration-200 ${
+                  className={`flex items-center space-x-2 rounded-lg bg-background-elevation2 px-3 py-2 transition-all duration-200 ${
                     canClick
-                      ? 'hover:bg-mainColor cursor-pointer hover:text-white'
+                      ? 'cursor-pointer hover:bg-brand'
                       : 'cursor-not-allowed opacity-50'
                   }`}
                   onClick={() =>
                     canClick ? handleWalletClick(wallet) : undefined
                   }
                 >
-                  <div className='flex h-10 w-10 items-center justify-center rounded-full'>
+                  <div className='flex h-6 w-6 items-center justify-center overflow-hidden rounded-full'>
                     {isCurrentlyConnecting ? (
                       <div className='border-primary-foreground h-6 w-6 animate-spin rounded-full border-2 border-t-transparent' />
                     ) : (
@@ -134,9 +135,12 @@ export function WalletModal({ open, onOpenChange }: WalletModalProps) {
                       />
                     )}
                   </div>
-                  <div className='flex-1'>
-                    <p className='text-sm font-medium'>{wallet.name}</p>
-                    <p className='text-xs opacity-70'>
+
+                  <div className='flex w-full items-center justify-between'>
+                    <div className='text-sm font-medium text-textColor'>
+                      {wallet.name}
+                    </div>
+                    <div className='rounded-lg bg-brand-50 px-2 py-[2px] text-xs text-textColor-secondary dark:bg-brand-700'>
                       {isCurrentlyConnecting
                         ? isConnecting
                           ? 'Connecting...'
@@ -144,14 +148,14 @@ export function WalletModal({ open, onOpenChange }: WalletModalProps) {
                         : wallet.isInstalled
                           ? 'Available'
                           : 'Not installed'}
-                    </p>
+                    </div>
                   </div>
                 </div>
               );
             })}
 
             {availableWallets.length === 0 && (
-              <div className='text-muted-foreground py-8 text-center'>
+              <div className='py-8 text-center text-textColor-secondary'>
                 <p className='text-sm'>No wallets available</p>
                 <p className='text-xs'>
                   Please install a Stellar wallet extension

@@ -50,6 +50,7 @@ import { getCurrentStellarNetwork } from '@/config/stellar';
 import { SolvBTCTokenClient } from '@/contracts/solvBTCTokenContract/src';
 import { getStellarAPI } from '@/stellar';
 import { LoaderIcon } from '@/assets/svg/svg';
+import ExchangeRate from '@/components/ExchangeRate';
 
 // Using shared utils for sanitization/formatting and calculations
 
@@ -736,33 +737,39 @@ export default function Deposit() {
     }
   }
 
+  function ExchangeRateValue() {
+    return (
+      <ExchangeRate
+        title='Exchange Rate'
+        value={
+          isLoadingFeeRate ? (
+            <Skeleton className='h-4 w-[200px]' />
+          ) : !selected || feeRateError ? (
+            '—'
+          ) : (
+            (() => {
+              const receive = computeReceiveFromDeposit(
+                '1',
+                depositFeeRate,
+                shareTokenDecimals ?? TOKEN_DECIMALS_FALLBACK
+              );
+              return `1.00 ${selected?.name} = ${receive ? parseFloat(receive).toFixed(4) : '—'} ${shareTokenName}`;
+            })()
+          )
+        }
+      />
+    );
+  }
+
   return (
     <Form {...form}>
       {/* Top-right exchange rate pill */}
-      <div className='absolute right-4 top-6 mb-3 flex w-full justify-end'>
-        <div className='flex items-center gap-2 rounded-md px-3 py-1 text-[.875rem]'>
-          <span className='text-textColor-tertiary'>Exchange Rate</span>
-          <span className='text-textColor'>
-            {isLoadingFeeRate ? (
-              <Skeleton className='h-4 w-[200px]' />
-            ) : !selected || feeRateError ? (
-              '—'
-            ) : (
-              (() => {
-                const receive = computeReceiveFromDeposit(
-                  '1',
-                  depositFeeRate,
-                  shareTokenDecimals ?? TOKEN_DECIMALS_FALLBACK
-                );
-                return `1.00 ${selected?.name} = ${receive ? parseFloat(receive).toFixed(4) : '—'} ${shareTokenName}`;
-              })()
-            )}
-          </span>
-        </div>
+      <div className='pointer-events-none absolute right-8 top-[2.3rem] hidden w-full justify-end md:flex'>
+        <ExchangeRateValue />
       </div>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className='flex w-full flex-col space-y-6'
+        className='flex w-full flex-col space-y-4 md:space-y-6'
       >
         <div className='flex flex-col justify-between md:flex-row'>
           <FormField
@@ -944,6 +951,10 @@ export default function Deposit() {
               </FormItem>
             )}
           />
+        </div>
+
+        <div className='flex h-[1.25rem] w-full justify-end md:hidden'>
+          <ExchangeRateValue />
         </div>
 
         <div className='flex items-end justify-center'>
