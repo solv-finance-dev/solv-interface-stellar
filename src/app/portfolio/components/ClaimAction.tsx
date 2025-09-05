@@ -207,7 +207,7 @@ export default function ClaimAction({
       <Button
         variant='default'
         size='sm'
-        className='w-full rounded-full bg-brand hover:bg-brand-600 disabled:opacity-60 md:w-[6.4375rem]'
+        className='w-full rounded-full bg-brand text-white hover:bg-brand-600 disabled:opacity-60 md:w-[6.4375rem]'
         onClick={handleClaim}
         disabled={disabled}
       >

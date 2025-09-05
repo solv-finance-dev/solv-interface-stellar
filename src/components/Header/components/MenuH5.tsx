@@ -39,8 +39,8 @@ const MenuH5 = ({ menuList }: { menuList: MenuItem[] }) => {
 
               item?.activeHref && item?.activeHref.includes(pathname)
                 ? theme === 'dark'
-                  ? 'bg-base-neutral-600'
-                  : 'bg-base-neutral-300'
+                  ? 'bg-base-neutral-600/50'
+                  : 'bg-base-neutral-300/50'
                 : 'bg-transparent'
             )}
             key={item.label}

@@ -207,7 +207,11 @@ export function DataTableComplex<TData, TValue>({
       </div>
 
       {/* Pagination */}
-      {data && data.length > 0 && <TablePagination table={table} data={data} />}
+      <div className='flex justify-end'>
+        {data && data.length > 0 && (
+          <TablePagination table={table} data={data} />
+        )}
+      </div>
     </>
   );
 }
