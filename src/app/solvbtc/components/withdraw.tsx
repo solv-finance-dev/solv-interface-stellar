@@ -14,7 +14,7 @@ import {
   toast,
   Skeleton,
 } from '@solvprotocol/ui-v2';
-import { ArrowRight, RotateCcw, Loader2 } from 'lucide-react';
+import { ArrowRight, RotateCcw } from 'lucide-react';
 import { InputComplex } from '@/components/InputComplex';
 // Removed token selector for withdraw; right side is fixed to SolvBTC
 import { TokenIcon } from '@/components/TokenIcon';
@@ -44,6 +44,7 @@ import { Buffer } from 'buffer';
 import { useLoadingDialog } from '@/hooks/useLoadingDialog';
 import { useSuccessfulDialog } from '@/hooks/useSuccessfulDialog';
 import { buildExplorerTxUrl, getTxHashFromSent } from '@/lib/stellar-tx';
+import { LoaderIcon } from '@/assets/svg/svg';
 
 const createFormSchema = (params: {
   depositDecimals: number;
@@ -545,7 +546,7 @@ export default function Withdraw() {
                       title='Refresh balance'
                     >
                       <RotateCcw
-                        className={`text-textColor-tertiary h-3 w-3 ${isLoadingBalance ? 'animate-spin' : ''}`}
+                        className={`h-3 w-3 text-textColor-tertiary ${isLoadingBalance ? 'animate-spin' : ''}`}
                       />
                     </button>
                   </div>
@@ -687,7 +688,7 @@ export default function Withdraw() {
           >
             {isSubmitting ? (
               <>
-                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                <LoaderIcon className='mr-2 h-4 w-4 animate-spin' />
                 Processing...
               </>
             ) : !!isConnected &&

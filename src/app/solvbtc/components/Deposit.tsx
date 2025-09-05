@@ -19,7 +19,7 @@ import {
   toast,
   Skeleton,
 } from '@solvprotocol/ui-v2';
-import { ArrowRight, RotateCcw, Loader2 } from 'lucide-react';
+import { ArrowRight, RotateCcw } from 'lucide-react';
 import { InputComplex } from '@/components/InputComplex';
 import { TooltipComplex } from '@/components/TooltipComplex';
 import { TokenIcon } from '@/components/TokenIcon';
@@ -49,6 +49,7 @@ import { useSuccessfulDialog } from '@/hooks/useSuccessfulDialog';
 import { getCurrentStellarNetwork } from '@/config/stellar';
 import { SolvBTCTokenClient } from '@/contracts/solvBTCTokenContract/src';
 import { getStellarAPI } from '@/stellar';
+import { LoaderIcon } from '@/assets/svg/svg';
 
 // Using shared utils for sanitization/formatting and calculations
 
@@ -793,7 +794,7 @@ export default function Deposit() {
                       title='Refresh balance'
                     >
                       <RotateCcw
-                        className={`text-textColor-tertiary h-3 w-3 ${isLoadingBalance ? 'animate-spin' : ''}`}
+                        className={`h-3 w-3 text-textColor-tertiary ${isLoadingBalance ? 'animate-spin' : ''}`}
                       />
                     </button>
                   </div>
@@ -970,7 +971,7 @@ export default function Deposit() {
           >
             {isSubmitting ? (
               <>
-                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                <LoaderIcon className='mr-2 h-4 w-4 animate-spin' />
                 Processing...
               </>
             ) : !!isConnected &&

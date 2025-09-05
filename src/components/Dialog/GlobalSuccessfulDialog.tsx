@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { Loader2 } from 'lucide-react';
+import { LoaderIcon } from 'lucide-react';
 
 import cn from 'classnames';
 import {
@@ -82,7 +82,7 @@ export function GlobalSuccessfulDialog() {
       >
         <DialogHeader className='mt-[2.75rem]'>
           <DialogTitle className='flex w-full justify-center'>
-            <div className='bg-background-elevation2 flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full'>
+            <div className='flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full bg-background-elevation2'>
               <svg
                 width='41'
                 height='40'
@@ -98,7 +98,7 @@ export function GlobalSuccessfulDialog() {
             </div>
           </DialogTitle>
 
-          <div className='text-textColor mb-[.5rem] mt-6 flex items-center justify-center text-[1.125rem] font-[500] leading-none'>
+          <div className='mb-[.5rem] mt-6 flex items-center justify-center text-[1.125rem] font-[500] leading-none text-textColor'>
             {title ? (
               <span>{title}&nbsp;Successfully</span>
             ) : (
@@ -107,7 +107,7 @@ export function GlobalSuccessfulDialog() {
           </div>
 
           {description && (
-            <DialogDescription className='text-textColor-secondary w-full text-center text-[0.875rem] font-[500]'>
+            <DialogDescription className='w-full text-center text-[0.875rem] font-[500] text-textColor-secondary'>
               {description}
             </DialogDescription>
           )}
@@ -136,7 +136,7 @@ export function GlobalSuccessfulDialog() {
                 !showCancel && 'w-full'
               )}
             >
-              {loading && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
+              {loading && <LoaderIcon className='mr-2 h-4 w-4 animate-spin' />}
 
               {confirmText}
             </Button>
