@@ -458,7 +458,7 @@ export default function Withdraw() {
       openSuccessfulDialog({
         title: 'Withdraw',
         description: `Withdraw request submitted: ${withdrawAmount} SolvBTC`,
-        confirmText: 'OK',
+        confirmText: 'Confirm',
         showConfirm: true,
         showCancel: false,
         scanUrl,

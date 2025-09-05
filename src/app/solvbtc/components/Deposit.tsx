@@ -689,7 +689,7 @@ export default function Deposit() {
       openSuccessfulDialog({
         title: 'Deposit',
         description: `Successfully deposited ${depositAmount} ${selected.name}.`,
-        confirmText: 'OK',
+        confirmText: 'Confirm',
         showConfirm: true,
         showCancel: false,
         scanUrl,
