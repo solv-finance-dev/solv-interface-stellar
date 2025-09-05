@@ -2153,10 +2153,10 @@
     rpc-websockets "^9.0.2"
     superstruct "^2.0.2"
 
-"@solvprotocol/ui-v2@2.1.16":
-  version "2.1.16"
-  resolved "https://registry.yarnpkg.com/@solvprotocol/ui-v2/-/ui-v2-2.1.16.tgz#0b4671eb72509e5d4be49925d9699bcfcab8fdf5"
-  integrity sha512-62x8F0aQcLU+PKlaAStDmbypNj3L0Z5SmoDo8lZfLfwsSxLtAVj3c6rDsLZrFut7oHlSS2RvlGEybmHAB3vp5A==
+"@solvprotocol/ui-v2@2.1.17":
+  version "2.1.17"
+  resolved "https://registry.yarnpkg.com/@solvprotocol/ui-v2/-/ui-v2-2.1.17.tgz#1013265ed76d215eac2f3172fa7055bf2f492214"
+  integrity sha512-8DjE4aXhTEFqL8fUhU6O/fvPvC4JhCQvMIouFKdKpLM9/62qj90rXMpOzVNdTa8Kl9uccfQm+WHFkpY8wQDCmQ==
   dependencies:
     "@hookform/resolvers" "^5.2.1"
     "@radix-ui/react-accordion" "^1.2.12"
