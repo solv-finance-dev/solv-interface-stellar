@@ -46,6 +46,7 @@ import { useSuccessfulDialog } from '@/hooks/useSuccessfulDialog';
 import { buildExplorerTxUrl, getTxHashFromSent } from '@/lib/stellar-tx';
 import { LoaderIcon } from '@/assets/svg/svg';
 import { TooltipComplex } from '@/components/TooltipComplex';
+import ExchangeRate from '@/components/ExchangeRate';
 
 const createFormSchema = (params: {
   depositDecimals: number;
@@ -487,29 +488,35 @@ export default function Withdraw() {
     }
   }
 
+  function ExchangeRateValue() {
+    return (
+      <ExchangeRate
+        title='Exchange Rate'
+        value={
+          isLoadingFeeRate ? (
+            <Skeleton className='h-4 w-[200px]' />
+          ) : feeRateError ? (
+            '—'
+          ) : (
+            (() => {
+              const receive = computeReceiveFromDeposit(
+                '1',
+                withdrawFeeRate,
+                shareTokenDecimals ?? TOKEN_DECIMALS_FALLBACK
+              );
+              return `1.00 ${vaultEntry?.shareTokenClient?.name || 'Share'} = ${receive ? parseFloat(receive).toFixed(4) : '—'} SolvBTC`;
+            })()
+          )
+        }
+      />
+    );
+  }
+
   return (
     <Form {...form}>
       {/* Top-right exchange rate pill */}
-      <div className='absolute right-4 top-6 mb-3 flex w-full justify-end'>
-        <div className='flex items-center gap-2 rounded-md px-3 py-1 text-[.875rem]'>
-          <span className='text-textColor-tertiary'>Exchange Rate</span>
-          <span className='text-textColor'>
-            {isLoadingFeeRate ? (
-              <Skeleton className='h-4 w-[200px]' />
-            ) : feeRateError ? (
-              '—'
-            ) : (
-              (() => {
-                const receive = computeReceiveFromDeposit(
-                  '1',
-                  withdrawFeeRate,
-                  shareTokenDecimals ?? TOKEN_DECIMALS_FALLBACK
-                );
-                return `1.00 ${vaultEntry?.shareTokenClient?.name || 'Share'} = ${receive ? parseFloat(receive).toFixed(4) : '—'} SolvBTC`;
-              })()
-            )}
-          </span>
-        </div>
+      <div className='pointer-events-none absolute right-8 top-[2.3rem] hidden w-full justify-end md:flex'>
+        <ExchangeRateValue />
       </div>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
@@ -664,6 +671,10 @@ export default function Withdraw() {
               </FormItem>
             )}
           />
+        </div>
+
+        <div className='flex h-[1.25rem] w-full justify-end md:hidden'>
+          <ExchangeRateValue />
         </div>
 
         <div className='flex items-end justify-center'>

@@ -737,29 +737,35 @@ export default function Deposit() {
     }
   }
 
+  function ExchangeRateValue() {
+    return (
+      <ExchangeRate
+        title='Exchange Rate'
+        value={
+          isLoadingFeeRate ? (
+            <Skeleton className='h-4 w-[200px]' />
+          ) : !selected || feeRateError ? (
+            '—'
+          ) : (
+            (() => {
+              const receive = computeReceiveFromDeposit(
+                '1',
+                depositFeeRate,
+                shareTokenDecimals ?? TOKEN_DECIMALS_FALLBACK
+              );
+              return `1.00 ${selected?.name} = ${receive ? parseFloat(receive).toFixed(4) : '—'} ${shareTokenName}`;
+            })()
+          )
+        }
+      />
+    );
+  }
+
   return (
     <Form {...form}>
       {/* Top-right exchange rate pill */}
-      <div className='absolute right-8 top-[2.3rem] hidden w-full justify-end md:flex'>
-        <ExchangeRate
-          title='Exchange Rate'
-          value={
-            isLoadingFeeRate ? (
-              <Skeleton className='h-4 w-[200px]' />
-            ) : !selected || feeRateError ? (
-              '—'
-            ) : (
-              (() => {
-                const receive = computeReceiveFromDeposit(
-                  '1',
-                  depositFeeRate,
-                  shareTokenDecimals ?? TOKEN_DECIMALS_FALLBACK
-                );
-                return `1.00 ${selected?.name} = ${receive ? parseFloat(receive).toFixed(4) : '—'} ${shareTokenName}`;
-              })()
-            )
-          }
-        />
+      <div className='pointer-events-none absolute right-8 top-[2.3rem] hidden w-full justify-end md:flex'>
+        <ExchangeRateValue />
       </div>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
@@ -948,25 +954,7 @@ export default function Deposit() {
         </div>
 
         <div className='flex h-[1.25rem] w-full justify-end md:hidden'>
-          <ExchangeRate
-            title='Exchange Rate'
-            value={
-              isLoadingFeeRate ? (
-                <Skeleton className='h-4 w-[200px]' />
-              ) : !selected || feeRateError ? (
-                '—'
-              ) : (
-                (() => {
-                  const receive = computeReceiveFromDeposit(
-                    '1',
-                    depositFeeRate,
-                    shareTokenDecimals ?? TOKEN_DECIMALS_FALLBACK
-                  );
-                  return `1.00 ${selected?.name} = ${receive ? parseFloat(receive).toFixed(4) : '—'} ${shareTokenName}`;
-                })()
-              )
-            }
-          />
+          <ExchangeRateValue />
         </div>
 
         <div className='flex items-end justify-center'>
