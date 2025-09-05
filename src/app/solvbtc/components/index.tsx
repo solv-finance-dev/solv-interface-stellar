@@ -34,7 +34,10 @@ export default function SolvBtc() {
     },
   ];
   return (
-    <Card className='mb-4 box-border !p-4 md:mb-8 md:!p-8' id='transaction'>
+    <Card
+      className='relative mb-4 box-border !p-4 md:mb-8 md:!p-8'
+      id='transaction'
+    >
       <Tabs defaultValue='deposit' className='w-full'>
         <TabsList className='mb-[2.25rem] h-[2.75rem] w-[17.6875rem] !space-x-1 !bg-transparent !p-0'>
           {tabs.map(({ value, label }) => (
