@@ -2,8 +2,6 @@
 
 html,
 body {
-  background: var(--surfaces);
-  color: var(--foreground);
   font-family: 'MatterSQ-Regular', sans-serif;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */

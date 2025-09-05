@@ -66,16 +66,20 @@ export function RedemptionTable({
       description: 'Sorry. You have no claimable amount at the moment.',
       content: (
         <section className=''>
-          <div className='text-[.875rem] leading-5'>Claimable</div>
-          <div className='mb-4 mt-2 text-2xl'>0.00 WBTC</div>
+          <div className='text-textColor-secondary text-[.875rem] leading-5'>
+            Claimable
+          </div>
+          <div className='text-textColor mb-4 mt-2 text-2xl'>0.00 WBTC</div>
 
-          <div className='box-border flex h-[2.25rem] w-full items-center justify-between rounded-md bg-gray-100 p-2'>
+          <div className='bg-background-elevation3 box-border flex h-[2.25rem] w-full items-center justify-between rounded-md p-2'>
             <div className='flex items-center justify-start text-[.875rem] leading-[1.25rem]'>
-              <span className='mr-1'>Pending repayment</span>{' '}
+              <span className='text-textColor-secondary mr-1'>
+                Pending repayment
+              </span>{' '}
               <TooltipComplex content={'tips'} />
             </div>
 
-            <div className='flex items-center justify-end text-[.875rem] leading-[1.25rem]'>
+            <div className='text-textColor flex items-center justify-end text-[.875rem] leading-[1.25rem]'>
               0.00 WBTC
             </div>
           </div>
@@ -120,7 +124,7 @@ export function RedemptionTable({
       cell: ({ row }) => {
         return (
           <div className=''>
-            <div className='w-full truncate font-MatterSQ-Medium text-[1rem] leading-[1.125rem] md:max-w-[calc(90%-1rem)]'>
+            <div className='text-textColor w-full truncate font-MatterSQ-Medium text-[1rem] leading-[1.125rem] md:max-w-[calc(90%-1rem)]'>
               {row.getValue('pool')}
             </div>
 
@@ -200,7 +204,11 @@ export function RedemptionTable({
           maximumFractionDigits: 6,
         }).format(amount);
 
-        return <div className='text-[.875rem] leading-4'>{formatted}</div>;
+        return (
+          <div className='text-textColor text-[.875rem] leading-4'>
+            {formatted}
+          </div>
+        );
       },
     },
     {
@@ -219,8 +227,8 @@ export function RedemptionTable({
 
         return (
           <div className='flex flex-row items-end text-[.875rem] leading-4 md:flex-col'>
-            <span>{formatted} SolvBTC</span>
-            <span className='ml-1 mt-0 text-[10px] text-gray-400 md:ml-0 md:mt-1 md:text-[.875rem]'>
+            <span className='text-textColor'>{formatted} SolvBTC</span>
+            <span className='text-textColor-secondary ml-1 mt-0 text-[10px] md:ml-0 md:mt-1 md:text-[.875rem]'>
               {formatted}
             </span>
           </div>

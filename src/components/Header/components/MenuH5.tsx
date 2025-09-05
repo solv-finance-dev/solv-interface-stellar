@@ -25,7 +25,7 @@ const MenuH5 = ({ menuList }: { menuList: MenuItem[] }) => {
         'fixed inset-0 z-50 box-border flex h-screen w-screen p-4 backdrop-blur-sm md:hidden',
 
         {
-          'bg-black': theme === 'dark',
+          'bg-base-neutral-950': theme === 'dark',
           'bg-white': theme === 'light',
         }
       )}
@@ -39,8 +39,8 @@ const MenuH5 = ({ menuList }: { menuList: MenuItem[] }) => {
 
               item?.activeHref && item?.activeHref.includes(pathname)
                 ? theme === 'dark'
-                  ? 'bg-[#161616]'
-                  : 'bg-gray-50'
+                  ? 'bg-base-neutral-600'
+                  : 'bg-base-neutral-300'
                 : 'bg-transparent'
             )}
             key={item.label}
@@ -48,8 +48,8 @@ const MenuH5 = ({ menuList }: { menuList: MenuItem[] }) => {
             <div
               className={
                 item?.activeHref && item?.activeHref.includes(pathname)
-                  ? '!text-textActiveColor'
-                  : 'text-textColor'
+                  ? '!text-textColor'
+                  : 'text-textColor-secondary'
               }
               onClick={() => handleNavClick(item.href)}
             >

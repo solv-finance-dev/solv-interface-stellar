@@ -28,7 +28,7 @@ export default function DetailsDescription({
           showMore ? 'h-auto' : 'h-40'
         )}
       >
-        <div ref={descriptionRef}>
+        <div ref={descriptionRef} className='text-textColor-secondary'>
           {true ? (
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
@@ -61,7 +61,7 @@ export default function DetailsDescription({
       </div>
       {showBtn && (
         <div
-          className='text-mainColor cursor-pointer pt-4 text-sm font-bold'
+          className='cursor-pointer pt-4 text-sm font-bold text-brand'
           onClick={() => setShowMore(!showMore)}
         >
           {showMore ? 'See less' : 'See more'}

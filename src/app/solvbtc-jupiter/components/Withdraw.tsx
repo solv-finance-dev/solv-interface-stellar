@@ -62,12 +62,13 @@ export default function Withdraw() {
             render={({ field }) => (
               <FormItem className='w-full gap-[10px] md:w-[45.4%]'>
                 <FormLabel className='flex items-end justify-between text-[.75rem] leading-[1rem]'>
-                  <span>You Will Withdraw</span>
+                  <span className='text-textColor'>You Will Withdraw</span>
                   <div className='flex items-end text-[.875rem]'>
                     {/*  Sample code error : !text-errorColor */}
-                    <span className='text-grayColor mr-2 !text-errorColor'>
+                    <span className='text-textColor-tertiary mr-2'>
                       Balance:
                     </span>
+
                     <div className='text-textColor'> 128.34 SolvBTC</div>
                   </div>
                 </FormLabel>
@@ -124,7 +125,7 @@ export default function Withdraw() {
             name='receive'
             render={({ field }) => (
               <FormItem className='w-full gap-[10px] md:w-[45.4%]'>
-                <FormLabel className='flex items-center !gap-1 text-[.75rem] leading-[1rem]'>
+                <FormLabel className='text-textColor flex items-center !gap-1 text-[.75rem] leading-[1rem]'>
                   You Will Receive
                 </FormLabel>
                 <FormControl>

@@ -39,6 +39,7 @@ const DynamicAccordion: React.FC<DynamicAccordionProps> = ({
       {data.map(item => (
         <AccordionItem key={item.title} value={item.title} className=''>
           <AccordionTrigger className='text-xl'>{item.title}</AccordionTrigger>
+
           <AccordionContent>
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}

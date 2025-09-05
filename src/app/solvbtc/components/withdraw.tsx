@@ -520,9 +520,9 @@ export default function Withdraw() {
             render={({ field }) => (
               <FormItem className='w-full gap-[10px] md:w-[45.4%]'>
                 <FormLabel className='flex items-end justify-between text-[.75rem] leading-[1rem]'>
-                  <span>You Will Withdraw</span>
+                  <span className='text-textColor'>You Will Withdraw</span>
                   <div className='flex items-center gap-2 text-[.875rem]'>
-                    <span className='text-grayColor'>Balance:</span>
+                    <span className='text-textColor-tertiary'>Balance:</span>
                     <div className='text-textColor'>
                       {isLoadingBalance ? (
                         <span className='animate-pulse'>Loading...</span>
@@ -545,7 +545,7 @@ export default function Withdraw() {
                       title='Refresh balance'
                     >
                       <RotateCcw
-                        className={`text-grayColor h-3 w-3 ${isLoadingBalance ? 'animate-spin' : ''}`}
+                        className={`text-textColor-tertiary h-3 w-3 ${isLoadingBalance ? 'animate-spin' : ''}`}
                       />
                     </button>
                   </div>
@@ -619,6 +619,22 @@ export default function Withdraw() {
                 <FormLabel className='flex items-center justify-between text-[.75rem] leading-[1rem]'>
                   <div className='flex items-center !gap-1'>
                     <span className='text-textColor'>You Will Receive</span>
+                  </div>
+                  <div className='flex items-center gap-2 text-[.875rem]'>
+                    <span className='text-textColor-tertiary'>Fee Rate:</span>
+                    <div className='text-textColor'>
+                      {isLoadingFeeRate ? (
+                        <span className='animate-pulse'>Loading...</span>
+                      ) : feeRateError ? (
+                        <span className='text-red-500' title={feeRateError}>
+                          Error
+                        </span>
+                      ) : (
+                        <span className='font-medium text-brand-500'>
+                          {withdrawFeeRate}%
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </FormLabel>
                 <FormControl>

@@ -113,13 +113,13 @@ const Header = ({ className }: { className?: string }) => {
 
             <div className='flex items-center justify-center'>
               <div
-                className='border-border flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-solid bg-gray-400/10 md:h-[2.75rem] md:w-[2.75rem] md:p-[.375rem]'
+                className='bg-base-neutral-600/10 border-base-neutral-300 dark:border-base-neutral-800 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-solid backdrop-blur-[5px] md:h-[2.75rem] md:w-[2.75rem] md:p-[.375rem]'
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
               >
                 {theme == 'dark' ? (
-                  <SunIcon className='text-textColor h-[1.125rem] w-[1.125rem] md:h-[1.5rem] md:w-[1.5rem]' />
+                  <SunIcon className='text-textColor-secondary h-[1.125rem] w-[1.125rem] md:h-[1.5rem] md:w-[1.5rem]' />
                 ) : (
-                  <MoonIcon className='text-textColor h-[1.125rem] w-[1.125rem] md:h-[1.5rem] md:w-[1.5rem]' />
+                  <MoonIcon className='text-textColor-secondary h-[1.125rem] w-[1.125rem] md:h-[1.5rem] md:w-[1.5rem]' />
                 )}
               </div>
             </div>

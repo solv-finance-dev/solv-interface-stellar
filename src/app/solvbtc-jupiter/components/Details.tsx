@@ -6,7 +6,9 @@ import React from 'react';
 export default function Details() {
   return (
     <div>
-      <div className='mb-4 font-MatterSQ-Medium text-xl'>Contract Info</div>
+      <div className='text-textColor mb-4 font-MatterSQ-Medium text-xl'>
+        Contract Info
+      </div>
 
       <div className='mb-6 flex space-x-[2rem] md:space-x-[3.875rem]'>
         <InfoItem label='Vault Address' value={`0x9537...d185`} url={''} />
@@ -14,7 +16,9 @@ export default function Details() {
         <InfoItem label='Token Address' value={`0x9537...d185`} url={''} />
       </div>
 
-      <div className='mb-4 font-MatterSQ-Medium text-xl'>Description</div>
+      <div className='text-textColor mb-4 font-MatterSQ-Medium text-xl'>
+        Description
+      </div>
 
       <DetailsDescription
         /* Placeholder text */

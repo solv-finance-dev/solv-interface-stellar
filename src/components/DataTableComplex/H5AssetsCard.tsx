@@ -44,7 +44,7 @@ export function NoDataDom() {
           height={160}
           className='h-40 w-40'
         ></Image>
-        <div className='text-center text-[1.2rem] text-[#A5A5A5]'>
+        <div className='text-center text-[1.2rem] text-textColor-tertiary'>
           <span>No results found</span>
         </div>
       </div>

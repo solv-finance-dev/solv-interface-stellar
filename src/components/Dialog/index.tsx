@@ -72,18 +72,18 @@ export function GlobalDialog() {
       >
         <DialogHeader>
           {title && (
-            <DialogTitle className='flex items-center justify-start'>
+            <DialogTitle className='text-textColor flex items-center justify-start'>
               {title}
             </DialogTitle>
           )}
           {description && (
-            <DialogDescription className='mt-[-4px] flex items-center justify-start text-[.875rem]'>
+            <DialogDescription className='text-textColor-secondary mt-[-4px] flex items-center justify-start text-[.875rem]'>
               {description}
             </DialogDescription>
           )}
         </DialogHeader>
 
-        <div className=''>{content}</div>
+        <div className='text-textColor'>{content}</div>
 
         <DialogFooter className='mt-1 flex w-full items-center'>
           {showCancel && (

@@ -772,8 +772,8 @@ export default function Deposit() {
                 <FormLabel className='flex items-end justify-between text-[.75rem] leading-[1rem]'>
                   <span className='text-textColor'>You Will Deposit</span>
                   <div className='flex items-center gap-2 text-[.875rem]'>
-                    <span className='text-grayColor'>Balance:</span>
-                    <div className='text-grayColor'>
+                    <span className='text-textColor-tertiary'>Balance:</span>
+                    <div className='text-textColor'>
                       {isLoadingBalance ? (
                         <span className='animate-pulse'>Loading...</span>
                       ) : (
@@ -793,7 +793,7 @@ export default function Deposit() {
                       title='Refresh balance'
                     >
                       <RotateCcw
-                        className={`text-grayColor h-3 w-3 ${isLoadingBalance ? 'animate-spin' : ''}`}
+                        className={`text-textColor-tertiary h-3 w-3 ${isLoadingBalance ? 'animate-spin' : ''}`}
                       />
                     </button>
                   </div>
@@ -895,6 +895,23 @@ export default function Deposit() {
                   <div className='flex items-center !gap-1'>
                     <span className='text-textColor'>You Will Receive</span>
                     <TooltipComplex content={'tips'}></TooltipComplex>
+                  </div>
+
+                  <div className='flex items-center gap-2 text-[.875rem]'>
+                    <span className='text-textColor-tertiary'>Fee Rate:</span>
+                    <div className='text-textColor'>
+                      {isLoadingFeeRate ? (
+                        <span className='animate-pulse'>Loading...</span>
+                      ) : feeRateError ? (
+                        <span className='text-red-500' title={feeRateError}>
+                          Error
+                        </span>
+                      ) : (
+                        <span className='font-medium text-brand-500'>
+                          {depositFeeRate}%
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </FormLabel>
                 <FormControl>
