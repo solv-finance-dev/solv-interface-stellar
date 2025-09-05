@@ -491,7 +491,7 @@ export default function Withdraw() {
       {/* Top-right exchange rate pill */}
       <div className='absolute right-4 top-6 mb-3 flex w-full justify-end'>
         <div className='flex items-center gap-2 rounded-md px-3 py-1 text-[.875rem]'>
-          <span className='text-grayColor'>Exchange Rate</span>
+          <span className='text-textColor-tertiary'>Exchange Rate</span>
           <span className='text-textColor'>
             {isLoadingFeeRate ? (
               <Skeleton className='h-4 w-[200px]' />
