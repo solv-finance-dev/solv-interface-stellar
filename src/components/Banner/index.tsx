@@ -32,11 +32,11 @@ const Banner = ({
       )}
     >
       <div className=''>
-        <div className='mb-4 flex flex-col text-[4rem] leading-[4rem] md:flex-row md:items-end'>
+        <div className='text-textColor mb-4 flex flex-col text-[4rem] leading-[4rem] md:flex-row md:items-end'>
           {title}
 
           {subTitle && (
-            <span className='text-grayColor text-[2.5rem] leading-[3rem] md:ml-4'>
+            <span className='text-textColor-tertiary text-[2.5rem] leading-[3rem] md:ml-4'>
               {subTitle}
             </span>
           )}
@@ -44,6 +44,7 @@ const Banner = ({
         {description && (
           <div
             className={cn(
+              'text-textColor',
               slot
                 ? 'text-[1.125rem] leading-[1.5rem]'
                 : 'text-[1.25rem] leading-[1.75rem]'

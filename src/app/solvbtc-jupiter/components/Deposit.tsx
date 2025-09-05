@@ -75,12 +75,13 @@ export default function Deposit() {
             render={({ field }) => (
               <FormItem className='w-full gap-[10px] md:w-[45.4%]'>
                 <FormLabel className='flex items-end justify-between text-[.75rem] leading-[1rem]'>
-                  <span>Deposit</span>
+                  <span className='text-textColor'>Deposit</span>
                   <div className='flex items-end text-[.875rem]'>
                     {/*  Sample code error : !text-errorColor */}
-                    <span className='mr-2 !text-errorColor text-grayColor'>
+                    <span className='text-textColor-tertiary mr-2'>
                       Balance:
                     </span>
+                    {/* !text-errorColor */}
                     <div className='text-textColor'> 128.34 mBTC</div>
                   </div>
                 </FormLabel>
@@ -160,7 +161,7 @@ export default function Deposit() {
             name='receive'
             render={({ field }) => (
               <FormItem className='w-full gap-[10px] md:w-[45.4%]'>
-                <FormLabel className='flex items-center !gap-1 text-[.75rem] leading-[1rem]'>
+                <FormLabel className='flex items-center !gap-1 text-[.75rem] leading-[1rem] text-textColor'>
                   You Will Receive
                   <TooltipComplex content={'tips'}></TooltipComplex>
                 </FormLabel>

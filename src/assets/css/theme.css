@@ -6,11 +6,16 @@
 @tailwind utilities;
 
 :root {
-  --fontfamily: 'MatterSQ-Regular';
 }
 
 .light {
 }
 
 .dark {
+}
+
+html,
+body {
+  background: hsl(var(--solv-background-default));
+  color: hsl(var(--solv-text-primary));
 }

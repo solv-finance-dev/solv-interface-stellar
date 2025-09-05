@@ -71,7 +71,7 @@ export default function MyRedemption() {
   return (
     <div className='pt-0 md:pt-6'>
       <div className='flex w-full items-end justify-between'>
-        <h3 className='text-[3rem] leading-[4rem] md:text-[4rem]'>
+        <h3 className='text-textColor-heading text-[3rem] leading-[4rem] md:text-[4rem]'>
           My Redemption
         </h3>
 
@@ -82,8 +82,8 @@ export default function MyRedemption() {
           isConnecting ? (
             <></>
           ) : (
-            <div className='border-border flex h-[3rem] w-[12.8125rem] items-center justify-between rounded-[1.875rem] border-[1px] border-solid py-1 pl-2 pr-3'>
-              <div className='box-border flex h-10 w-10 items-center justify-center rounded-full border-[1px] border-solid border-gray-300 p-2'>
+            <div className='border-border border-base-neutral-400 flex h-[3rem] w-[12.8125rem] items-center justify-between rounded-[1.875rem] border-[1px] border-solid py-1 pl-2 pr-3'>
+              <div className='border-borderColor box-border flex items-center justify-center rounded-full border-[1px] border-solid p-2'>
                 <TokenIcon
                   src='https://avatar.sft-api.com/avatar/28.png'
                   className='h-6 w-6'
@@ -91,7 +91,7 @@ export default function MyRedemption() {
               </div>
 
               <CopyHelper size='18' data={connectedWallet.publicKey}>
-                <div className='text-textColor w-[7.0625rem] truncate text-right text-[.875rem] leading-5'>
+                <div className='text-textColor-secondary w-[7.0625rem] truncate text-right text-[.875rem] leading-5'>
                   {otherAddressFormat(connectedWallet.publicKey)}
                 </div>
               </CopyHelper>
