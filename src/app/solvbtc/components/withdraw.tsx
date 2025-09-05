@@ -45,6 +45,7 @@ import { useLoadingDialog } from '@/hooks/useLoadingDialog';
 import { useSuccessfulDialog } from '@/hooks/useSuccessfulDialog';
 import { buildExplorerTxUrl, getTxHashFromSent } from '@/lib/stellar-tx';
 import { LoaderIcon } from '@/assets/svg/svg';
+import { TooltipComplex } from '@/components/TooltipComplex';
 
 const createFormSchema = (params: {
   depositDecimals: number;
@@ -620,22 +621,7 @@ export default function Withdraw() {
                 <FormLabel className='flex items-center justify-between text-[.75rem] leading-[1rem]'>
                   <div className='flex items-center !gap-1'>
                     <span className='text-textColor'>You Will Receive</span>
-                  </div>
-                  <div className='flex items-center gap-2 text-[.875rem]'>
-                    <span className='text-textColor-tertiary'>Fee Rate:</span>
-                    <div className='text-textColor'>
-                      {isLoadingFeeRate ? (
-                        <span className='animate-pulse'>Loading...</span>
-                      ) : feeRateError ? (
-                        <span className='text-red-500' title={feeRateError}>
-                          Error
-                        </span>
-                      ) : (
-                        <span className='font-medium text-brand-500'>
-                          {withdrawFeeRate}%
-                        </span>
-                      )}
-                    </div>
+                    <TooltipComplex content={'tips'}></TooltipComplex>
                   </div>
                 </FormLabel>
                 <FormControl>

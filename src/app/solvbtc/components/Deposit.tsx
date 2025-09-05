@@ -898,23 +898,6 @@ export default function Deposit() {
                     <span className='text-textColor'>You Will Receive</span>
                     <TooltipComplex content={'tips'}></TooltipComplex>
                   </div>
-
-                  <div className='flex items-center gap-2 text-[.875rem]'>
-                    <span className='text-textColor-tertiary'>Fee Rate:</span>
-                    <div className='text-textColor'>
-                      {isLoadingFeeRate ? (
-                        <span className='animate-pulse'>Loading...</span>
-                      ) : feeRateError ? (
-                        <span className='text-red-500' title={feeRateError}>
-                          Error
-                        </span>
-                      ) : (
-                        <span className='font-medium text-brand-500'>
-                          {depositFeeRate}%
-                        </span>
-                      )}
-                    </div>
-                  </div>
                 </FormLabel>
                 <FormControl>
                   <InputComplex

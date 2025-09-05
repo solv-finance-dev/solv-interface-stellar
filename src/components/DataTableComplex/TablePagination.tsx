@@ -96,7 +96,7 @@ export default function TablePagination({
               }
             }}
             disabled={pageNumber === '...'}
-            className='text-textColor-tertiary h-8 w-8 rounded-full bg-transparent p-0 hover:bg-gray-100'
+            className='h-8 w-8 rounded-full bg-transparent p-0 text-textColor-tertiary hover:bg-gray-100'
           >
             {pageNumber}
           </Button>
@@ -108,7 +108,7 @@ export default function TablePagination({
           size='sm'
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
-          className='text-textColor-secondary h-8 w-8 rounded-full border-0 p-0 text-[.875rem]'
+          className='h-8 w-8 rounded-full border-0 p-0 text-[.875rem] text-textColor-secondary'
         >
           {/* <ChevronRight className='h-4 w-4' /> */}
           Next

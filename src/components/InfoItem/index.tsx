@@ -11,7 +11,7 @@ export default function c({
 }) {
   return (
     <div className='flex flex-col text-sm'>
-      <span className='text-textColor-tertiary mb-1'>{label}</span>
+      <span className='mb-1 text-textColor-tertiary'>{label}</span>
 
       <span>
         <a

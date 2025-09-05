@@ -32,11 +32,11 @@ const Banner = ({
       )}
     >
       <div className=''>
-        <div className='text-textColor mb-4 flex flex-col text-[4rem] leading-[4rem] md:flex-row md:items-end'>
+        <div className='mb-4 flex flex-col text-[4rem] leading-[4rem] text-textColor md:flex-row md:items-end'>
           {title}
 
           {subTitle && (
-            <span className='text-textColor-tertiary text-[2.5rem] leading-[3rem] md:ml-4'>
+            <span className='text-[2.5rem] leading-[3rem] text-textColor-tertiary md:ml-4'>
               {subTitle}
             </span>
           )}
