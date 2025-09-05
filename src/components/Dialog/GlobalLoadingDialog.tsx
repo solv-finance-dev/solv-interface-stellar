@@ -43,8 +43,8 @@ export function GlobalLoadingDialog() {
         showCloseButton={showCloseButton}
       >
         <DialogHeader className='mt-[2.75rem]'>
-          <DialogTitle className='flex items-center justify-center'>
-            <div className='flex size-[4.5rem] items-center justify-center rounded-full bg-gray-50'>
+          <DialogTitle className='flex items-center justify-center text-textColor'>
+            <div className='flex size-[4.5rem] items-center justify-center rounded-full bg-background-elevation2'>
               <svg
                 className='animate-spin'
                 xmlns='http://www.w3.org/2000/svg'
@@ -61,11 +61,11 @@ export function GlobalLoadingDialog() {
             </div>
           </DialogTitle>
 
-          <div className='mb-2 mt-[1.8rem] !text-[1.25rem] !font-[600] leading-none'>
+          <div className='mb-2 mt-[1.8rem] !text-[1.25rem] !font-[600] leading-none text-textColor'>
             {title || <span>Loading</span>}
           </div>
           {description && (
-            <DialogDescription className='w-full text-center text-[0.875rem] font-[500] text-gray-500'>
+            <DialogDescription className='w-full text-center text-[0.875rem] font-[500] text-textColor-secondary'>
               {description}
             </DialogDescription>
           )}

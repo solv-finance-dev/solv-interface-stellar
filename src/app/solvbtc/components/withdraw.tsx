@@ -12,8 +12,9 @@ import {
   FormItem,
   FormLabel,
   toast,
+  Skeleton,
 } from '@solvprotocol/ui-v2';
-import { ArrowRight, RotateCcw, Loader2 } from 'lucide-react';
+import { ArrowRight, RotateCcw } from 'lucide-react';
 import { InputComplex } from '@/components/InputComplex';
 // Removed token selector for withdraw; right side is fixed to SolvBTC
 import { TokenIcon } from '@/components/TokenIcon';
@@ -43,6 +44,8 @@ import { Buffer } from 'buffer';
 import { useLoadingDialog } from '@/hooks/useLoadingDialog';
 import { useSuccessfulDialog } from '@/hooks/useSuccessfulDialog';
 import { buildExplorerTxUrl, getTxHashFromSent } from '@/lib/stellar-tx';
+import { LoaderIcon } from '@/assets/svg/svg';
+import { TooltipComplex } from '@/components/TooltipComplex';
 
 const createFormSchema = (params: {
   depositDecimals: number;
@@ -456,7 +459,7 @@ export default function Withdraw() {
       openSuccessfulDialog({
         title: 'Withdraw',
         description: `Withdraw request submitted: ${withdrawAmount} SolvBTC`,
-        confirmText: 'OK',
+        confirmText: 'Confirm',
         showConfirm: true,
         showCancel: false,
         scanUrl,
@@ -486,6 +489,28 @@ export default function Withdraw() {
 
   return (
     <Form {...form}>
+      {/* Top-right exchange rate pill */}
+      <div className='absolute right-4 top-6 mb-3 flex w-full justify-end'>
+        <div className='flex items-center gap-2 rounded-md px-3 py-1 text-[.875rem]'>
+          <span className='text-textColor-tertiary'>Exchange Rate</span>
+          <span className='text-textColor'>
+            {isLoadingFeeRate ? (
+              <Skeleton className='h-4 w-[200px]' />
+            ) : feeRateError ? (
+              '—'
+            ) : (
+              (() => {
+                const receive = computeReceiveFromDeposit(
+                  '1',
+                  withdrawFeeRate,
+                  shareTokenDecimals ?? TOKEN_DECIMALS_FALLBACK
+                );
+                return `1.00 ${vaultEntry?.shareTokenClient?.name || 'Share'} = ${receive ? parseFloat(receive).toFixed(4) : '—'} SolvBTC`;
+              })()
+            )}
+          </span>
+        </div>
+      </div>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className='flex w-full flex-col space-y-6'
@@ -497,9 +522,9 @@ export default function Withdraw() {
             render={({ field }) => (
               <FormItem className='w-full gap-[10px] md:w-[45.4%]'>
                 <FormLabel className='flex items-end justify-between text-[.75rem] leading-[1rem]'>
-                  <span>You Will Withdraw</span>
+                  <span className='text-textColor'>You Will Withdraw</span>
                   <div className='flex items-center gap-2 text-[.875rem]'>
-                    <span className='text-grayColor'>Balance:</span>
+                    <span className='text-textColor-tertiary'>Balance:</span>
                     <div className='text-textColor'>
                       {isLoadingBalance ? (
                         <span className='animate-pulse'>Loading...</span>
@@ -510,8 +535,7 @@ export default function Withdraw() {
                           {formatTokenBalance(
                             shareBalance.balance,
                             shareBalance.decimals
-                          )}{' '}
-                          {vaultEntry?.shareTokenClient?.name}
+                          )}
                         </span>
                       )}
                     </div>
@@ -523,7 +547,7 @@ export default function Withdraw() {
                       title='Refresh balance'
                     >
                       <RotateCcw
-                        className={`h-3 w-3 text-grayColor ${isLoadingBalance ? 'animate-spin' : ''}`}
+                        className={`h-3 w-3 text-textColor-tertiary ${isLoadingBalance ? 'animate-spin' : ''}`}
                       />
                     </button>
                   </div>
@@ -597,22 +621,7 @@ export default function Withdraw() {
                 <FormLabel className='flex items-center justify-between text-[.75rem] leading-[1rem]'>
                   <div className='flex items-center !gap-1'>
                     <span className='text-textColor'>You Will Receive</span>
-                  </div>
-                  <div className='flex items-center gap-2 text-[.875rem]'>
-                    <span className='text-grayColor'>Fee Rate:</span>
-                    <div className='text-textColor'>
-                      {isLoadingFeeRate ? (
-                        <span className='animate-pulse'>Loading...</span>
-                      ) : feeRateError ? (
-                        <span className='text-red-500' title={feeRateError}>
-                          Error
-                        </span>
-                      ) : (
-                        <span className='font-medium text-brand-500'>
-                          {withdrawFeeRate}%
-                        </span>
-                      )}
-                    </div>
+                    <TooltipComplex content={'tips'}></TooltipComplex>
                   </div>
                 </FormLabel>
                 <FormControl>
@@ -665,7 +674,7 @@ export default function Withdraw() {
           >
             {isSubmitting ? (
               <>
-                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                <LoaderIcon className='mr-2 h-4 w-4 animate-spin' />
                 Processing...
               </>
             ) : !!isConnected &&

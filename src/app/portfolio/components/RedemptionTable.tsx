@@ -1,6 +1,6 @@
 'use client';
 
-import { ClaimIcon } from '@/assets/svg/svg';
+import ClaimAction from './ClaimAction';
 import { DataTableComplex } from '@/components/DataTableComplex';
 
 import H5AssetsCard, {
@@ -10,12 +10,8 @@ import H5AssetsCard, {
 } from '@/components/DataTableComplex/H5AssetsCard';
 import TablePagination from '@/components/DataTableComplex/TablePagination';
 import { TokenIcon } from '@/components/TokenIcon';
-import { TooltipComplex } from '@/components/TooltipComplex';
 import { useDialog } from '@/hooks/useDialog';
-import { useLoadingDialog } from '@/hooks/useLoadingDialog';
-import { useSuccessfulDialog } from '@/hooks/useSuccessfulDialog';
-import { getCurItem } from '@/lib/utils';
-import { Button } from '@solvprotocol/ui-v2';
+import { getCurItem, upperCaseFirst } from '@/lib/utils';
 import {
   ColumnDef,
   getCoreRowModel,
@@ -24,6 +20,12 @@ import {
 } from '@tanstack/react-table';
 import cn from 'classnames';
 
+export enum RedemptionState {
+  Pending = 'pending',
+  Signed = 'signed',
+  Claimed = 'claimed',
+}
+
 export interface Redemption {
   id: string;
   pool: string;
@@ -31,7 +33,10 @@ export interface Redemption {
   withdrawAmount: number | string;
   valueUsd: number;
   availableTime?: string;
-  state?: string;
+  state?: RedemptionState;
+  // raw fields for claim
+  withdrawRequestHash?: string;
+  share?: string;
 }
 
 interface RedemptionTableProps {
@@ -50,58 +55,6 @@ export function RedemptionTable({
   pageCount,
 }: RedemptionTableProps) {
   const { openDialog } = useDialog();
-  const { openLoadingDialog, closeLoadingDialog } = useLoadingDialog();
-  const { openSuccessfulDialog } = useSuccessfulDialog();
-
-  const showClaimDialog = () => {
-    openDialog({
-      size: 'md',
-      title: 'Claim',
-      description: 'Sorry. You have no claimable amount at the moment.',
-      content: (
-        <section className=''>
-          <div className='text-[.875rem] leading-5'>Claimable</div>
-          <div className='mb-4 mt-2 text-2xl'>0.00 WBTC</div>
-
-          <div className='box-border flex h-[2.25rem] w-full items-center justify-between rounded-md bg-gray-100 p-2'>
-            <div className='flex items-center justify-start text-[.875rem] leading-[1.25rem]'>
-              <span className='mr-1'>Pending repayment</span>{' '}
-              <TooltipComplex content={'tips'} />
-            </div>
-
-            <div className='flex items-center justify-end text-[.875rem] leading-[1.25rem]'>
-              0.00 WBTC
-            </div>
-          </div>
-        </section>
-      ),
-      loading: false,
-      onConfirm: async () => {
-        console.log('Confirm Claim');
-
-        openLoadingDialog({
-          description: '当前操作的描述',
-          chainId: 'xxx',
-          scanUrl: 'xxx',
-        });
-
-        setTimeout(() => {
-          closeLoadingDialog();
-
-          openSuccessfulDialog({
-            size: 'md',
-            title: 'Deposit',
-            description: 'You successfully deposited 100.00 WBTC.',
-            chainId: 'xxx',
-            scanUrl: 'xxx',
-            onConfirm: async () => {
-              console.log('close successful dialog');
-            },
-          });
-        }, 2000);
-      },
-    });
-  };
 
   const columns: ColumnDef<Redemption>[] = [
     {
@@ -114,19 +67,21 @@ export function RedemptionTable({
       cell: ({ row }) => {
         return (
           <div className=''>
-            <div className='w-full truncate font-MatterSQ-Medium text-[1rem] leading-[1.125rem] md:max-w-[calc(90%-1rem)]'>
+            <div className='w-full truncate font-MatterSQ-Medium text-[1rem] leading-[1.125rem] text-textColor md:max-w-[calc(90%-1rem)]'>
               {row.getValue('pool')}
             </div>
 
             <div className='mt-1 hidden font-MatterSQ-Regular text-[.875rem] leading-4 md:flex'>
               <span
                 className={cn(
-                  row.original.state == 'pending'
+                  row.original.state == RedemptionState.Pending
                     ? 'text-yellow-500'
                     : 'text-green-500'
                 )}
               >
-                {row.original.state}
+                {row.original.state === RedemptionState.Signed
+                  ? 'Ready to claim'
+                  : upperCaseFirst(row.original.state || '')}
               </span>
             </div>
           </div>
@@ -145,12 +100,14 @@ export function RedemptionTable({
           <div className='mt-1 font-MatterSQ-Regular text-[.875rem] leading-4'>
             <span
               className={cn(
-                row.original.state == 'pending'
+                row.original.state == RedemptionState.Pending
                   ? 'text-yellow-500'
                   : 'text-green-500'
               )}
             >
-              {row.original.state}
+              {row.original.state === RedemptionState.Signed
+                ? 'Ready to claim'
+                : upperCaseFirst(row.original.state || '')}
             </span>
           </div>
         );
@@ -190,7 +147,11 @@ export function RedemptionTable({
           maximumFractionDigits: 6,
         }).format(amount);
 
-        return <div className='text-[.875rem] leading-4'>{formatted}</div>;
+        return (
+          <div className='text-[.875rem] leading-4 text-textColor'>
+            {formatted}
+          </div>
+        );
       },
     },
     {
@@ -209,8 +170,8 @@ export function RedemptionTable({
 
         return (
           <div className='flex flex-row items-end text-[.875rem] leading-4 md:flex-col'>
-            <span>{formatted} SolvBTC</span>
-            <span className='ml-1 mt-0 text-[10px] text-gray-400 md:ml-0 md:mt-1 md:text-[.875rem]'>
+            <span className='text-textColor'>{formatted} SolvBTC</span>
+            <span className='ml-1 mt-0 text-[10px] text-textColor-secondary md:ml-0 md:mt-1 md:text-[.875rem]'>
               {formatted}
             </span>
           </div>
@@ -226,21 +187,13 @@ export function RedemptionTable({
       },
       cell: ({ row }) => {
         return (
-          <div className='flex flex-col items-end'>
-            <Button
-              variant='default'
-              size='sm'
-              className='w-full rounded-full bg-brand hover:bg-brand-600 md:w-[6.4375rem]'
-              onClick={showClaimDialog}
-            >
-              <ClaimIcon className='h-4 w-4' /> Claim
-            </Button>
-            {row.original.availableTime && (
-              <div className='text-xs text-brand-500'>
-                {new Date(row.original.availableTime).toLocaleString()}
-              </div>
-            )}
-          </div>
+          <ClaimAction
+            availableTime={row.original.availableTime}
+            redemptionState={row.original.state}
+            redemptionId={row.original.id}
+            withdrawRequestHash={row.original.withdrawRequestHash}
+            share={row.original.share}
+          />
         );
       },
     },
@@ -287,10 +240,7 @@ export function RedemptionTable({
             {tableH5.getRowModel().rows?.length > 0 ? (
               <div>
                 {tableH5.getRowModel().rows.map((row, index) => (
-                  <div
-                    key={`H5AssetsCard-${row.id}-${index}`}
-                    onClick={() => { }}
-                  >
+                  <div key={`H5AssetsCard-${row.id}-${index}`}>
                     <H5AssetsCard
                       cardTitle={<>{getCurItem(columns, 'pool', row)}</>}
                       operateBtn={<>{getCurItem(columns, 'action', row)}</>}

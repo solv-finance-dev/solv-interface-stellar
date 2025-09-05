@@ -45,8 +45,9 @@ const ChainIcon = ({ className }: { className?: string }) => {
   return (
     <div
       className={cn(
+        'border-base-neutral-300 bg-base-neutral-600/10 dark:border-base-neutral-800',
         'h-8 w-8 md:h-[2.75rem] md:w-[2.75rem]',
-        'flex items-center justify-center rounded-full border-[1px] border-solid border-border bg-gray-400/10 backdrop-blur-[5px]',
+        'border-border flex items-center justify-center rounded-full border-[1px] border-solid backdrop-blur-[5px]',
         className
       )}
     >
@@ -94,7 +95,8 @@ export function WalletConnector({
           size='lg'
           disabled={isConnecting || isLoadingAccount}
           className={cn(
-            'h-8 space-x-1 rounded-full border border-solid border-border bg-gray-400/10 px-3 text-sm font-medium text-textColor backdrop-blur-[5px] transition-all hover:opacity-90 md:h-[2.75rem] md:px-4',
+            'border-base-neutral-300 bg-base-neutral-600/10 text-textColor-secondary dark:border-base-neutral-800',
+            'border-border h-8 space-x-1 rounded-full border border-solid px-3 text-sm font-medium backdrop-blur-[5px] transition-all hover:opacity-90 md:h-[2.75rem] md:px-4',
             'disabled:cursor-not-allowed disabled:opacity-50',
             className
           )}
@@ -119,15 +121,20 @@ export function WalletConnector({
       {showChainIcon && <ChainIcon />}
       <Popover>
         <PopoverTrigger asChild>
-          <div className='flex h-8 cursor-pointer items-center space-x-1 rounded-full border border-border bg-gray-400/10 px-1 backdrop-blur-[5px] transition-colors md:h-[2.75rem] md:px-4'>
+          <div
+            className={cn(
+              'border-base-neutral-300 bg-base-neutral-600/10 text-textColor-secondary dark:border-base-neutral-800',
+              'border-border flex h-8 cursor-pointer items-center space-x-1 rounded-full border px-1 backdrop-blur-[5px] transition-colors md:h-[2.75rem] md:px-4'
+            )}
+          >
             <ImageAvatar
               src='https://avatar.sft-api.com/avatar/28.png'
               alt='User Avatar'
             />
-            <span className='text-[.75rem] font-medium text-textColor md:text-sm'>
+            <span className='text-[.75rem] font-medium text-textColor-secondary md:text-sm'>
               {otherAddressFormat(connectedWallet.publicKey)}
             </span>
-            <ChevronDown className='h-4 w-4 text-textColor transition-transform' />
+            <ChevronDown className='h-4 w-4 text-textColor-secondary transition-transform' />
           </div>
         </PopoverTrigger>
 
@@ -137,7 +144,7 @@ export function WalletConnector({
           sideOffset={8}
         >
           {/* user info */}
-          <div className='p-6'>
+          <div className='p-6 text-textColor-secondary'>
             <div className='bg- flex items-center space-x-3'>
               <ImageAvatar
                 src='https://avatar.sft-api.com/avatar/28.png '
@@ -145,11 +152,13 @@ export function WalletConnector({
                 className='!h-12 !w-12'
               />
               <div className='min-w-0 flex-1'>
-                <h3 className='text-xl font-medium'>{connectedWallet.name}</h3>
+                <h3 className='text-xl font-medium text-textColor'>
+                  {connectedWallet.name}
+                </h3>
 
                 <div className='flex items-center space-x-2'>
                   <CopyHelper size='14' data={connectedWallet.publicKey}>
-                    <p className='truncate text-[.875rem] leading-5 text-textColor'>
+                    <p className='truncate text-[.875rem] leading-5 text-textColor-secondary'>
                       {otherAddressFormat(connectedWallet.publicKey)}
                     </p>
                   </CopyHelper>
@@ -161,13 +170,15 @@ export function WalletConnector({
             <div className='mt-4 py-4'>
               <div className='flex items-center space-x-2 rounded-lg bg-gray-300/20 px-3 py-[.625rem]'>
                 <ChainIcon className='!h-6 !w-6 !border-0 !bg-none !p-0' />
-                <span className='text-[.875rem] leading-4'>Stellar</span>
+                <span className='text-[.875rem] leading-4 text-textColor'>
+                  Stellar
+                </span>
               </div>
             </div>
 
-            <div className='space-y-1'>
+            <div className='space-y-1 text-textColor'>
               <div
-                className='border-input leader-5 flex w-full cursor-pointer items-center space-x-2 border-b-[1px] border-solid py-3 text-left text-[.875rem] transition-colors'
+                className='leader-5 flex w-full cursor-pointer items-center space-x-2 border-b-[1px] border-solid border-base-neutral-300 py-3 text-left text-[.875rem] transition-colors dark:border-base-neutral-800'
                 onClick={() => router.push('/portfolio')}
               >
                 <MyPortfolioIcon className='h-4 w-4' />

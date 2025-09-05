@@ -30,7 +30,7 @@ export function TooltipComplex({
         <TooltipTrigger asChild>
           <div className='flex items-center justify-start'>
             {showIcon && (
-              <InfoIcon className='h-[.875rem] w-[.875rem] text-grayColor' />
+              <InfoIcon className='h-[.875rem] w-[.875rem] text-textColor-tertiary' />
             )}
             {children && <div>{children}</div>}
           </div>

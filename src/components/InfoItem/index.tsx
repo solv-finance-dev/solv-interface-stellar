@@ -11,12 +11,12 @@ export default function c({
 }) {
   return (
     <div className='flex flex-col text-sm'>
-      <span className='mb-1 text-textColor'>{label}</span>
+      <span className='mb-1 text-textColor-tertiary'>{label}</span>
 
       <span>
         <a
           href={url}
-          className='underline hover:text-brand'
+          className='text-textColor underline hover:text-brand'
           target='_blank'
           rel='noreferrer'
         >

@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { Loader2 } from 'lucide-react';
+import { LoaderIcon } from 'lucide-react';
 import { useDialogStore } from '@/states/dialog-store';
 import cn from 'classnames';
 import {
@@ -72,18 +72,18 @@ export function GlobalDialog() {
       >
         <DialogHeader>
           {title && (
-            <DialogTitle className='flex items-center justify-start'>
+            <DialogTitle className='flex items-center justify-start text-textColor'>
               {title}
             </DialogTitle>
           )}
           {description && (
-            <DialogDescription className='mt-[-4px] flex items-center justify-start text-[.875rem]'>
+            <DialogDescription className='mt-[-4px] flex items-center justify-start text-[.875rem] text-textColor-secondary'>
               {description}
             </DialogDescription>
           )}
         </DialogHeader>
 
-        <div className=''>{content}</div>
+        <div className='text-textColor'>{content}</div>
 
         <DialogFooter className='mt-1 flex w-full items-center'>
           {showCancel && (
@@ -106,7 +106,7 @@ export function GlobalDialog() {
                 !showCancel && 'w-full'
               )}
             >
-              {loading && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
+              {loading && <LoaderIcon className='mr-2 h-4 w-4 animate-spin' />}
 
               {confirmText}
             </Button>

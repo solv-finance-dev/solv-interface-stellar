@@ -17,8 +17,9 @@ import {
   SelectItem,
   SelectTrigger,
   toast,
+  Skeleton,
 } from '@solvprotocol/ui-v2';
-import { ArrowRight, RotateCcw, Loader2 } from 'lucide-react';
+import { ArrowRight, RotateCcw } from 'lucide-react';
 import { InputComplex } from '@/components/InputComplex';
 import { TooltipComplex } from '@/components/TooltipComplex';
 import { TokenIcon } from '@/components/TokenIcon';
@@ -48,6 +49,7 @@ import { useSuccessfulDialog } from '@/hooks/useSuccessfulDialog';
 import { getCurrentStellarNetwork } from '@/config/stellar';
 import { SolvBTCTokenClient } from '@/contracts/solvBTCTokenContract/src';
 import { getStellarAPI } from '@/stellar';
+import { LoaderIcon } from '@/assets/svg/svg';
 
 // Using shared utils for sanitization/formatting and calculations
 
@@ -486,7 +488,7 @@ export default function Deposit() {
       openSuccessfulDialog({
         title: 'Approve',
         description: `Approve successful for ${selected.name}.`,
-        confirmText: 'OK',
+        confirmText: 'Confirm',
         showConfirm: true,
         showCancel: false,
         scanUrl,
@@ -687,7 +689,7 @@ export default function Deposit() {
       openSuccessfulDialog({
         title: 'Deposit',
         description: `Successfully deposited ${depositAmount} ${selected.name}.`,
-        confirmText: 'OK',
+        confirmText: 'Confirm',
         showConfirm: true,
         showCancel: false,
         scanUrl,
@@ -736,6 +738,28 @@ export default function Deposit() {
 
   return (
     <Form {...form}>
+      {/* Top-right exchange rate pill */}
+      <div className='absolute right-4 top-6 mb-3 flex w-full justify-end'>
+        <div className='flex items-center gap-2 rounded-md px-3 py-1 text-[.875rem]'>
+          <span className='text-textColor-tertiary'>Exchange Rate</span>
+          <span className='text-textColor'>
+            {isLoadingFeeRate ? (
+              <Skeleton className='h-4 w-[200px]' />
+            ) : !selected || feeRateError ? (
+              '—'
+            ) : (
+              (() => {
+                const receive = computeReceiveFromDeposit(
+                  '1',
+                  depositFeeRate,
+                  shareTokenDecimals ?? TOKEN_DECIMALS_FALLBACK
+                );
+                return `1.00 ${selected?.name} = ${receive ? parseFloat(receive).toFixed(4) : '—'} ${shareTokenName}`;
+              })()
+            )}
+          </span>
+        </div>
+      </div>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className='flex w-full flex-col space-y-6'
@@ -749,8 +773,8 @@ export default function Deposit() {
                 <FormLabel className='flex items-end justify-between text-[.75rem] leading-[1rem]'>
                   <span className='text-textColor'>You Will Deposit</span>
                   <div className='flex items-center gap-2 text-[.875rem]'>
-                    <span className='text-grayColor'>Balance:</span>
-                    <div className='text-grayColor'>
+                    <span className='text-textColor-tertiary'>Balance:</span>
+                    <div className='text-textColor'>
                       {isLoadingBalance ? (
                         <span className='animate-pulse'>Loading...</span>
                       ) : (
@@ -758,8 +782,7 @@ export default function Deposit() {
                           {formatTokenBalance(
                             tokenBalance.balance,
                             tokenBalance.decimals
-                          )}{' '}
-                          {selected?.name}
+                          )}
                         </span>
                       )}
                     </div>
@@ -771,7 +794,7 @@ export default function Deposit() {
                       title='Refresh balance'
                     >
                       <RotateCcw
-                        className={`h-3 w-3 text-grayColor ${isLoadingBalance ? 'animate-spin' : ''}`}
+                        className={`h-3 w-3 text-textColor-tertiary ${isLoadingBalance ? 'animate-spin' : ''}`}
                       />
                     </button>
                   </div>
@@ -874,22 +897,6 @@ export default function Deposit() {
                     <span className='text-textColor'>You Will Receive</span>
                     <TooltipComplex content={'tips'}></TooltipComplex>
                   </div>
-                  <div className='flex items-center gap-2 text-[.875rem]'>
-                    <span className='text-grayColor'>Fee Rate:</span>
-                    <div className='text-textColor'>
-                      {isLoadingFeeRate ? (
-                        <span className='animate-pulse'>Loading...</span>
-                      ) : feeRateError ? (
-                        <span className='text-red-500' title={feeRateError}>
-                          Error
-                        </span>
-                      ) : (
-                        <span className='font-medium text-brand-500'>
-                          {depositFeeRate}%
-                        </span>
-                      )}
-                    </div>
-                  </div>
                 </FormLabel>
                 <FormControl>
                   <InputComplex
@@ -947,7 +954,7 @@ export default function Deposit() {
           >
             {isSubmitting ? (
               <>
-                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                <LoaderIcon className='mr-2 h-4 w-4 animate-spin' />
                 Processing...
               </>
             ) : !!isConnected &&

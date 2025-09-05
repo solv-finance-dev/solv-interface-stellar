@@ -207,7 +207,7 @@ export function DataTableComplex<TData, TValue>({
       </div>
 
       {/* Pagination */}
-      <TablePagination table={table} data={data} />
+      {data && data.length > 0 && <TablePagination table={table} data={data} />}
     </>
   );
 }

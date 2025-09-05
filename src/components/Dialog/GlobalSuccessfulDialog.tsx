@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { Loader2 } from 'lucide-react';
+import { LoaderIcon } from 'lucide-react';
 
 import cn from 'classnames';
 import {
@@ -82,7 +82,7 @@ export function GlobalSuccessfulDialog() {
       >
         <DialogHeader className='mt-[2.75rem]'>
           <DialogTitle className='flex w-full justify-center'>
-            <div className='flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full bg-gray-50'>
+            <div className='flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full bg-background-elevation2'>
               <svg
                 width='41'
                 height='40'
@@ -98,7 +98,7 @@ export function GlobalSuccessfulDialog() {
             </div>
           </DialogTitle>
 
-          <div className='mb-[.5rem] mt-6 flex items-center justify-center text-[1.125rem] font-[500] leading-none'>
+          <div className='mb-[.5rem] mt-6 flex items-center justify-center text-[1.125rem] font-[500] leading-none text-textColor'>
             {title ? (
               <span>{title}&nbsp;Successfully</span>
             ) : (
@@ -107,13 +107,13 @@ export function GlobalSuccessfulDialog() {
           </div>
 
           {description && (
-            <DialogDescription className='w-full text-center text-[0.875rem] font-[500] text-gray-400'>
+            <DialogDescription className='w-full text-center text-[0.875rem] font-[500] text-textColor-secondary'>
               {description}
             </DialogDescription>
           )}
         </DialogHeader>
 
-        {content && <div className=''>{content}</div>}
+        {content && <div className='text-textColor'>{content}</div>}
 
         <DialogFooter className='mt-[.5rem] flex w-full items-center'>
           {showCancel && (
@@ -132,11 +132,11 @@ export function GlobalSuccessfulDialog() {
               onClick={handleConfirm}
               disabled={disableConfirm || loading}
               className={cn(
-                'h-12 flex-1 rounded-full bg-brand-500 text-[1rem] outline-none hover:bg-brand-600',
+                'h-12 flex-1 rounded-full bg-brand-500 text-[1rem] text-white outline-none hover:bg-brand-600',
                 !showCancel && 'w-full'
               )}
             >
-              {loading && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
+              {loading && <LoaderIcon className='mr-2 h-4 w-4 animate-spin' />}
 
               {confirmText}
             </Button>
