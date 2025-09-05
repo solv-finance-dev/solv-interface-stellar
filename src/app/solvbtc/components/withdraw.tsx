@@ -515,7 +515,7 @@ export default function Withdraw() {
   return (
     <Form {...form}>
       {/* Top-right exchange rate pill */}
-      <div className='pointer-events-none absolute right-8 top-[2.3rem] hidden w-full justify-end md:flex'>
+      <div className='absolute right-8 top-[2.3rem] hidden w-full justify-end md:flex pointer-events-none'>
         <ExchangeRateValue />
       </div>
       <form
