@@ -2,12 +2,6 @@ import { BigNumber } from 'bignumber.js';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
-export function upperCaseFirst(str: string) {
-  if (!str) {
-    return '';
-  }
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
 
 interface BeautyAmountProps {
   value: string | number | BigNumber;
@@ -378,14 +372,14 @@ export function comparisonDate(
     isGreaterThan(endTime, getCurrentTimestamp());
   const closed =
     maturityDate &&
-    isGreaterThanOrEqualTo(getCurrentTimestamp(), endTime) &&
-    isGreaterThan(getCurrentTimestamp(), maturityDate)
+      isGreaterThanOrEqualTo(getCurrentTimestamp(), endTime) &&
+      isGreaterThan(getCurrentTimestamp(), maturityDate)
       ? true
       : false;
   const fundraising =
     maturityDate &&
-    isGreaterThanOrEqualTo(getCurrentTimestamp(), endTime) &&
-    isGreaterThan(maturityDate, getCurrentTimestamp())
+      isGreaterThanOrEqualTo(getCurrentTimestamp(), endTime) &&
+      isGreaterThan(maturityDate, getCurrentTimestamp())
       ? true
       : false;
 
@@ -619,7 +613,7 @@ export const fixedDecimals = (
   options?: { fixed?: number; isFixed?: boolean; mantissa?: boolean }
 ) => {
   const fixed =
-      (options?.fixed ?? 0) != 0 ? options?.fixed || 4 : options?.fixed || 4,
+    (options?.fixed ?? 0) != 0 ? options?.fixed || 4 : options?.fixed || 4,
     isFixed = options?.isFixed != undefined ? options.isFixed : true,
     mantissa = options?.mantissa || false;
 

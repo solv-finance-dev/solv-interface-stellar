@@ -11,7 +11,7 @@ import H5AssetsCard, {
 import TablePagination from '@/components/DataTableComplex/TablePagination';
 import { TokenIcon } from '@/components/TokenIcon';
 import { useDialog } from '@/hooks/useDialog';
-import { getCurItem, upperCaseFirst } from '@/lib/utils';
+import { getCurItem } from '@/lib/utils';
 import {
   ColumnDef,
   getCoreRowModel,
@@ -71,7 +71,7 @@ export function RedemptionTable({
               {row.getValue('pool')}
             </div>
 
-            <div className='mt-1 hidden font-MatterSQ-Regular text-[.875rem] leading-4 md:flex'>
+            <div className='mt-1 hidden capitalize font-MatterSQ-Regular text-[.875rem] leading-4 md:flex'>
               <span
                 className={cn(
                   row.original.state == RedemptionState.Pending
@@ -81,7 +81,7 @@ export function RedemptionTable({
               >
                 {row.original.state === RedemptionState.Signed
                   ? 'Ready to claim'
-                  : upperCaseFirst(row.original.state || '')}
+                  : row.original.state}
               </span>
             </div>
           </div>
@@ -97,7 +97,7 @@ export function RedemptionTable({
       },
       cell: ({ row }) => {
         return (
-          <div className='mt-1 font-MatterSQ-Regular text-[.875rem] leading-4'>
+          <div className='mt-1 capitalize font-MatterSQ-Regular text-[.875rem] leading-4'>
             <span
               className={cn(
                 row.original.state == RedemptionState.Pending
@@ -107,7 +107,7 @@ export function RedemptionTable({
             >
               {row.original.state === RedemptionState.Signed
                 ? 'Ready to claim'
-                : upperCaseFirst(row.original.state || '')}
+                : row.original.state}
             </span>
           </div>
         );
