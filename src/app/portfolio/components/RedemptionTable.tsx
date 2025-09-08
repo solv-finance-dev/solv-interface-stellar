@@ -10,8 +10,7 @@ import H5AssetsCard, {
 } from '@/components/DataTableComplex/H5AssetsCard';
 import TablePagination from '@/components/DataTableComplex/TablePagination';
 import { TokenIcon } from '@/components/TokenIcon';
-import { useDialog } from '@/hooks/useDialog';
-import { getCurItem, upperCaseFirst } from '@/lib/utils';
+import { getCurItem } from '@/lib/utils';
 import {
   ColumnDef,
   getCoreRowModel,
@@ -37,6 +36,7 @@ export interface Redemption {
   // raw fields for claim
   withdrawRequestHash?: string;
   share?: string;
+  nav?: number;
 }
 
 interface RedemptionTableProps {
@@ -54,8 +54,6 @@ export function RedemptionTable({
   onPaginationChange,
   pageCount,
 }: RedemptionTableProps) {
-  const { openDialog } = useDialog();
-
   const columns: ColumnDef<Redemption>[] = [
     {
       accessorKey: 'pool',
@@ -71,7 +69,7 @@ export function RedemptionTable({
               {row.getValue('pool')}
             </div>
 
-            <div className='mt-1 hidden font-MatterSQ-Regular text-[.875rem] leading-4 md:flex'>
+            <div className='mt-1 hidden font-MatterSQ-Regular text-[.875rem] capitalize leading-4 md:flex'>
               <span
                 className={cn(
                   row.original.state == RedemptionState.Pending
@@ -81,7 +79,7 @@ export function RedemptionTable({
               >
                 {row.original.state === RedemptionState.Signed
                   ? 'Ready to claim'
-                  : upperCaseFirst(row.original.state || '')}
+                  : row.original.state}
               </span>
             </div>
           </div>
@@ -97,7 +95,7 @@ export function RedemptionTable({
       },
       cell: ({ row }) => {
         return (
-          <div className='mt-1 font-MatterSQ-Regular text-[.875rem] leading-4'>
+          <div className='mt-1 font-MatterSQ-Regular text-[.875rem] capitalize leading-4'>
             <span
               className={cn(
                 row.original.state == RedemptionState.Pending
@@ -107,7 +105,7 @@ export function RedemptionTable({
             >
               {row.original.state === RedemptionState.Signed
                 ? 'Ready to claim'
-                : upperCaseFirst(row.original.state || '')}
+                : row.original.state}
             </span>
           </div>
         );
@@ -170,7 +168,7 @@ export function RedemptionTable({
 
         return (
           <div className='flex flex-row items-end text-[.875rem] leading-4 md:flex-col'>
-            <span className='text-textColor'>{formatted} SolvBTC</span>
+            <span className='text-textColor'>{formatted}</span>
             <span className='ml-1 mt-0 text-[10px] text-textColor-secondary md:ml-0 md:mt-1 md:text-[.875rem]'>
               {formatted}
             </span>
@@ -193,6 +191,7 @@ export function RedemptionTable({
             redemptionId={row.original.id}
             withdrawRequestHash={row.original.withdrawRequestHash}
             share={row.original.share}
+            navNumber={row.original.nav}
           />
         );
       },

@@ -118,7 +118,6 @@ const createFormSchema = (params: {
   });
 
 export default function Withdraw() {
-  const supportedTokens: any[] = [];
   const solvBTCClient = useSolvBTCVaultClient();
   const { isConnected, connectedWallet } = useWalletStore();
   const { openLoadingDialog, closeLoadingDialog } = useLoadingDialog();
@@ -430,7 +429,7 @@ export default function Withdraw() {
       // shares amount
       const sharesBigInt = scaleAmountToBigInt(
         withdrawAmount,
-        supportedTokens[0]?.decimals ?? TOKEN_DECIMALS_FALLBACK
+        shareTokenDecimals ?? TOKEN_DECIMALS_FALLBACK
       );
 
       // random request hash
@@ -574,8 +573,7 @@ export default function Withdraw() {
                       onInputChange={value => {
                         const sanitized = sanitizeAmountInput(
                           value,
-                          supportedTokens[0]?.decimals ??
-                            TOKEN_DECIMALS_FALLBACK
+                          shareTokenDecimals ?? TOKEN_DECIMALS_FALLBACK
                         );
                         field.onChange(sanitized);
                         calculateReceiveAmount(sanitized);

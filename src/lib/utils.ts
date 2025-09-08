@@ -2,13 +2,6 @@ import { BigNumber } from 'bignumber.js';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
-export function upperCaseFirst(str: string) {
-  if (!str) {
-    return '';
-  }
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
 interface BeautyAmountProps {
   value: string | number | BigNumber;
   thousands?: boolean;
