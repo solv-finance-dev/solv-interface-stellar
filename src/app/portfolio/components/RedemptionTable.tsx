@@ -170,7 +170,7 @@ export function RedemptionTable({
 
         return (
           <div className='flex flex-row items-end text-[.875rem] leading-4 md:flex-col'>
-            <span className='text-textColor'>{formatted} SolvBTC</span>
+            <span className='text-textColor'>{formatted}</span>
             <span className='ml-1 mt-0 text-[10px] text-textColor-secondary md:ml-0 md:mt-1 md:text-[.875rem]'>
               {formatted}
             </span>
