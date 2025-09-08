@@ -116,10 +116,11 @@ export function WalletModal({ open, onOpenChange }: WalletModalProps) {
               return (
                 <div
                   key={wallet.id}
-                  className={`flex items-center space-x-2 rounded-lg bg-background-elevation2 px-3 py-2 transition-all duration-200 ${canClick
+                  className={`flex items-center space-x-2 rounded-lg bg-background-elevation2 px-3 py-2 transition-all duration-200 ${
+                    canClick
                       ? 'cursor-pointer hover:bg-brand'
                       : 'cursor-not-allowed opacity-50'
-                    }`}
+                  }`}
                   onClick={() =>
                     canClick ? handleWalletClick(wallet) : undefined
                   }
