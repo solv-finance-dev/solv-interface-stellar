@@ -157,8 +157,8 @@ export default function ClaimAction({
 
       // Prepare args for withdraw
       const sharesBigInt = BigInt(share);
-      const request_hash = Buffer.from(withdrawRequestHash, 'hex');
-      const signatureBuf = Buffer.from(sig, 'hex');
+      const request_hash = Buffer.from(withdrawRequestHash, 'base64');
+      const signatureBuf = Buffer.from(sig, 'base64');
 
       // For now, use nav=0 since not provided by API; backend verification covers signature correctness against current nav
       const nav = BigInt(navNumber || 0);
@@ -174,8 +174,8 @@ export default function ClaimAction({
       });
 
       console.log('sharesBigInt', sharesBigInt);
-      console.log('request_hash', request_hash.toString('hex'));
-      console.log('signatureBuf', signatureBuf.toString('hex'));
+      console.log('request_hash', request_hash.toString('base64'));
+      console.log('signatureBuf', signatureBuf.toString('base64'));
       console.log('nav', nav);
       console.log('signature_type', SignatureType.Secp256k1);
       console.log('recovery_id', recoveryId);
