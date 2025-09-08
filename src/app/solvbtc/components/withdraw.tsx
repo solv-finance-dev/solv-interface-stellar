@@ -118,7 +118,6 @@ const createFormSchema = (params: {
   });
 
 export default function Withdraw() {
-  const supportedTokens: any[] = [];
   const solvBTCClient = useSolvBTCVaultClient();
   const { isConnected, connectedWallet } = useWalletStore();
   const { openLoadingDialog, closeLoadingDialog } = useLoadingDialog();
@@ -247,7 +246,7 @@ export default function Withdraw() {
           // Save to a local variable used in UI label
           // We keep it in closure via state
         }
-      } catch {}
+      } catch { }
     };
     loadShareDecimals();
   }, [solvBTCClient]);
@@ -430,7 +429,7 @@ export default function Withdraw() {
       // shares amount
       const sharesBigInt = scaleAmountToBigInt(
         withdrawAmount,
-        supportedTokens[0]?.decimals ?? TOKEN_DECIMALS_FALLBACK
+        shareTokenDecimals ?? TOKEN_DECIMALS_FALLBACK
       );
 
       // random request hash
@@ -568,14 +567,14 @@ export default function Withdraw() {
                         !!isConnected &&
                         !!field.value &&
                         parseFloat(field.value || '0') >
-                          parseFloat(shareBalance.balance || '0')
+                        parseFloat(shareBalance.balance || '0')
                       }
                       inputValue={field.value}
                       onInputChange={value => {
                         const sanitized = sanitizeAmountInput(
                           value,
-                          supportedTokens[0]?.decimals ??
-                            TOKEN_DECIMALS_FALLBACK
+                          shareTokenDecimals ??
+                          TOKEN_DECIMALS_FALLBACK
                         );
                         field.onChange(sanitized);
                         calculateReceiveAmount(sanitized);
@@ -638,7 +637,7 @@ export default function Withdraw() {
                       !!isConnected &&
                       !!form.getValues('deposit') &&
                       parseFloat(form.getValues('deposit') || '0') >
-                        parseFloat(shareBalance.balance || '0')
+                      parseFloat(shareBalance.balance || '0')
                     }
                     inputValue={field.value}
                     onInputChange={value => {
@@ -691,7 +690,7 @@ export default function Withdraw() {
             ) : !!isConnected &&
               !!form.getValues('deposit') &&
               parseFloat(form.getValues('deposit') || '0') >
-                parseFloat(shareBalance.balance || '0') ? (
+              parseFloat(shareBalance.balance || '0') ? (
               'Insufficient balance'
             ) : (
               'Withdraw'

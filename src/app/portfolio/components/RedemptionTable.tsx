@@ -10,7 +10,6 @@ import H5AssetsCard, {
 } from '@/components/DataTableComplex/H5AssetsCard';
 import TablePagination from '@/components/DataTableComplex/TablePagination';
 import { TokenIcon } from '@/components/TokenIcon';
-import { useDialog } from '@/hooks/useDialog';
 import { getCurItem } from '@/lib/utils';
 import {
   ColumnDef,
@@ -37,6 +36,7 @@ export interface Redemption {
   // raw fields for claim
   withdrawRequestHash?: string;
   share?: string;
+  nav?: number;
 }
 
 interface RedemptionTableProps {
@@ -54,8 +54,6 @@ export function RedemptionTable({
   onPaginationChange,
   pageCount,
 }: RedemptionTableProps) {
-  const { openDialog } = useDialog();
-
   const columns: ColumnDef<Redemption>[] = [
     {
       accessorKey: 'pool',
@@ -193,6 +191,7 @@ export function RedemptionTable({
             redemptionId={row.original.id}
             withdrawRequestHash={row.original.withdrawRequestHash}
             share={row.original.share}
+            navNumber={row.original.nav}
           />
         );
       },

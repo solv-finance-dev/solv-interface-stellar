@@ -21,6 +21,7 @@ import {
 import { buildExplorerTxUrl, getTxHashFromSent } from '@/lib/stellar-tx';
 import TxResult from '@/components/TxResult';
 import { Buffer } from 'buffer';
+import { SignatureType, SolvBTCVaultClient } from '@/contracts/solvBTCVaultContract/src';
 dayjs.extend(duration);
 
 interface ClaimActionProps {
@@ -30,6 +31,7 @@ interface ClaimActionProps {
   redemptionId?: string;
   withdrawRequestHash?: string; // hex string from backend list
   share?: string; // shares amount (string)
+  navNumber?: number;
 }
 
 function formatCountdown(remainingMs: number): string {
@@ -49,6 +51,7 @@ export default function ClaimAction({
   redemptionId,
   withdrawRequestHash,
   share,
+  navNumber,
 }: ClaimActionProps) {
   const target = useMemo(
     () => (availableTime ? dayjs(availableTime) : null),
@@ -114,6 +117,7 @@ export default function ClaimAction({
         fetchPolicy: 'network-only',
       });
       const sig = data?.nonEvmRedemptionSig?.signature || '';
+      const recoveryId = data?.nonEvmRedemptionSig?.recoveryId || 0;
       if (!sig) {
         closeLoadingDialog();
         toast(
@@ -151,21 +155,30 @@ export default function ClaimAction({
       // Prepare args for withdraw
       const sharesBigInt = BigInt(share);
       const request_hash = Buffer.from(
-        withdrawRequestHash.replace(/^0x/, ''),
+        withdrawRequestHash,
         'hex'
       );
-      const signatureBuf = Buffer.from(sig.replace(/^0x/, ''), 'hex');
+      const signatureBuf = Buffer.from(sig, 'hex');
 
       // For now, use nav=0 since not provided by API; backend verification covers signature correctness against current nav
-      const nav = BigInt(0);
+      const nav = BigInt(navNumber || 0);
 
-      const tx = await (currentClient as any).withdraw({
+      const tx = await (currentClient as SolvBTCVaultClient).withdraw({
         from: connectedWallet.publicKey,
         shares: sharesBigInt,
-        nav,
-        request_hash,
         signature: signatureBuf,
+        request_hash,
+        nav,
+        signature_type: SignatureType.Secp256k1,
+        recovery_id: recoveryId,
       });
+
+      console.log('sharesBigInt', sharesBigInt);
+      console.log('request_hash', request_hash.toString('hex'));
+      console.log('signatureBuf', signatureBuf.toString('hex'));
+      console.log('nav', nav);
+      console.log('signature_type', SignatureType.Secp256k1);
+      console.log('recovery_id', recoveryId);
 
       const sent = await tx.signAndSend();
       const txHash = getTxHashFromSent(sent);
