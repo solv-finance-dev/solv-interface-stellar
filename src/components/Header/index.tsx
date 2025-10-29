@@ -38,11 +38,11 @@ export const menuList: MenuItem[] = [
     //   </div>
     // ),
   },
-  {
-    label: 'SolvBTC_JUP',
-    href: '/solvbtc-jupiter',
-    activeHref: ['/solvbtc-jupiter'],
-  },
+  // {
+  //   label: 'SolvBTC_JUP',
+  //   href: '/solvbtc-jupiter',
+  //   activeHref: ['/solvbtc-jupiter'],
+  // },
   {
     label: 'My portfolio',
     href: '/portfolio',

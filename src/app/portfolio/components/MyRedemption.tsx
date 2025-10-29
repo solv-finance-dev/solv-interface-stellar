@@ -55,12 +55,13 @@ export default function MyRedemption() {
             id: r.id,
             pool: r.vaultName || 'SolvBTC Yield Pool',
             network: r.chain,
-            withdrawAmount: Number(r.withdrawAmount) / 1e8,
+            withdrawAmount: r.withdrawAmount,
             valueUsd: Number(r.valueUsd) || 0,
             availableTime: r.availableTime,
             state: r.state as RedemptionState,
             withdrawRequestHash: r.withdrawRequestHash,
             share: r.share,
+            nav: Number(r.nav || 0),
           })
         );
         setRows(mapped);
@@ -83,9 +84,9 @@ export default function MyRedemption() {
 
         <div className='hidden lg:block'>
           {!isConnected ||
-          !connectedWallet ||
-          isLoadingAccount ||
-          isConnecting ? (
+            !connectedWallet ||
+            isLoadingAccount ||
+            isConnecting ? (
             <></>
           ) : (
             <div className='border-border flex h-[3rem] w-[12.8125rem] items-center justify-between rounded-[1.875rem] border-[1px] border-solid border-base-neutral-400 py-1 pl-2 pr-3'>
