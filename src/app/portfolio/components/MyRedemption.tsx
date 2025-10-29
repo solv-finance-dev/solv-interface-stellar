@@ -40,7 +40,7 @@ export default function MyRedemption() {
           query: QUERY_NON_EVM_REDEMPTIONS,
           variables: {
             // todo: add walletAddress
-            filter: { chain: 'stellar' },
+            filter: { chain: 'stellar', walletAddress: walletAddress },
             pagination: {
               offset: pagination.pageIndex * pagination.pageSize,
               limit: pagination.pageSize,
