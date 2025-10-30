@@ -2,6 +2,8 @@
 
 import BigNumber from 'bignumber.js';
 import { z } from 'zod';
+import { formatTokenBalanceWithDecimals, TokenInfo } from './token-balance';
+import { handleDecimalValue } from './utils';
 
 export const TOKEN_DECIMALS_FALLBACK = 6;
 
@@ -47,28 +49,46 @@ export const bnToTruncatedString = (
 export const computeReceiveFromDeposit = (
   depositAmount: string,
   feeRatePercentage: string,
-  receiveDecimals: number
+  receiveDecimals: number,
+  nav: number,
+  type: 'withdraw' | 'deposit'
 ): string => {
   const depositValue = new BigNumber(depositAmount || '0');
   const feeRateValue = new BigNumber(feeRatePercentage || '0');
   const one = new BigNumber(1);
   const ratio = one.minus(feeRateValue);
-  const receiveAmount = depositValue.multipliedBy(ratio);
-  return bnToTruncatedString(receiveAmount, receiveDecimals);
+  // NAV provided is not scaled down; it has 8 decimal places (1e8)
+  const navScaled = new BigNumber(nav || 0).dividedBy(new BigNumber(10).pow(8));
+  if (navScaled.lte(0)) return '';
+  // Convert deposit by multiplying NAV, then apply fee ratio
+  const baseAmount =
+    type === 'withdraw'
+      ? depositValue.multipliedBy(navScaled)
+      : depositValue.dividedBy(navScaled);
+  const receiveAmount = baseAmount.multipliedBy(ratio);
+  return handleDecimalValue(receiveAmount.toString(), receiveDecimals);
 };
 
 export const computeDepositFromReceive = (
   receiveAmount: string,
   feeRatePercentage: string,
-  depositDecimals: number
+  depositDecimals: number,
+  nav: number,
+  type: 'withdraw' | 'deposit'
 ): string => {
   const receiveValue = new BigNumber(receiveAmount || '0');
   const feeRateValue = new BigNumber(feeRatePercentage || '0');
   const one = new BigNumber(1);
-  const denom = one.minus(feeRateValue.div(100));
-  if (denom.lte(0)) return '';
-  const depositAmount = receiveValue.div(denom);
-  return bnToTruncatedString(depositAmount, depositDecimals);
+  const ratio = one.minus(feeRateValue);
+  if (ratio.lte(0)) return '';
+  const navScaled = new BigNumber(nav || 0).dividedBy(new BigNumber(10).pow(8));
+  if (navScaled.lte(0)) return '';
+  const baseAmount =
+    type === 'withdraw'
+      ? receiveValue.dividedBy(navScaled)
+      : receiveValue.multipliedBy(navScaled);
+  const depositAmount = baseAmount.dividedBy(ratio);
+  return handleDecimalValue(depositAmount.toString(), depositDecimals);
 };
 
 export const scaleAmountToBigInt = (
@@ -162,3 +182,27 @@ export const createLinkedAmountSchema = (params: LinkedAmountSchemaParams) =>
         }
       ),
   });
+
+export const computeExchangeRate = ({
+  leftToken,
+  rightToken,
+  nav,
+  type,
+  feeRatio = '0'
+}: {
+  leftToken: TokenInfo;
+  rightToken: TokenInfo;
+  nav: number;
+  type: 'withdraw' | 'deposit';
+  feeRatio: string;
+}) => {
+  if (!leftToken || !rightToken) return null;
+  const receive = formatTokenBalanceWithDecimals(computeReceiveFromDeposit(
+    '1',
+    feeRatio,
+    rightToken.decimals ?? TOKEN_DECIMALS_FALLBACK,
+    nav,
+    type
+  ));
+  return `1.00 ${leftToken?.name} = ${receive ? receive : '—'} ${rightToken?.name}`;
+};
