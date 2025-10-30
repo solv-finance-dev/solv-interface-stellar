@@ -3,8 +3,8 @@
 import React from 'react';
 import Banner from '@/components/Banner';
 import FAQ from '@/components/FAQ';
-import SolvBtc from './components';
 import { solvFAQ } from '@/constants';
+import ActionTab from '@/components/ActionTab';
 
 export default function SolvBtcPage() {
   return (
@@ -15,9 +15,7 @@ export default function SolvBtcPage() {
         description='A Bitcoin Reserve for Everyone'
         showBg={true}
       />
-
-      <SolvBtc />
-
+      <ActionTab />
       <FAQ faqData={solvFAQ} />
     </div>
   );

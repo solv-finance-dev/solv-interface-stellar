@@ -3,6 +3,7 @@ import {
   ensureClientInitialized,
 } from '@/states/contract-store';
 import { Client as ContractClient } from '@stellar/stellar-sdk/contract';
+import BigNumber from 'bignumber.js';
 
 export interface TokenBalanceResult {
   balance: string;
@@ -291,3 +292,24 @@ export const TOKEN_CONTRACTS = {
 } as const;
 
 export type TokenSymbol = keyof typeof TOKEN_CONTRACTS;
+
+export const formatTokenBalanceWithDecimals = (balance: string) => {
+  const base = new BigNumber(balance || 0);
+
+  if (!base.isFinite()) {
+    return '0.00';
+  }
+
+  // Truncate to at most 6 decimal places (no rounding up)
+  const truncated = base.decimalPlaces(6, BigNumber.ROUND_DOWN);
+
+  // Format string then remove trailing zeros
+  const stripped = truncated.toFixed(6).replace(/\.0+$/, '').replace(/\.(\d*?)0+$/, (_, g1) => (g1 ? `.${g1}` : ''));
+
+  // If it's an integer after stripping, keep two zeros
+  if (!stripped.includes('.')) {
+    return `${stripped}.00`;
+  }
+
+  return stripped;
+};

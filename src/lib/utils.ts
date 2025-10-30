@@ -2,13 +2,6 @@ import { BigNumber } from 'bignumber.js';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
-export function upperCaseFirst(str: string) {
-  if (!str) {
-    return '';
-  }
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
 interface BeautyAmountProps {
   value: string | number | BigNumber;
   thousands?: boolean;
@@ -18,6 +11,8 @@ interface BeautyAmountProps {
   minimumFractionDigits?: number;
   needBillion?: boolean;
 }
+
+export const TOKEN_DECIMALS_FALLBACK = 6;
 
 // 复制到剪贴板
 export async function copyToClipboard(text: string): Promise<boolean> {
@@ -378,14 +373,14 @@ export function comparisonDate(
     isGreaterThan(endTime, getCurrentTimestamp());
   const closed =
     maturityDate &&
-    isGreaterThanOrEqualTo(getCurrentTimestamp(), endTime) &&
-    isGreaterThan(getCurrentTimestamp(), maturityDate)
+      isGreaterThanOrEqualTo(getCurrentTimestamp(), endTime) &&
+      isGreaterThan(getCurrentTimestamp(), maturityDate)
       ? true
       : false;
   const fundraising =
     maturityDate &&
-    isGreaterThanOrEqualTo(getCurrentTimestamp(), endTime) &&
-    isGreaterThan(maturityDate, getCurrentTimestamp())
+      isGreaterThanOrEqualTo(getCurrentTimestamp(), endTime) &&
+      isGreaterThan(maturityDate, getCurrentTimestamp())
       ? true
       : false;
 
@@ -619,7 +614,7 @@ export const fixedDecimals = (
   options?: { fixed?: number; isFixed?: boolean; mantissa?: boolean }
 ) => {
   const fixed =
-      (options?.fixed ?? 0) != 0 ? options?.fixed || 4 : options?.fixed || 4,
+    (options?.fixed ?? 0) != 0 ? options?.fixed || 4 : options?.fixed || 4,
     isFixed = options?.isFixed != undefined ? options.isFixed : true,
     mantissa = options?.mantissa || false;
 
@@ -748,3 +743,37 @@ export function beautyAmount(
 
   return res + (poly ? si[i].symbol : '');
 }
+
+
+export const handleDecimalValue = (value: string, decimals: number) => {
+  value = value.replace(/。/, '.');
+  value = value.replace(/[^\d.]/g, '');
+  value = value.replace(/^\./g, '');
+  value = value.replace(/\.{4,}/g, '.');
+  value = value.replace('.', '$#$').replace(/\./g, '').replace('$#$', '.');
+
+  if (value.indexOf('.') > -1) {
+    if (value.split('.')[1] && value.split('.')[1].length > decimals) {
+      value = new BigNumber(value).toFixed(decimals, 1);
+    }
+  } else {
+    value = value.replace(
+      new RegExp(
+        `^ (\\-) * (\\d +) \\.(${'\\d'.repeat(Number(decimals))}).* $`,
+        'g'
+      ),
+      '$1$2.$3'
+    );
+  }
+  return value;
+};
+
+export const scaleAmountToBigInt = (
+  amount: string,
+  decimals: number
+): bigint => {
+  const scaled = new BigNumber(amount)
+    .multipliedBy(new BigNumber(10).pow(decimals))
+    .integerValue(BigNumber.ROUND_DOWN);
+  return BigInt(scaled.toFixed(0));
+};

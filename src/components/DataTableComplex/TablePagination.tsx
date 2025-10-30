@@ -54,7 +54,7 @@ export default function TablePagination({
   };
   return (
     <div className='flex items-center justify-between py-4'>
-      <div className='text-muted-foreground hidden text-sm'>
+      <div className='hidden text-sm text-textColor'>
         Showing
         {table.getState().pagination.pageIndex *
           table.getState().pagination.pageSize +
@@ -96,7 +96,7 @@ export default function TablePagination({
               }
             }}
             disabled={pageNumber === '...'}
-            className='h-8 w-8 rounded-full bg-transparent p-0 text-textColor-tertiary hover:bg-gray-100'
+            className='h-8 w-8 rounded-full bg-transparent p-0 text-textColor-tertiary hover:bg-base-neutral-200 hover:text-textColor dark:hover:bg-base-neutral-500'
           >
             {pageNumber}
           </Button>
@@ -108,7 +108,7 @@ export default function TablePagination({
           size='sm'
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
-          className='h-8 w-8 rounded-full border-0 p-0 text-[.875rem] text-textColor-secondary'
+          className='rounded-0 h-8 w-8 border-0 bg-transparent p-0 text-[.875rem] text-textColor-secondary hover:bg-transparent'
         >
           {/* <ChevronRight className='h-4 w-4' /> */}
           Next

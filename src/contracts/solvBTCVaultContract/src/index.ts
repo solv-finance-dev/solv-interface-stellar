@@ -30,10 +30,15 @@ if (typeof window !== 'undefined') {
   window.Buffer = window.Buffer || Buffer;
 }
 
+export enum SignatureType {
+  Ed25519 = 0,
+  Secp256k1 = 1,
+}
+
 export const networks = {
   testnet: {
     networkPassphrase: 'Test SDF Network ; September 2015',
-    contractId: 'CC7QI7A5SAWKRUBWVDXGI545WSQI5V3JF25TRMI2JC2H3HOW3QVEUDHU',
+    contractId: 'CAR4BTRMWF4AQ5P2H75NSDSVTR2ND4NP55PIYF7HZI3X3XPHR4YPY4RL',
   },
 } as const;
 
@@ -105,7 +110,7 @@ export interface TreasurerDepositEvent {
 export type DataKey =
   | { tag: 'Oracle'; values: void }
   | { tag: 'Treasurer'; values: void }
-  | { tag: 'WithdrawVerifier'; values: void }
+  | { tag: 'WithdrawVerifier'; values: readonly [u32] }
   | { tag: 'TokenContract'; values: void }
   | { tag: 'AllowedCurrency'; values: void }
   | { tag: 'DepositFeeRatio'; values: void }
@@ -126,7 +131,7 @@ export interface EIP712Domain {
 /**
  * Error code definition
  */
-export const Errors1 = {
+export const ContractErrors = {
   /**
    * Currency not supported
    */
@@ -186,6 +191,11 @@ export const Errors1 = {
    * Invalid deposit fee ratio
    */
   312: { message: 'InvalidDepositFeeRatio' },
+
+  /**
+   * Insufficient permissions
+   */
+  313: { message: 'Unauthorized' },
 };
 export enum WithdrawStatus {
   NotExist = 0,
@@ -193,7 +203,7 @@ export enum WithdrawStatus {
   Done = 2,
 }
 
-export const Errors2 = {
+export const OpenzeppelinErrors = {
   1220: { message: 'OwnerNotSet' },
 
   1221: { message: 'TransferInProgress' },
@@ -207,17 +217,13 @@ export type OwnableStorageKey =
   | { tag: 'Owner'; values: void }
   | { tag: 'PendingOwner'; values: void };
 
-export const Errors3 = {
+export const Errors = {
+  ...ContractErrors,
+  ...OpenzeppelinErrors,
   /**
    * When migration is attempted but not allowed due to upgrade state.
    */
   1100: { message: 'MigrationNotAllowed' },
-};
-
-export const Errors = {
-  ...Errors1,
-  ...Errors2,
-  ...Errors3,
 };
 
 export interface SolvBTCVaultClient {
@@ -308,12 +314,16 @@ export interface SolvBTCVaultClient {
       nav,
       request_hash,
       signature,
+      signature_type,
+      recovery_id,
     }: {
       from: string;
       shares: i128;
       nav: i128;
       request_hash: Buffer;
       signature: Buffer;
+      signature_type: u32;
+      recovery_id: u32;
     },
     options?: {
       /**
@@ -512,7 +522,10 @@ export interface SolvBTCVaultClient {
    * Construct and simulate a set_withdraw_verifier_by_admin transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
    */
   set_withdraw_verifier_by_admin: (
-    { verifier_public_key }: { verifier_public_key: Buffer },
+    {
+      signature_type,
+      verifier_public_key,
+    }: { signature_type: u32; verifier_public_key: Buffer },
     options?: {
       /**
        * The fee to pay for the transaction. Default: BASE_FEE
@@ -670,22 +683,25 @@ export interface SolvBTCVaultClient {
   /**
    * Construct and simulate a get_withdraw_verifier transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
    */
-  get_withdraw_verifier: (options?: {
-    /**
-     * The fee to pay for the transaction. Default: BASE_FEE
-     */
-    fee?: number;
+  get_withdraw_verifier: (
+    { signature_type }: { signature_type: u32 },
+    options?: {
+      /**
+       * The fee to pay for the transaction. Default: BASE_FEE
+       */
+      fee?: number;
 
-    /**
-     * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
-     */
-    timeoutInSeconds?: number;
+      /**
+       * The maximum amount of time to wait for the transaction to complete. Default: DEFAULT_TIMEOUT
+       */
+      timeoutInSeconds?: number;
 
-    /**
-     * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
-     */
-    simulate?: boolean;
-  }) => Promise<AssembledTransaction<Buffer>>;
+      /**
+       * Whether to automatically simulate the transaction when constructing the AssembledTransaction. Default: true
+       */
+      simulate?: boolean;
+    }
+  ) => Promise<AssembledTransaction<Buffer>>;
 
   /**
    * Construct and simulate a get_oracle transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
@@ -1013,15 +1029,15 @@ export class SolvBTCVaultClient extends ContractClient {
         'AAAAAQAAABZDdXJyZW5jeSByZW1vdmVkIGV2ZW50AAAAAAAAAAAAFEN1cnJlbmN5UmVtb3ZlZEV2ZW50AAAAAQAAAAAAAAAFYWRtaW4AAAAAAAAT',
         'AAAAAQAAABZXaXRoZHJhdyByZXF1ZXN0IGV2ZW50AAAAAAAAAAAAFFdpdGhkcmF3UmVxdWVzdEV2ZW50AAAABQAAAAAAAAAGYW1vdW50AAAAAAALAAAAAAAAAANuYXYAAAAACwAAAAAAAAAMcmVxdWVzdF9oYXNoAAAADgAAAAAAAAAGc2hhcmVzAAAAAAALAAAAAAAAAA50b2tlbl9jb250cmFjdAAAAAAAEw==',
         'AAAAAQAAABdUcmVhc3VyZXIgZGVwb3NpdCBldmVudAAAAAAAAAAAFVRyZWFzdXJlckRlcG9zaXRFdmVudAAAAAAAAAEAAAAAAAAABmFtb3VudAAAAAAACw==',
-        'AAAAAgAAABVTdG9yYWdlIGRhdGEga2V5IGVudW0AAAAAAAAAAAAAB0RhdGFLZXkAAAAACwAAAAAAAAAXT3JhY2xlIGNvbnRyYWN0IGFkZHJlc3MAAAAABk9yYWNsZQAAAAAAAAAAABFUcmVhc3VyZXIgYWRkcmVzcwAAAAAAAAlUcmVhc3VyZXIAAAAAAAAAAAAAKVdpdGhkcmF3YWwgdmVyaWZpZXIgcHVibGljIGtleSAoMzIgYnl0ZXMpAAAAAAAAEFdpdGhkcmF3VmVyaWZpZXIAAAAAAAAAFlRva2VuIGNvbnRyYWN0IGFkZHJlc3MAAAAAAA1Ub2tlbkNvbnRyYWN0AAAAAAAAAAAAADFTdXBwb3J0ZWQgY3VycmVuY2llcyBtYXBwaW5nIChNYXA8QWRkcmVzcywgYm9vbD4pAAAAAAAAD0FsbG93ZWRDdXJyZW5jeQAAAAAAAAAAEURlcG9zaXQgZmVlIHJhdGlvAAAAAAAAD0RlcG9zaXRGZWVSYXRpbwAAAAAAAAAAE1dpdGhkcmF3YWwgY3VycmVuY3kAAAAAEFdpdGhkcmF3Q3VycmVuY3kAAAAAAAAAFFdpdGhkcmF3YWwgZmVlIHJhdGlvAAAAEFdpdGhkcmF3RmVlUmF0aW8AAAAAAAAAHVdpdGhkcmF3IGZlZSByZWNlaXZlciBhZGRyZXNzAAAAAAAAE1dpdGhkcmF3RmVlUmVjZWl2ZXIAAAAAAAAAABlXaXRoZHJhd2FsIHJlcXVlc3Qgc3RhdHVzAAAAAAAAFVdpdGhkcmF3UmVxdWVzdFN0YXR1cwAAAAAAAAEAAAAZVXNlZCByZXF1ZXN0IGhhc2ggbWFwcGluZwAAAAAAAA9Vc2VkUmVxdWVzdEhhc2gAAAAAAQAAAA4=',
+        'AAAAAgAAABVTdG9yYWdlIGRhdGEga2V5IGVudW0AAAAAAAAAAAAAB0RhdGFLZXkAAAAACwAAAAAAAAAXT3JhY2xlIGNvbnRyYWN0IGFkZHJlc3MAAAAABk9yYWNsZQAAAAAAAAAAABFUcmVhc3VyZXIgYWRkcmVzcwAAAAAAAAlUcmVhc3VyZXIAAAAAAAABAAAAlVdpdGhkcmF3YWwgdmVyaWZpZXIgbWFwOiB1MzIgKHNpZ25hdHVyZV90eXBlKSAtPiBQdWJsaWNLZXkgKEJ5dGVzKQpTaWduYXR1cmVUeXBlOjpFRDI1NTE5ICgzMiBieXRlcykKU2lnbmF0dXJlVHlwZTo6U0VDUDI1NksxICg2NSBieXRlcyB1bmNvbXByZXNzZWQpAAAAAAAAEFdpdGhkcmF3VmVyaWZpZXIAAAABAAAABAAAAAAAAAAWVG9rZW4gY29udHJhY3QgYWRkcmVzcwAAAAAADVRva2VuQ29udHJhY3QAAAAAAAAAAAAAMVN1cHBvcnRlZCBjdXJyZW5jaWVzIG1hcHBpbmcgKE1hcDxBZGRyZXNzLCBib29sPikAAAAAAAAPQWxsb3dlZEN1cnJlbmN5AAAAAAAAAAARRGVwb3NpdCBmZWUgcmF0aW8AAAAAAAAPRGVwb3NpdEZlZVJhdGlvAAAAAAAAAAATV2l0aGRyYXdhbCBjdXJyZW5jeQAAAAAQV2l0aGRyYXdDdXJyZW5jeQAAAAAAAAAUV2l0aGRyYXdhbCBmZWUgcmF0aW8AAAAQV2l0aGRyYXdGZWVSYXRpbwAAAAAAAAAdV2l0aGRyYXcgZmVlIHJlY2VpdmVyIGFkZHJlc3MAAAAAAAATV2l0aGRyYXdGZWVSZWNlaXZlcgAAAAAAAAAAGVdpdGhkcmF3YWwgcmVxdWVzdCBzdGF0dXMAAAAAAAAVV2l0aGRyYXdSZXF1ZXN0U3RhdHVzAAAAAAAAAQAAABlVc2VkIHJlcXVlc3QgaGFzaCBtYXBwaW5nAAAAAAAAD1VzZWRSZXF1ZXN0SGFzaAAAAAABAAAADg==',
         'AAAAAQAAAAAAAAAAAAAADEVJUDcxMkRvbWFpbgAAAAUAAAAAAAAACGNoYWluX2lkAAAADgAAAAAAAAAEbmFtZQAAABAAAAAAAAAABHNhbHQAAAAOAAAAAAAAABJ2ZXJpZnlpbmdfY29udHJhY3QAAAAAABMAAAAAAAAAB3ZlcnNpb24AAAAAEA==',
-        'AAAABAAAABVFcnJvciBjb2RlIGRlZmluaXRpb24AAAAAAAAAAAAAClZhdWx0RXJyb3IAAAAAAAwAAAAWQ3VycmVuY3kgbm90IHN1cHBvcnRlZAAAAAAAEkN1cnJlbmN5Tm90QWxsb3dlZAAAAAABLQAAACFFeGNlZWRzIG1heGltdW0gY3VycmVuY3kgcXVhbnRpdHkAAAAAAAARVG9vTWFueUN1cnJlbmNpZXMAAAAAAAEuAAAAF0N1cnJlbmN5IGFscmVhZHkgZXhpc3RzAAAAABVDdXJyZW5jeUFscmVhZHlFeGlzdHMAAAAAAAEvAAAAF0N1cnJlbmN5IGRvZXMgbm90IGV4aXN0AAAAABFDdXJyZW5jeU5vdEV4aXN0cwAAAAAAATAAAAAOSW52YWxpZCBhbW91bnQAAAAAAA1JbnZhbGlkQW1vdW50AAAAAAABMQAAAAtJbnZhbGlkIE5BVgAAAAAKSW52YWxpZE5hdgAAAAABMgAAACVXaXRoZHJhdyBmZWUgcmF0aW8gbm90IHNldCBvciBpbnZhbGlkAAAAAAAAFldpdGhkcmF3RmVlUmF0aW9Ob3RTZXQAAAAAATMAAAAaSW52YWxpZCB3aXRoZHJhdyBmZWUgcmF0aW8AAAAAABdJbnZhbGlkV2l0aGRyYXdGZWVSYXRpbwAAAAE0AAAAFlJlcXVlc3QgYWxyZWFkeSBleGlzdHMAAAAAABRSZXF1ZXN0QWxyZWFkeUV4aXN0cwAAATUAAAAUSW5zdWZmaWNpZW50IGJhbGFuY2UAAAATSW5zdWZmaWNpZW50QmFsYW5jZQAAAAE2AAAAFkludmFsaWQgcmVxdWVzdCBzdGF0dXMAAAAAABRJbnZhbGlkUmVxdWVzdFN0YXR1cwAAATcAAAAZSW52YWxpZCBkZXBvc2l0IGZlZSByYXRpbwAAAAAAABZJbnZhbGlkRGVwb3NpdEZlZVJhdGlvAAAAAAE4',
+        'AAAABAAAABVFcnJvciBjb2RlIGRlZmluaXRpb24AAAAAAAAAAAAAClZhdWx0RXJyb3IAAAAAAA0AAAAWQ3VycmVuY3kgbm90IHN1cHBvcnRlZAAAAAAAEkN1cnJlbmN5Tm90QWxsb3dlZAAAAAABLQAAACFFeGNlZWRzIG1heGltdW0gY3VycmVuY3kgcXVhbnRpdHkAAAAAAAARVG9vTWFueUN1cnJlbmNpZXMAAAAAAAEuAAAAF0N1cnJlbmN5IGFscmVhZHkgZXhpc3RzAAAAABVDdXJyZW5jeUFscmVhZHlFeGlzdHMAAAAAAAEvAAAAF0N1cnJlbmN5IGRvZXMgbm90IGV4aXN0AAAAABFDdXJyZW5jeU5vdEV4aXN0cwAAAAAAATAAAAAOSW52YWxpZCBhbW91bnQAAAAAAA1JbnZhbGlkQW1vdW50AAAAAAABMQAAAAtJbnZhbGlkIE5BVgAAAAAKSW52YWxpZE5hdgAAAAABMgAAACVXaXRoZHJhdyBmZWUgcmF0aW8gbm90IHNldCBvciBpbnZhbGlkAAAAAAAAFldpdGhkcmF3RmVlUmF0aW9Ob3RTZXQAAAAAATMAAAAaSW52YWxpZCB3aXRoZHJhdyBmZWUgcmF0aW8AAAAAABdJbnZhbGlkV2l0aGRyYXdGZWVSYXRpbwAAAAE0AAAAFlJlcXVlc3QgYWxyZWFkeSBleGlzdHMAAAAAABRSZXF1ZXN0QWxyZWFkeUV4aXN0cwAAATUAAAAUSW5zdWZmaWNpZW50IGJhbGFuY2UAAAATSW5zdWZmaWNpZW50QmFsYW5jZQAAAAE2AAAAFkludmFsaWQgcmVxdWVzdCBzdGF0dXMAAAAAABRJbnZhbGlkUmVxdWVzdFN0YXR1cwAAATcAAAAZSW52YWxpZCBkZXBvc2l0IGZlZSByYXRpbwAAAAAAABZJbnZhbGlkRGVwb3NpdEZlZVJhdGlvAAAAAAE4AAAAGEluc3VmZmljaWVudCBwZXJtaXNzaW9ucwAAAAxVbmF1dGhvcml6ZWQAAAE5',
         'AAAAAwAAAAAAAAAAAAAADldpdGhkcmF3U3RhdHVzAAAAAAADAAAAAAAAAAhOb3RFeGlzdAAAAAAAAAAAAAAAB1BlbmRpbmcAAAAAAQAAAAAAAAAERG9uZQAAAAI=',
         'AAAAAAAAAAAAAAAHdXBncmFkZQAAAAACAAAAAAAAAA1uZXdfd2FzbV9oYXNoAAAAAAAD7gAAACAAAAAAAAAACG9wZXJhdG9yAAAAEwAAAAA=',
         'AAAAAAAAAAAAAAANX19jb25zdHJ1Y3RvcgAAAAAAAAkAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAOdG9rZW5fY29udHJhY3QAAAAAABMAAAAAAAAABm9yYWNsZQAAAAAAEwAAAAAAAAAJdHJlYXN1cmVyAAAAAAAAEwAAAAAAAAARd2l0aGRyYXdfdmVyaWZpZXIAAAAAAAPuAAAAIAAAAAAAAAARZGVwb3NpdF9mZWVfcmF0aW8AAAAAAAALAAAAAAAAABJ3aXRoZHJhd19mZWVfcmF0aW8AAAAAAAsAAAAAAAAAFXdpdGhkcmF3X2ZlZV9yZWNlaXZlcgAAAAAAABMAAAAAAAAAEXdpdGhkcmF3X2N1cnJlbmN5AAAAAAAAEwAAAAA=',
         'AAAAAAAAAAAAAAAHZGVwb3NpdAAAAAADAAAAAAAAAARmcm9tAAAAEwAAAAAAAAAIY3VycmVuY3kAAAATAAAAAAAAAAZhbW91bnQAAAAAAAsAAAABAAAACw==',
         'AAAAAAAAAAAAAAAQd2l0aGRyYXdfcmVxdWVzdAAAAAMAAAAAAAAABGZyb20AAAATAAAAAAAAAAZzaGFyZXMAAAAAAAsAAAAAAAAADHJlcXVlc3RfaGFzaAAAAA4AAAAA',
-        'AAAAAAAAAAAAAAAId2l0aGRyYXcAAAAFAAAAAAAAAARmcm9tAAAAEwAAAAAAAAAGc2hhcmVzAAAAAAALAAAAAAAAAANuYXYAAAAACwAAAAAAAAAMcmVxdWVzdF9oYXNoAAAADgAAAAAAAAAJc2lnbmF0dXJlAAAAAAAD7gAAAEAAAAABAAAACw==',
+        'AAAAAAAAAAAAAAAId2l0aGRyYXcAAAAHAAAAAAAAAARmcm9tAAAAEwAAAAAAAAAGc2hhcmVzAAAAAAALAAAAAAAAAANuYXYAAAAACwAAAAAAAAAMcmVxdWVzdF9oYXNoAAAADgAAAAAAAAAJc2lnbmF0dXJlAAAAAAAD7gAAAEAAAAAAAAAADnNpZ25hdHVyZV90eXBlAAAAAAAEAAAAAAAAAAtyZWNvdmVyeV9pZAAAAAAEAAAAAQAAAAs=',
         'AAAAAAAAAAAAAAARdHJlYXN1cmVyX2RlcG9zaXQAAAAAAAABAAAAAAAAAAZhbW91bnQAAAAAAAsAAAAA',
         'AAAAAAAAAAAAAAAVYWRkX2N1cnJlbmN5X2J5X2FkbWluAAAAAAAAAQAAAAAAAAAIY3VycmVuY3kAAAATAAAAAA==',
         'AAAAAAAAAAAAAAAYcmVtb3ZlX2N1cnJlbmN5X2J5X2FkbWluAAAAAQAAAAAAAAAIY3VycmVuY3kAAAATAAAAAA==',
@@ -1030,14 +1046,14 @@ export class SolvBTCVaultClient extends ContractClient {
         'AAAAAAAAAAAAAAAVZ2V0X3dpdGhkcmF3X2N1cnJlbmN5AAAAAAAAAAAAAAEAAAPoAAAAEw==',
         'AAAAAAAAAAAAAAAec2V0X3dpdGhkcmF3X2N1cnJlbmN5X2J5X2FkbWluAAAAAAABAAAAAAAAABF3aXRoZHJhd19jdXJyZW5jeQAAAAAAABMAAAAA',
         'AAAAAAAAAAAAAAAQZ2V0X3NoYXJlc190b2tlbgAAAAAAAAABAAAAEw==',
-        'AAAAAAAAAAAAAAAec2V0X3dpdGhkcmF3X3ZlcmlmaWVyX2J5X2FkbWluAAAAAAABAAAAAAAAABN2ZXJpZmllcl9wdWJsaWNfa2V5AAAAA+4AAAAgAAAAAA==',
+        'AAAAAAAAAAAAAAAec2V0X3dpdGhkcmF3X3ZlcmlmaWVyX2J5X2FkbWluAAAAAAACAAAAAAAAAA5zaWduYXR1cmVfdHlwZQAAAAAABAAAAAAAAAATdmVyaWZpZXJfcHVibGljX2tleQAAAAAOAAAAAA==',
         'AAAAAAAAAAAAAAATc2V0X29yYWNsZV9ieV9hZG1pbgAAAAABAAAAAAAAAAZvcmFjbGUAAAAAABMAAAAA',
         'AAAAAAAAAAAAAAAWc2V0X3RyZWFzdXJlcl9ieV9hZG1pbgAAAAAAAQAAAAAAAAAJdHJlYXN1cmVyAAAAAAAAEwAAAAA=',
         'AAAAAAAAAAAAAAAec2V0X2RlcG9zaXRfZmVlX3JhdGlvX2J5X2FkbWluAAAAAAABAAAAAAAAABFkZXBvc2l0X2ZlZV9yYXRpbwAAAAAAAAsAAAAA',
         'AAAAAAAAAAAAAAAfc2V0X3dpdGhkcmF3X2ZlZV9yYXRpb19ieV9hZG1pbgAAAAABAAAAAAAAABJ3aXRoZHJhd19mZWVfcmF0aW8AAAAAAAsAAAAA',
         'AAAAAAAAAAAAAAAec2V0X3dpdGhkcmF3X2ZlZV9yZWN2X2J5X2FkbWluAAAAAAABAAAAAAAAABV3aXRoZHJhd19mZWVfcmVjZWl2ZXIAAAAAAAATAAAAAA==',
         'AAAAAAAAAB1HZXQgdGhlIGN1cnJlbnQgYWRtaW4gYWRkcmVzcwAAAAAAAAlnZXRfYWRtaW4AAAAAAAAAAAAAAQAAABM=',
-        'AAAAAAAAAAAAAAAVZ2V0X3dpdGhkcmF3X3ZlcmlmaWVyAAAAAAAAAAAAAAEAAAPuAAAAIA==',
+        'AAAAAAAAAAAAAAAVZ2V0X3dpdGhkcmF3X3ZlcmlmaWVyAAAAAAAAAQAAAAAAAAAOc2lnbmF0dXJlX3R5cGUAAAAAAAQAAAABAAAADg==',
         'AAAAAAAAAAAAAAAKZ2V0X29yYWNsZQAAAAAAAAAAAAEAAAAT',
         'AAAAAAAAAAAAAAANZ2V0X3RyZWFzdXJlcgAAAAAAAAAAAAABAAAAEw==',
         'AAAAAAAAAAAAAAAWZ2V0X3dpdGhkcmF3X2ZlZV9yYXRpbwAAAAAAAAAAAAEAAAAL',

@@ -23,6 +23,7 @@ export const QUERY_NON_EVM_REDEMPTIONS = gql`
         availableTime
         verifierAddress
         valueUsd
+        nav
       }
     }
   }
@@ -43,6 +44,7 @@ export interface NonEvmRedemptionRecord {
   availableTime: string; // ISO timestamp
   verifierAddress: string;
   valueUsd: string;
+  nav: string;
 }
 
 export interface NonEvmRedemptionsResponse {
@@ -58,13 +60,15 @@ export const QUERY_NON_EVM_REDEMPTION_SIG = gql`
     nonEvmRedemptionSig(redemptionId: $redemptionId) {
       id
       signature
+      recoveryId
     }
   }
 `;
 
 export interface NonEvmRedemptionSigResponse {
-  nonEvmRedemptionSig?: {
-    id: string;
-    signature: string;
+  nonEvmRedemptionSig: {
+    id: string | null | undefined;
+    signature: string | null | undefined;
+    recoveryId: number | null | undefined;
   } | null;
 }

@@ -10,8 +10,8 @@ import H5AssetsCard, {
 } from '@/components/DataTableComplex/H5AssetsCard';
 import TablePagination from '@/components/DataTableComplex/TablePagination';
 import { TokenIcon } from '@/components/TokenIcon';
-import { useDialog } from '@/hooks/useDialog';
-import { getCurItem, upperCaseFirst } from '@/lib/utils';
+import { formatTokenBalanceWithDecimals } from '@/lib/token-balance';
+import { getCurItem } from '@/lib/utils';
 import {
   ColumnDef,
   getCoreRowModel,
@@ -19,6 +19,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import cn from 'classnames';
+import BigNumber from 'bignumber.js';
 
 export enum RedemptionState {
   Pending = 'pending',
@@ -37,6 +38,7 @@ export interface Redemption {
   // raw fields for claim
   withdrawRequestHash?: string;
   share?: string;
+  nav?: number;
 }
 
 interface RedemptionTableProps {
@@ -54,8 +56,6 @@ export function RedemptionTable({
   onPaginationChange,
   pageCount,
 }: RedemptionTableProps) {
-  const { openDialog } = useDialog();
-
   const columns: ColumnDef<Redemption>[] = [
     {
       accessorKey: 'pool',
@@ -71,7 +71,7 @@ export function RedemptionTable({
               {row.getValue('pool')}
             </div>
 
-            <div className='mt-1 hidden font-MatterSQ-Regular text-[.875rem] leading-4 md:flex'>
+            <div className='mt-1 hidden font-MatterSQ-Regular text-[.875rem] capitalize leading-4 md:flex'>
               <span
                 className={cn(
                   row.original.state == RedemptionState.Pending
@@ -81,7 +81,7 @@ export function RedemptionTable({
               >
                 {row.original.state === RedemptionState.Signed
                   ? 'Ready to claim'
-                  : upperCaseFirst(row.original.state || '')}
+                  : row.original.state}
               </span>
             </div>
           </div>
@@ -97,7 +97,7 @@ export function RedemptionTable({
       },
       cell: ({ row }) => {
         return (
-          <div className='mt-1 font-MatterSQ-Regular text-[.875rem] leading-4'>
+          <div className='mt-1 font-MatterSQ-Regular text-[.875rem] capitalize leading-4'>
             <span
               className={cn(
                 row.original.state == RedemptionState.Pending
@@ -107,7 +107,7 @@ export function RedemptionTable({
             >
               {row.original.state === RedemptionState.Signed
                 ? 'Ready to claim'
-                : upperCaseFirst(row.original.state || '')}
+                : row.original.state}
             </span>
           </div>
         );
@@ -141,12 +141,8 @@ export function RedemptionTable({
         align: 'right',
       },
       cell: ({ row }) => {
-        const amount = parseFloat(row.getValue('withdrawAmount'));
-        const formatted = new Intl.NumberFormat('en-US', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 6,
-        }).format(amount);
-
+        const amount = row.original.share || '0';
+        const formatted = formatTokenBalanceWithDecimals(new BigNumber(amount).dividedBy(new BigNumber(10).pow(8)).toString());
         return (
           <div className='text-[.875rem] leading-4 text-textColor'>
             {formatted}
@@ -163,6 +159,7 @@ export function RedemptionTable({
       },
       cell: ({ row }) => {
         const value = Number(row.getValue('valueUsd')) || 0;
+        const withdrawAmount = Number(row.getValue('withdrawAmount')) || 0;
         const formatted = new Intl.NumberFormat('en-US', {
           style: 'currency',
           currency: 'USD',
@@ -170,7 +167,7 @@ export function RedemptionTable({
 
         return (
           <div className='flex flex-row items-end text-[.875rem] leading-4 md:flex-col'>
-            <span className='text-textColor'>{formatted} SolvBTC</span>
+            <span className='text-textColor'>{formatTokenBalanceWithDecimals(new BigNumber(withdrawAmount).dividedBy(new BigNumber(10).pow(8)).toString())} SolvBTC</span>
             <span className='ml-1 mt-0 text-[10px] text-textColor-secondary md:ml-0 md:mt-1 md:text-[.875rem]'>
               {formatted}
             </span>
@@ -193,6 +190,7 @@ export function RedemptionTable({
             redemptionId={row.original.id}
             withdrawRequestHash={row.original.withdrawRequestHash}
             share={row.original.share}
+            navNumber={row.original.nav}
           />
         );
       },

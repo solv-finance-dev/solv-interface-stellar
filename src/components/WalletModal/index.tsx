@@ -59,6 +59,7 @@ export function WalletModal({ open, onOpenChange }: WalletModalProps) {
       setConnectingWalletId(null);
     }
     onOpenChange(newOpen);
+    setIsCheckedTerms(false);
   };
 
   return (
